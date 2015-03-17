@@ -1,7 +1,7 @@
 A build stack helper.
 
-EXAMPLE
--------
+
+**EXAMPLE**
 
 Pick a random project on github:
 
@@ -13,8 +13,8 @@ Use code to poke it:
 
 The build stack will be detected and invoked properly to reach well-known targets.
 
-INSTALLATION
-------------
+
+**INSTALLATION**
 
 	$ pip install -i https://pypi.fclaerhout.fr/simple/ code
 
@@ -23,7 +23,7 @@ or, if that repository is not available:
 	$ git clone $this
 	$ python setup.py install
 
-DEVELOPMENT
------------
+
+**DEVELOPMENT**
 
 	$ python setup.py develop
