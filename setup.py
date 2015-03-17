@@ -8,9 +8,10 @@ setuptools.setup(
 	version = "1.0.0",
 	license = "MIT",
 	test_suite = "test",
+	py_modules = ["code"],
 	description = "build stack helper",
 	author_email = "contact@fclaerhout.fr",
-	entry_points = {"console_scripts": ["code=main:main"]},
+	entry_points = {"console_scripts": ["code=code:main"]},
 	tests_require = ["docopt"],
 	install_requires = ["docopt"],
 )
