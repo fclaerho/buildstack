@@ -11,5 +11,6 @@ setuptools.setup(
 	description = "build stack helper",
 	author_email = "contact@fclaerhout.fr",
 	entry_points = {"console_scripts": ["code=code:main"]},
+	tests_require = ["docopt"],
 	install_requires = ["docopt"],
 )
