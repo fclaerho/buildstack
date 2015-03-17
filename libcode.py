@@ -156,7 +156,7 @@ class SetupTools(BuildStack):
 		if all:
 			args += ["--all"]
 		self._setup(*args)
-		subprocess.check_call(["rm", "-vrf", "_env"] + glob.glob("*.egg-info"))
+		subprocess.check_call(["rm", "-vrf", "_env"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 
 	def test(self): self._setup("test")
 
