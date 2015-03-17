@@ -1,5 +1,9 @@
 A build stack helper.
 
+Supported build stacks:
+  - make
+  - python setuptools, pip, twine
+
 
 **EXAMPLE**
 
