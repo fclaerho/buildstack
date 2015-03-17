@@ -2,7 +2,7 @@
 
 import unittest, tempfile
 
-import code # 3rd-party
+import libcode # 3rd-party
 
 class Test(unittest.TestCase):
 
