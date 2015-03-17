@@ -1,4 +1,6 @@
-A build stack helper.
+Build stack helper.
+
+"Code" detects the project build stack and drives it to reach well-known targets
 
 Supported build stacks:
   - make
@@ -14,8 +16,6 @@ Pick a random project on github:
 Use code to poke it:
 
 	$ code clean test
-
-The build stack will be detected and invoked properly to reach well-known targets.
 
 
 **INSTALLATION**

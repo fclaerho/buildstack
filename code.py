@@ -9,7 +9,7 @@ Usage:
   code --help
 
 Options:
-  -r <name>, --repository <name>  with publish, set repository name
+  -r <name>, --repository <name>  with publish, select publication repository
   -f <path>, --manifest <path>    set build manifest
   -u, --uninstall                 with develop and install, uninstall
   -v, --version                   show version
@@ -18,13 +18,13 @@ Options:
 
 "Code" detects the project build stack and drives it to reach well-known targets:
   * get: install dependency in a virtual environment
-  * clean: delete objects generated during the build
+  * clean [-a]: delete objects generated during the build
   * test: run unit tests
   * compile: compile code, for non-interpreted languages
   * package: package code
-  * develop: install locally in development mode -- i.e. use the current location
-  * install: install locally
-  * publish: publish package into a specified repository
+  * develop [-u]: install locally in development mode -- i.e. use current directory
+  * install [-u]: install locally
+  * publish [-r]: publish package into a specified repository
 """
 
 import pkg_resources, subprocess, glob, abc, os
@@ -96,7 +96,7 @@ class Make(BuildStack):
 			raise ManifestError
 		super(Make, self).__init__(manifest_path)
 		try:
-			self._make("--dry-run")
+			self._make("--dry-run") # check manifest
 		except:
 			raise ManifestError
 
