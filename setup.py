@@ -5,7 +5,7 @@ import setuptools
 setuptools.setup(
 	name = "code",
 	author = "fclaerhout.fr",
-	version = "1.0.0rc2",
+	version = "1.0.0",
 	license = "MIT",
 	test_suite = "test",
 	description = "build stack helper",
