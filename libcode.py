@@ -232,7 +232,10 @@ def get_build_stack(manifest_path = None):
 	raise BuildError("failed to detect build stack")
 
 def main(*argv):
-	opts = docopt.docopt(__doc__, argv = argv, version = pkg_resources.require("code")[0].version)
+	opts = docopt.docopt(
+		__doc__,
+		argv = argv or sys.argv[1:],
+		version = pkg_resources.require("code")[0].version)
 	try:
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
