@@ -11,7 +11,7 @@ class Test(unittest.TestCase):
 		dirname = tempfile.mkdtemp()
 		with open(os.path.join(dirname, "Makefile"), "w") as f:
 			f.write("all: ; touch %s/success" % dirname)
-		libcode.main("code", "-C", dirname, "compile")
+		libcode.main("-C", dirname, "compile")
 		self.assertTrue(os.path.exists(os.path.join(dirname, "success")))
 		shutil.rmtree(dirname)
 
