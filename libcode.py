@@ -134,7 +134,7 @@ class Make(BuildStack):
 			elif target == Target("compile"):
 				args.append("all")
 			elif target == Target("package"):
-				args.append("dist"):
+				args.append("dist")
 			elif target == Target("install"):
 				args.append("install")
 			elif target == Target("install", uninstall = True):
@@ -230,8 +230,8 @@ def get_build_stack(manifest_path = None):
 			continue
 	raise BuildError("failed to detect build stack")
 
-def main():
-	opts = docopt.docopt(__doc__, version = pkg_resources.require("code")[0].version)
+def main(*argv):
+	opts = docopt.docopt(__doc__, argv = argv, version = pkg_resources.require("code")[0].version)
 	try:
 		manifest_path = opts["--manifest"] or None
 		bs = get_build_stack(manifest_path)
