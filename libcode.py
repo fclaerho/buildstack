@@ -197,7 +197,7 @@ class SetupTools(BuildStack):
 				args = []
 				# do uninstall:
 				self._pip("uninstall", os.path.basename(os.getcwd()))
-			elif target == Target("publish"):
+			elif target.name == "publish":
 				# build everything up to this point:
 				self._setup(*args)
 				# reset args:

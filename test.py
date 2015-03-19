@@ -9,7 +9,7 @@ class Test(unittest.TestCase):
 	def test(self):
 		# generate a Makefile, check it's detected and run
 		dirname = tempfile.mkdtemp()
-		with open(os.path.join(dirname, "Makefile")) as f:
+		with open(os.path.join(dirname, "Makefile"), "w") as f:
 			f.write("all: ; touch %s/success" % dirname)
 		libcode.main("code", "-C", dirname, "compile")
 		self.assertTrue(os.path.exists(os.path.join(dirname, "success")))
