@@ -10,6 +10,7 @@ Usage:
 
 Options:
   -r <name>, --repository <name>  with publish, select upload repository
+  -C <path>, --directory <path>   set working directory
   -f <path>, --manifest <path>    set build manifest
   -u, --uninstall                 with develop and install, uninstall
   -v, --version                   show version
@@ -182,7 +183,7 @@ class SetupTools(BuildStack):
 			elif target == Target("compile"):
 				args.append("build")
 			elif target == Target("package"):
-				args.append("sdist"):
+				args.append("sdist")
 			elif target == Target("develop"):
 				args.append("develop")
 			elif target == Target("develop", uninstall = True):
@@ -233,6 +234,8 @@ def get_build_stack(manifest_path = None):
 def main(*argv):
 	opts = docopt.docopt(__doc__, argv = argv, version = pkg_resources.require("code")[0].version)
 	try:
+		if opts["--directory"]:
+			os.chdir(opts["--directory"])
 		manifest_path = opts["--manifest"] or None
 		bs = get_build_stack(manifest_path)
 		if opts["get"]:
