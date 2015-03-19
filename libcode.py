@@ -9,7 +9,7 @@ Usage:
   code --help
 
 Options:
-  -r <name>, --repository <name>  with publish, select publication repository
+  -r <name>, --repository <name>  with publish, select upload repository
   -f <path>, --manifest <path>    set build manifest
   -u, --uninstall                 with develop and install, uninstall
   -v, --version                   show version
@@ -31,9 +31,27 @@ import pkg_resources, subprocess, glob, abc, os
 
 import docopt # 3rd-party
 
+class Target(object):
+
+	def __init__(self, name, **kwargs):
+		self.name = name
+		self.kwargs = kwargs
+
+	def __eq__(self, other):
+		return self.name == other.name and self.kwargs == other.kwargs
+
+	def __getattr__(self, key):
+		try:
+			self.kwargs[key]
+		except KeyError:
+			raise AttributeError(key)
+
 class ManifestError(Exception): pass
 
-class BuildError(Exception): pass
+class BuildError(Exception):
+
+	def __str__(self):
+		return "build error: %s" % (self.args,)
 
 class BuildStack(object):
 
@@ -45,87 +63,86 @@ class BuildStack(object):
 		elif not os.path.exists(manifest_path):
 			raise ManifestError("%s: no such file" % manifest_path)
 		self.manifest_path = manifest_path
+		self.targets = []
 
 	@abc.abstractmethod
 	def get(self, packageid):
-		raise NotImplementedError("cannot get package")
+		raise NotImplementedError()
 
-	@abc.abstractmethod
 	def clean(self, all = False):
-		raise NotImplementedError("cannot clean")
+		self.targets.append(Target("clean", all = all))
 
-	@abc.abstractmethod
 	def test(self):
-		raise NotImplementedError("cannot test")
+		self.targets.append(Target("test"))
 
-	@abc.abstractmethod
 	def compile(self):
-		raise NotImplementedError("cannot compile")
+		self.targets.append(Target("compile"))
 
-	@abc.abstractmethod
 	def package(self):
-		raise NotImplementedError("cannot package")
+		self.targets.append(Target("package"))
 
-	@abc.abstractmethod
 	def develop(self, uninstall = False):
-		raise NotImplementedError("cannot develop")
+		self.targets.append(Target("develop", uninstall = uninstall))
 
-	@abc.abstractmethod
 	def install(self, uninstall = False):
-		raise NotImplementedError("cannot install")
+		self.targets.append(Target("install", uninstall = uninstall))
+
+	def publish(self, name = None):
+		self.targets.append(Target("publish", name = name))
 
 	@abc.abstractmethod
-	def publish(self, name = None):
-		raise NotImplementedError("cannot publish")
+	def build(self):
+		raise NotImplementedError()
 
 #########################
 # concrete build stacks #
 #########################
 
-class Make(BuildStack):
+class TargetError(BuildError):
 
-	def _make(self, *args):
-		subprocess.check_call(("make", "-f", self.manifest_path) + args)
+	def __init__(self, target):
+		super(TargetError, self).__init__("%s: unexpected target" % target.name)
+
+class Make(BuildStack):
 
 	def __init__(self, manifest_path = None):
 		if not manifest_path:
 			for basename in ("Makefile", "makefile"):
 				if os.path.exists(basename):
 					manifest_path = basename
-		else:
-			raise ManifestError
+		# FIXME: check this is a Makefile, raise ManifestError otherwise
 		super(Make, self).__init__(manifest_path)
-		try:
-			self._make("--dry-run") # check manifest
-		except:
-			raise ManifestError
 
 	def get(self, packageid):
-		raise BuildError("%s: make stack has no package manager" % packageid)
+		raise BuildError("make stack has no package manager")
 
-	def clean(self, all = False):
-		if all:
-			self._make("distclean")
-		else:
-			self._make("clean")
-
-	def test(self): self._make("check")
-
-	def compile(self): self._make("all")
-
-	def package(self): self._make("dist")
-
-	def develop(self, uninstall = False):
+	def develop(self, *argv, **kwargs):
 		raise BuildError("make stack has no develop mode")
 
-	def install(self, uninstall = False):
-		if uninstall:
-			self._make("uninstall")
-		else:
-			self._make("install")
-
-	def publish(self, name = None):
+	def publish(self, *argv, **kwargs):
 		raise BuildError("make stack has no publication manager")
+
+	def build(self):
+		args = []
+		for target in self.targets:
+			if target == Target("clean"):
+				args.append("clean")
+			elif target == Target("clean", all = True):
+				args.append("distclean")
+			elif target == Target("test"):
+				args.append("check")
+			elif target == Target("compile"):
+				args.append("all")
+			elif target == Target("package"):
+				args.append("dist"):
+			elif target == Target("install"):
+				args.append("install")
+			elif target == Target("install", uninstall = True):
+				args.append("uninstall")
+			else:
+				raise TargetError(target)
+		if args:
+			subprocess.check_call(["make", "-f", self.manifest_path] + args)
 
 class SetupTools(BuildStack):
 
@@ -135,6 +152,7 @@ class SetupTools(BuildStack):
 		if not manifest_path:
 			if os.path.exists("setup.py"):
 				manifest_path = "setup.py"
+		# FIXME: check this is a setuptools manifest, raise ManifestError otherwise
 		super(SetupTools, self).__init__(manifest_path)
 
 	def _pip(self, *args):
@@ -151,42 +169,58 @@ class SetupTools(BuildStack):
 
 	def get(self, packageid): self._pip("install", packageid)
 
-	def clean(self, all = False):
-		args = ["clean"]
-		if all:
-			args += ["--all"]
-		self._setup(*args)
-		subprocess.check_call(["rm", "-vrf", "_env"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
+	def build(self):
+		args = []
+		for target in self.targets:
+			if target == Target("clean"):
+				args.append("clean")
+			elif target == Target("clean", all = True):
+				args += ["clean", "--all"]
+				subprocess.check_call(["rm", "-vrf", "_env"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
+			elif target == Target("test"):
+				args.append("test")
+			elif target == Target("compile"):
+				args.append("build")
+			elif target == Target("package"):
+				args.append("sdist"):
+			elif target == Target("develop"):
+				args.append("develop")
+			elif target == Target("develop", uninstall = True):
+				args += ["develop",  "--uninstall"]
+			elif target == Target("install"):
+				args.append("install")
+			elif target == Target("install", uninstall = True):
+				# build everything up to this point:
+				self._setup(*args)
+				# reset args:
+				args = []
+				# do uninstall:
+				self._pip("uninstall", os.path.basename(os.getcwd()))
+			elif target == Target("publish"):
+				# build everything up to this point:
+				self._setup(*args)
+				# reset args:
+				args = []
+				# do publish:
+				_args = ["-r", name] if name else []
+				_args += ["upload"] + glob.glob("dist/*")
+				self._twine(*_args)
+			else:
+				raise TargetError(target)
+		if args:
+			self._setup(*args)
 
-	def test(self): self._setup("test")
+class Maven(BuildStack):
 
-	def compile(self):
-		raise NotImplementedError()
-
-	def package(self): self._setup("sdist")
-
-	def develop(self, uninstall = False):
-		if uninstall:
-			self._setup("develop", "--uninstall")
-		else:
-			self._setup("develop")
-
-	def install(self, uninstall = False):
-		if uninstall:
-			self._pip("uninstall", os.path.basename(os.getcwd()))
-		else:
-			self._setup("install")
-
-	def publish(self, name = None):
-		args = ["-r", name] if name else []
-		args += ["upload"] + glob.glob("dist/*")
-		self._twine(*args)
+	def __init__(self, manifest_path = None):
+		if not manifest_path:
+			if os.path.exists("pom.xml"):
+				manifest_path = "pom.xml"
+		super(SetupTools, self).__init__(manifest_path)
 
 ###############
 # entry point #
 ###############
-
-class DetectionError(Exception): pass
 
 def get_build_stack(manifest_path = None):
 	for cls in (Make, SetupTools):
@@ -194,7 +228,7 @@ def get_build_stack(manifest_path = None):
 			return (cls)(manifest_path)
 		except ManifestError:
 			continue
-	raise DetectionError("failed to detect build stack")
+	raise BuildError("failed to detect build stack")
 
 def main():
 	opts = docopt.docopt(__doc__, version = pkg_resources.require("code")[0].version)
@@ -206,15 +240,16 @@ def main():
 		else:
 			for target in opts["<target>"]:
 				{
-					"clean": lambda: bs.clean(opts["--all"]),
-					"test": lambda: bs.test(),
-					"compile": lambda: bs.compile(),
-					"package": lambda: bs.package(),
-					"develop": lambda: bs.develop(opts["--uninstall"]),
-					"install": lambda: bs.install(opts["--uninstall"]),
-					"publish": lambda: bs.publish(opts["--repository"]),
+					"clean": lambda: bs.clean(all = opts["--all"]),
+					"test": bs.test,
+					"compile": bs.compile,
+					"package": bs.package,
+					"develop": lambda: bs.develop(uninstall = opts["--uninstall"]),
+					"install": lambda: bs.install(uninstall = opts["--uninstall"]),
+					"publish": lambda: bs.publish(name = opts["--repository"]),
 				}[target]()
-	except (subprocess.CalledProcessError, DetectionError, BuildError) as exc:
-		raise SystemExit("** fatal error! %s: %s" % (type(exc).__name__, exc))
+			bs.build()
+	except (subprocess.CalledProcessError, BuildError) as exc:
+		raise SystemExit("** fatal error! %s" % exc)
 
 if __name__ == "__main__": main()
