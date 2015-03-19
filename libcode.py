@@ -23,8 +23,8 @@ Options:
   * test: run unit tests
   * compile: compile code, for non-interpreted languages
   * package: package code
-  * develop [-u]: install locally in development mode -- i.e. use current directory
-  * install [-u]: install locally
+  * develop [-u]: install on localhost in development mode
+  * install [-u]: install on localhost
   * publish [-r]: publish package into a specified repository
 """
 

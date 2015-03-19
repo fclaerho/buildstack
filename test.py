@@ -1,6 +1,6 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
-import unittest, tempfile, shutil
+import unittest, tempfile, shutil, os
 
 import libcode # 3rd-party
 
