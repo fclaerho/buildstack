@@ -18,7 +18,7 @@ Options:
   -h, --help                      show help
   -a, --all                       with clean, remove build artifacts
 
-"Code" detects the project build stack and drives it to reach well-known targets:
+"Code" detects and drives the project build stack to reach well-known targets:
   * get: install dependency in a virtual environment
   * clean [-a]: delete objects generated during the build
   * test: run unit tests
@@ -177,8 +177,13 @@ class SetupTools(BuildStack):
 			if target == Target("clean"):
 				args.append("clean")
 			elif target == Target("clean", all = True):
+				# build everything up to this point:
 				args += ["clean", "--all"]
-				subprocess.check_call(["rm", "-vrf", "_env"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
+				self._setup(*args)
+				# reset args:
+				args = []
+				# do deep clean:
+				subprocess.check_call(["rm", "-vrf", "_env", "dist"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 			elif target == Target("test"):
 				args.append("test")
 			elif target == Target("compile"):
