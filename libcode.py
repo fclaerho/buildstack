@@ -6,6 +6,7 @@ Build stack helper.
 Usage:
   code [options] get <packageid>
   code [options] <target>...
+  code --version
   code --help
 
 Options:
@@ -28,7 +29,7 @@ Options:
   * publish [-r]: publish package into a specified repository
 """
 
-import pkg_resources, subprocess, glob, abc, sys, os
+import pkg_resources, subprocess, glob, abc, os
 
 import docopt # 3rd-party
 
@@ -234,7 +235,7 @@ def get_build_stack(manifest_path = None):
 def main(*argv):
 	opts = docopt.docopt(
 		__doc__,
-		argv = argv or sys.argv[1:],
+		argv = argv or None,
 		version = pkg_resources.require("code")[0].version)
 	try:
 		if opts["--directory"]:
