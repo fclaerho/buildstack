@@ -28,7 +28,7 @@ Options:
   * publish [-r]: publish package into a specified repository
 """
 
-import pkg_resources, subprocess, glob, abc, os
+import pkg_resources, subprocess, glob, abc, sys, os
 
 import docopt # 3rd-party
 
