@@ -16,12 +16,15 @@ Options:
   -f <path>, --manifest <path>    set build manifest
   -u, --uninstall                 with develop and install, uninstall
   -v, --version                   show version
+  -P, --no-push                   do not push on commit
   -h, --help                      show help
   -a, --all                       with clean, remove build artifacts
 
 "Code" detects and drives the project build stack to reach well-known targets:
-  * ci: git commit & push
+  * diff: git diff
+  * ci, commit [-P]: git commit & push
   * log: git log
+  * diff: git diff
   * get: install dependency in a virtual environment
   * clean [-a]: delete objects generated during the build
   * test: run unit tests
@@ -73,9 +76,13 @@ class BuildStack(object):
 		self.manifest_path = manifest_path
 		self.targets = []
 
-	def ci(self):
+	def diff(self):
+		subprocess.check_call(("git", "diff"))
+
+	def commit(self, push = True):
 		subprocess.check_call(("git", "commit", "-a"))
-		subprocess.check_call(("git", "push"))
+		if push:
+			subprocess.check_call(("git", "push"))
 
 	def log(self):
 		subprocess.check_call((
@@ -291,8 +298,12 @@ def main(*argv):
 			bs.get(opts["<packageid>"])
 		else:
 			for target in opts["<target>"]:
+				target = {
+					"ci": "commit",
+				}.get(target, target) # expand aliases
 				{
-					"ci": bs.ci,
+					"diff": bs.diff,
+					"commit": lambda: bs.commit(push = not opts["--no-push"]),
 					"log": bs.log,
 					"clean": lambda: bs.clean(all = opts["--all"]),
 					"test": bs.test,
