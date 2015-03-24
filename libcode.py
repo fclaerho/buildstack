@@ -12,6 +12,7 @@ Usage:
 Options:
   -r <name>, --repository <name>  with publish, select upload repository
   -C <path>, --directory <path>   set working directory
+  -i <path>, --inventory <path>   set inventory file
   -f <path>, --manifest <path>    set build manifest
   -u, --uninstall                 with develop and install, uninstall
   -v, --version                   show version
@@ -24,9 +25,9 @@ Options:
   * test: run unit tests
   * compile: compile code, for non-interpreted languages
   * package: package code
-  * develop [-u]: install on localhost in development mode
-  * install [-u]: install on localhost
   * publish [-r]: publish package into a specified repository
+  * develop [-u]: install on localhost in development mode
+  * install [-u,-i]: provision inventory
 """
 
 import pkg_resources, subprocess, glob, abc, os
@@ -39,21 +40,24 @@ class Target(object):
 		self.name = name
 		self.kwargs = kwargs
 
+	def __str__(self):
+		return "%s %s" % (self.name, " ".join("%s=%s" % (k, v) for k, v in self.kwargs.items()))
+
 	def __eq__(self, other):
 		return self.name == other.name and self.kwargs == other.kwargs
 
 	def __getattr__(self, key):
 		try:
-			self.kwargs[key]
+			return self.kwargs[key]
 		except KeyError:
 			raise AttributeError(key)
-
-class ManifestError(Exception): pass
 
 class BuildError(Exception):
 
 	def __str__(self):
-		return "build error: %s" % (self.args,)
+		return "build error: %s" % " ".join(self.args)
+
+class ManifestError(BuildError): pass
 
 class BuildStack(object):
 
@@ -83,14 +87,14 @@ class BuildStack(object):
 	def package(self):
 		self.targets.append(Target("package"))
 
+	def publish(self, repository = None):
+		self.targets.append(Target("publish", repository = repository))
+
 	def develop(self, uninstall = False):
 		self.targets.append(Target("develop", uninstall = uninstall))
 
-	def install(self, uninstall = False):
-		self.targets.append(Target("install", uninstall = uninstall))
-
-	def publish(self, name = None):
-		self.targets.append(Target("publish", name = name))
+	def install(self, inventory = None, uninstall = False):
+		self.targets.append(Target("install", inventory = inventory, uninstall = uninstall))
 
 	@abc.abstractmethod
 	def build(self):
@@ -103,7 +107,7 @@ class BuildStack(object):
 class TargetError(BuildError):
 
 	def __init__(self, target):
-		super(TargetError, self).__init__("%s: unexpected target" % target.name)
+		super(TargetError, self).__init__("%s: unsupported target" % target.name)
 
 class Make(BuildStack):
 
@@ -112,17 +116,12 @@ class Make(BuildStack):
 			for basename in ("Makefile", "makefile"):
 				if os.path.exists(basename):
 					manifest_path = basename
+					break
 		# FIXME: check this is a Makefile, raise ManifestError otherwise
 		super(Make, self).__init__(manifest_path)
 
 	def get(self, packageid):
-		raise BuildError("make stack has no package manager")
-
-	def develop(self, *argv, **kwargs):
-		raise BuildError("make stack has no develop mode")
-
-	def publish(self, *argv, **kwargs):
-		raise BuildError("make stack has no publication manager")
+		raise TargetError("get")
 
 	def build(self):
 		args = []
@@ -137,10 +136,10 @@ class Make(BuildStack):
 				args.append("all")
 			elif target == Target("package"):
 				args.append("dist")
-			elif target == Target("install", uninstall = False):
-				args.append("install")
-			elif target == Target("install", uninstall = True):
-				args.append("uninstall")
+			elif target.name == "install":
+				if target.inventory:
+					raise BuildError("make stack does not support any inventory")
+				args.append("uninstall" if target.uninstall else "install")
 			else:
 				raise TargetError(target)
 		if args:
@@ -148,14 +147,13 @@ class Make(BuildStack):
 
 class SetupTools(BuildStack):
 
-	prefix = ""
-
 	def __init__(self, manifest_path):
 		if not manifest_path:
 			if os.path.exists("setup.py"):
 				manifest_path = "setup.py"
 		# FIXME: check this is a setuptools manifest, raise ManifestError otherwise
 		super(SetupTools, self).__init__(manifest_path)
+		self.prefix = ""
 
 	def _pip(self, *args):
 		if not os.path.exists("env"):
@@ -190,32 +188,59 @@ class SetupTools(BuildStack):
 				args.append("build")
 			elif target == Target("package"):
 				args.append("sdist")
-			elif target == Target("develop", uninstall = False):
-				args.append("develop")
-			elif target == Target("develop", uninstall = True):
-				args += ["develop",  "--uninstall"]
-			elif target == Target("install", uninstall = False):
-				args.append("install")
-			elif target == Target("install", uninstall = True):
-				# build everything up to this point:
-				self._setup(*args)
-				# reset args:
-				args = []
-				# do uninstall:
-				self._pip("uninstall", os.path.basename(os.getcwd()))
 			elif target.name == "publish":
 				# build everything up to this point:
 				self._setup(*args)
 				# reset args:
 				args = []
 				# do publish:
-				_args = ["-r", name] if name else []
+				_args = ["-r", target.repository] if target.repository else []
 				_args += ["upload"] + glob.glob("dist/*")
 				self._twine(*_args)
+			elif target == Target("develop", uninstall = False):
+				args.append("develop")
+			elif target == Target("develop", uninstall = True):
+				args += ["develop",  "--uninstall"]
+			elif target.name == "install":
+				if target.inventory:
+					raise BuildError("setuptools does not support any inventory")
+				if target.uninstall:
+					# build everything up to this point:
+					self._setup(*args)
+					# reset args:
+					args = []
+					# do uninstall:
+					self._pip("uninstall", os.path.basename(os.getcwd()))
+				else:
+					args.append("install")
 			else:
 				raise TargetError(target)
 		if args:
 			self._setup(*args)
+
+class Ansible(BuildStack):
+
+	def __init__(self, manifest_path = None):
+		if not manifest_path:
+			if os.path.exists("playbook.yml"):
+				manifest_path = "playbook.yml"
+		super(Ansible, self).__init__(manifest_path)
+
+	def get(self, packageid):
+		raise TargetError("get")
+
+	def build(self):
+		args = []
+		for target in self.targets:
+			if target.name == "install" and not target.uninstall:
+				if target.inventory:
+					print "adding inventory"
+					args += ["-i", target.inventory]
+				else:
+					print "no inventory"
+				subprocess.check_call(["ansible-playbook", self.manifest_path] + args)
+			else:
+				raise TargetError(target)
 
 class Maven(BuildStack):
 
@@ -230,7 +255,7 @@ class Maven(BuildStack):
 ###############
 
 def get_build_stack(manifest_path = None):
-	for cls in (Make, SetupTools):
+	for cls in (Make, SetupTools, Ansible):
 		try:
 			return (cls)(manifest_path)
 		except ManifestError:
@@ -256,9 +281,9 @@ def main(*argv):
 					"test": bs.test,
 					"compile": bs.compile,
 					"package": bs.package,
-					"develop": lambda: bs.develop(uninstall = opts["--uninstall"]),
-					"install": lambda: bs.install(uninstall = opts["--uninstall"]),
 					"publish": lambda: bs.publish(name = opts["--repository"]),
+					"develop": lambda: bs.develop(uninstall = opts["--uninstall"]),
+					"install": lambda: bs.install(inventory = opts["--inventory"], uninstall = opts["--uninstall"]),
 				}[target]()
 			bs.build()
 	except (subprocess.CalledProcessError, BuildError) as exc:
