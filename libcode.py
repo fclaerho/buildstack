@@ -127,7 +127,7 @@ class Make(BuildStack):
 	def build(self):
 		args = []
 		for target in self.targets:
-			if target == Target("clean"):
+			if target == Target("clean", all = False):
 				args.append("clean")
 			elif target == Target("clean", all = True):
 				args.append("distclean")
@@ -137,7 +137,7 @@ class Make(BuildStack):
 				args.append("all")
 			elif target == Target("package"):
 				args.append("dist")
-			elif target == Target("install"):
+			elif target == Target("install", uninstall = False):
 				args.append("install")
 			elif target == Target("install", uninstall = True):
 				args.append("uninstall")
@@ -174,7 +174,7 @@ class SetupTools(BuildStack):
 	def build(self):
 		args = []
 		for target in self.targets:
-			if target == Target("clean"):
+			if target == Target("clean", all = False):
 				args.append("clean")
 			elif target == Target("clean", all = True):
 				# build everything up to this point:
@@ -190,11 +190,11 @@ class SetupTools(BuildStack):
 				args.append("build")
 			elif target == Target("package"):
 				args.append("sdist")
-			elif target == Target("develop"):
+			elif target == Target("develop", uninstall = False):
 				args.append("develop")
 			elif target == Target("develop", uninstall = True):
 				args += ["develop",  "--uninstall"]
-			elif target == Target("install"):
+			elif target == Target("install", uninstall = False):
 				args.append("install")
 			elif target == Target("install", uninstall = True):
 				# build everything up to this point:
@@ -223,7 +223,7 @@ class Maven(BuildStack):
 		if not manifest_path:
 			if os.path.exists("pom.xml"):
 				manifest_path = "pom.xml"
-		super(SetupTools, self).__init__(manifest_path)
+		super(Maven, self).__init__(manifest_path)
 
 ###############
 # entry point #
