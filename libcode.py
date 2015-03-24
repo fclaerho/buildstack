@@ -20,6 +20,8 @@ Options:
   -a, --all                       with clean, remove build artifacts
 
 "Code" detects and drives the project build stack to reach well-known targets:
+  * ci: git commit & push
+  * log: git log
   * get: install dependency in a virtual environment
   * clean [-a]: delete objects generated during the build
   * test: run unit tests
@@ -70,6 +72,19 @@ class BuildStack(object):
 			raise ManifestError("%s: no such file" % manifest_path)
 		self.manifest_path = manifest_path
 		self.targets = []
+
+	def ci(self):
+		subprocess.check_call(("git", "commit", "-a"))
+		subprocess.check_call(("git", "push"))
+
+	def log(self):
+		subprocess.check_call((
+			"git",
+			"log",
+			"--color",
+			"--graph",
+			"--pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'",
+			"--abbrev-commit"))
 
 	@abc.abstractmethod
 	def get(self, packageid):
@@ -277,6 +292,8 @@ def main(*argv):
 		else:
 			for target in opts["<target>"]:
 				{
+					"ci": bs.ci,
+					"log": bs.log,
 					"clean": lambda: bs.clean(all = opts["--all"]),
 					"test": bs.test,
 					"compile": bs.compile,
