@@ -203,7 +203,7 @@ class SetupTools(BuildStack):
 				# reset args:
 				args = []
 				# do deep clean:
-				subprocess.check_call(["rm", "-vrf", "_env", "dist"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
+				subprocess.check_call(["rm", "-vrf", "_env", "dist", ".eggs"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 			elif target == Target("test"):
 				args.append("test")
 			elif target == Target("compile"):
