@@ -35,6 +35,8 @@ Options:
   * install [-u,-i]: provision inventory
 """
 
+# TODO: http://en.wikipedia.org/wiki/List_of_build_automation_software
+
 import pkg_resources, subprocess, glob, abc, os
 
 import docopt # 3rd-party
