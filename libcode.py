@@ -72,7 +72,7 @@ class BuildStack(object):
 
 	def __init__(self, manifest_path):
 		if not manifest_path:
-			raise ManifestError("failed to detect manifest")
+			raise ManifestError("missing manifest")
 		elif not os.path.exists(manifest_path):
 			raise ManifestError("%s: no such file" % manifest_path)
 		self.manifest_path = manifest_path
@@ -135,15 +135,6 @@ class TargetError(BuildError):
 
 class Make(BuildStack):
 
-	def __init__(self, manifest_path = None):
-		if not manifest_path:
-			for basename in ("Makefile", "makefile"):
-				if os.path.exists(basename):
-					manifest_path = basename
-					break
-		# FIXME: check this is a Makefile, raise ManifestError otherwise
-		super(Make, self).__init__(manifest_path)
-
 	def get(self, packageid):
 		raise TargetError("get")
 
@@ -161,8 +152,6 @@ class Make(BuildStack):
 			elif target == Target("package"):
 				args.append("dist")
 			elif target.name == "install":
-				if target.inventory:
-					raise BuildError("make stack does not support any inventory")
 				args.append("uninstall" if target.uninstall else "install")
 			else:
 				raise TargetError(target)
@@ -171,25 +160,22 @@ class Make(BuildStack):
 
 class SetupTools(BuildStack):
 
-	def __init__(self, manifest_path):
-		if not manifest_path:
-			if os.path.exists("setup.py"):
-				manifest_path = "setup.py"
-		# FIXME: check this is a setuptools manifest, raise ManifestError otherwise
-		super(SetupTools, self).__init__(manifest_path)
-		self.prefix = ""
+	prefix = None
+
+	def _get_path(self, basename):
+		return os.path.join(filter(None, (self.prefix, name)))
 
 	def _pip(self, *args):
 		if not os.path.exists("env"):
 			subprocess.check_call(("virtualenv", "_env"))
 			self.prefix = "_env/bin"
-		subprocess.check_call(("_env/bin/pip",) + args)
+		subprocess.check_call((self._get_path("pip"),) + args)
 
 	def _setup(self, *args):
-		subprocess.check_call((os.path.join(self.prefix, "python"), self.manifest_path) + args)
+		subprocess.check_call((self._get_path("python"), self.manifest_path) + args)
 
 	def _twine(self, *args):
-		subprocess.check_call((os.path.join(self.prefix, "twine"),) + args)
+		subprocess.check_call((self._get_path("twine"),) + args)
 
 	def get(self, packageid): self._pip("install", packageid)
 
@@ -226,8 +212,6 @@ class SetupTools(BuildStack):
 			elif target == Target("develop", uninstall = True):
 				args += ["develop",  "--uninstall"]
 			elif target.name == "install":
-				if target.inventory:
-					raise BuildError("setuptools does not support any inventory")
 				if target.uninstall:
 					# build everything up to this point:
 					self._setup(*args)
@@ -244,12 +228,6 @@ class SetupTools(BuildStack):
 
 class Ansible(BuildStack):
 
-	def __init__(self, manifest_path = None):
-		if not manifest_path:
-			if os.path.exists("playbook.yml"):
-				manifest_path = "playbook.yml"
-		super(Ansible, self).__init__(manifest_path)
-
 	def get(self, packageid):
 		raise TargetError("get")
 
@@ -258,32 +236,28 @@ class Ansible(BuildStack):
 		for target in self.targets:
 			if target.name == "install" and not target.uninstall:
 				if target.inventory:
-					print "adding inventory"
 					args += ["-i", target.inventory]
-				else:
-					print "no inventory"
 				subprocess.check_call(["ansible-playbook", self.manifest_path] + args)
 			else:
 				raise TargetError(target)
-
-class Maven(BuildStack):
-
-	def __init__(self, manifest_path = None):
-		if not manifest_path:
-			if os.path.exists("pom.xml"):
-				manifest_path = "pom.xml"
-		super(Maven, self).__init__(manifest_path)
 
 ###############
 # entry point #
 ###############
 
 def get_build_stack(manifest_path = None):
-	for cls in (Make, SetupTools, Ansible):
-		try:
-			return (cls)(manifest_path)
-		except ManifestError:
-			continue
+	map = {
+		"Makefile": Make,
+		"makefile": Make,
+		"setup.py": SetupTools,
+		"playbook.yml": Ansible,
+	}
+	if not manifest_path:
+		for basename in map:
+			if os.path.exists(basename):
+				return map[basename](basename)
+	else:
+		return map[os.path.basename(manifest_path)](manifest_path)
 	raise BuildError("failed to detect build stack")
 
 def main(*argv):
