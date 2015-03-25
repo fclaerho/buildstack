@@ -42,11 +42,11 @@ class VCS(object):
 
 	__metaclass__ = abc.ABCMeta
 
-	@abc.abstractmethod()
+	@abc.abstractmethod
 	def log(self):
 		raise NotImplementedError()
 
-	@abc.abstractmethod()
+	@abc.abstractmethod
 	def commit(self, push = True):
 		raise NotImplementedError()
 
