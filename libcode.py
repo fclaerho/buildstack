@@ -170,7 +170,10 @@ class SetupTools(BuildStack):
 	prefix = None
 
 	def _get_path(self, basename):
-		return os.path.join(filter(None, (self.prefix, basename)))
+		if self.prefix:
+			return os.path.join(self.prefix, basename)
+		else:
+			return basename
 
 	def _pip(self, *args):
 		if not os.path.exists("env"):
