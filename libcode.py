@@ -6,7 +6,6 @@ Build stack helper.
 Usage:
   code [options] get <packageid>
   code [options] <target>...
-  code [options] (commit|log)
   code --version
   code --help
 
@@ -171,7 +170,7 @@ class SetupTools(BuildStack):
 	prefix = None
 
 	def _get_path(self, basename):
-		return os.path.join(filter(None, (self.prefix, name)))
+		return os.path.join(filter(None, (self.prefix, basename)))
 
 	def _pip(self, *args):
 		if not os.path.exists("env"):
@@ -279,15 +278,13 @@ def main(*argv):
 		manifest_path = opts["--manifest"] or None
 		vcs = Git()
 		bs = get_build_stack(manifest_path)
-		if opts["commit"]:
-			vcs.commit()
-		elif opts["log"]:
-			vcs.log()
-		elif opts["get"]:
+		if opts["get"]:
 			bs.get(opts["<packageid>"])
 		else:
 			for target in opts["<target>"]:
 				{
+					"log": vcs.log,
+					"commit": vcs.commit,
 					"clean": lambda: bs.clean(all = opts["--all"]),
 					"test": bs.test,
 					"compile": bs.compile,
