@@ -6,6 +6,7 @@ Build stack helper.
 Usage:
   code [options] get <packageid>
   code [options] <target>...
+  code [options] (commit|log)
   code --version
   code --help
 
@@ -16,15 +17,10 @@ Options:
   -f <path>, --manifest <path>    set build manifest
   -u, --uninstall                 with develop and install, uninstall
   -v, --version                   show version
-  -P, --no-push                   do not push on commit
   -h, --help                      show help
   -a, --all                       with clean, remove build artifacts
 
 "Code" detects and drives the project build stack to reach well-known targets:
-  * diff: git diff
-  * ci, commit [-P]: git commit & push
-  * log: git log
-  * diff: git diff
   * get: install dependency in a virtual environment
   * clean [-a]: delete objects generated during the build
   * test: run unit tests
@@ -40,6 +36,19 @@ Options:
 import pkg_resources, subprocess, glob, abc, os
 
 import docopt # 3rd-party
+
+class VCS(object):
+	"version control system interface"
+
+	__metaclass__ = abc.ABCMeta
+
+	@abc.abstractmethod()
+	def log(self):
+		raise NotImplementedError()
+
+	@abc.abstractmethod()
+	def commit(self, push = True):
+		raise NotImplementedError()
 
 class Target(object):
 
@@ -67,6 +76,7 @@ class BuildError(Exception):
 class ManifestError(BuildError): pass
 
 class BuildStack(object):
+	"build stack interface"
 
 	__metaclass__ = abc.ABCMeta
 
@@ -77,23 +87,6 @@ class BuildStack(object):
 			raise ManifestError("%s: no such file" % manifest_path)
 		self.manifest_path = manifest_path
 		self.targets = []
-
-	def diff(self):
-		subprocess.check_call(("git", "diff"))
-
-	def commit(self, push = True):
-		subprocess.check_call(("git", "commit", "-a"))
-		if push:
-			subprocess.check_call(("git", "push"))
-
-	def log(self):
-		subprocess.check_call((
-			"git",
-			"log",
-			"--color",
-			"--graph",
-			"--pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'",
-			"--abbrev-commit"))
 
 	@abc.abstractmethod
 	def get(self, packageid):
@@ -127,6 +120,21 @@ class BuildStack(object):
 #########################
 # concrete build stacks #
 #########################
+
+class Git(VCS):
+
+	def log(self):
+		subprocess.check_call((
+			"git",
+			"log",
+			"--color",
+			"--graph",
+			"--pretty=format:%Cred%h%Creset: %C(yellow)%d%Creset %s %Cgreen — %an %cr%Creset",
+			"--abbrev-commit"))
+
+	def commit(self):
+		subprocess.check_call(("git", "commit", "-a"))
+		subprocess.check_call(("git", "push"))
 
 class TargetError(BuildError):
 
@@ -269,18 +277,17 @@ def main(*argv):
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
 		manifest_path = opts["--manifest"] or None
+		vcs = Git()
 		bs = get_build_stack(manifest_path)
-		if opts["get"]:
+		if opts["commit"]:
+			vcs.commit()
+		elif opts["log"]:
+			vcs.log()
+		elif opts["get"]:
 			bs.get(opts["<packageid>"])
 		else:
 			for target in opts["<target>"]:
-				target = {
-					"ci": "commit",
-				}.get(target, target) # expand aliases
 				{
-					"diff": bs.diff,
-					"commit": lambda: bs.commit(push = not opts["--no-push"]),
-					"log": bs.log,
 					"clean": lambda: bs.clean(all = opts["--all"]),
 					"test": bs.test,
 					"compile": bs.compile,
