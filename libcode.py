@@ -128,7 +128,7 @@ class Git(VCS):
 			"log",
 			"--color",
 			"--graph",
-			"--pretty=format:%Cred%h%Creset: %C(yellow)%d%Creset %s %Cgreen - %an %cr%Creset",
+			"--pretty=format:%Cred%h%Creset:%C(yellow)%d%Creset %s %Cgreen- %an, %cr%Creset",
 			"--abbrev-commit"))
 
 	def commit(self):
