@@ -159,7 +159,7 @@ class Make(BuildStack):
 		raise TargetError("make has no package management feature")
 
 	def _make(self, *args):
-		argv = ["make", "-f", self.manifest_path] + args
+		argv = ["make", "-f", self.manifest_path] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
 		subprocess.check_call(argv)
