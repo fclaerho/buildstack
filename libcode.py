@@ -278,19 +278,16 @@ class Ansible(BuildStack):
 # entry point #
 ###############
 
-def get_build_stack(manifest_path = None, username = None):
+def get_build_stack(username = None):
 	map = {
 		"Makefile": Make,
 		"makefile": Make,
 		"setup.py": SetupTools,
 		"playbook.yml": Ansible,
 	}
-	if not manifest_path:
-		for basename in map:
-			if os.path.exists(basename):
-				return map[basename](basename, username = username)
-	else:
-		return map[os.path.basename(manifest_path)](manifest_path, username = username)
+	for basename in map:
+		if os.path.exists(basename):
+			return map[basename](basename, username = username)
 	raise BuildError("failed to detect build stack")
 
 def main(*argv):
@@ -301,7 +298,6 @@ def main(*argv):
 	try:
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
-		manifest_path = opts["--manifest"] or None
 		vcs = Git()
 		if opts["--makefile"]:
 			bs = Make(opts["--makefile"], username = opts["--user"])
@@ -310,7 +306,7 @@ def main(*argv):
 		elif opts["--ansible"]:
 			bs = Ansible(opts["--ansible"], username = opts["--user"])
 		else:
-			bs = get_build_stack(manifest_path, username = opts["--user"])
+			bs = get_build_stack(username = opts["--user"])
 		if opts["get"]:
 			bs.get(opts["<packageid>"])
 		else:
