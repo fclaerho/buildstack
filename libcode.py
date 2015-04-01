@@ -10,25 +10,26 @@ Usage:
   code --help
 
 Options:
-  -r <name>, --repository <name>  with publish, select upload repository
-  -C <path>, --directory <path>   set working directory
-  -i <path>, --inventory <path>   set inventory file
-  -S <path>, --setuptools <path>  force setup tools as build stack
-  -M <path>, --makefile <path>    force make as build stack
-  -A <path>, --ansible <path>     force ansible as build stack
-  -u <name>, --user <user>        set execution uid
-  -U, --uninstall                 undo develop or install
-  -v, --version                   show version
-  -h, --help                      show help
-  -a, --all                       with clean, remove build artifacts
+  -C <path>, --directory <path>  set working directory
+  -r <id>, --repository <id>     with get & publish: select repository
+  -i <id>, --inventory <id>      with install: select inventory
+  -u <name>, --user <name>       build on behalf of the specified user
+  --setupscript <path>           force python setup tools as build stack
+  --makefile <path>              force make as build stack
+  --playbook <path>              force ansible as build stack
+  -U, --uninstall                with develop & install: undo
+  -v, --version                  show version
+  --pom <path>                   force maven as build stack
+  -h, --help                     show help
+  -a, --all                      with clean: remove build artifacts
 
 "Code" detects and drives the project build stack to reach well-known targets:
-  * get: install dependency in a virtual environment
+  * get [-r]: install dependency from a repository -- use a VE if possible
   * clean [-a]: delete objects generated during the build
   * test: run unit tests
   * compile: compile code, for non-interpreted languages
   * package: package code
-  * publish [-r]: publish package into a specified repository
+  * publish [-r]: publish package to a repository
   * develop [-U]: [un]install locally in development mode
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
@@ -81,8 +82,6 @@ class BuildError(Exception):
 	def __str__(self):
 		return "build error: %s" % " ".join(self.args)
 
-class ManifestError(BuildError): pass
-
 class BuildStack(object):
 	"build stack interface"
 
@@ -90,15 +89,15 @@ class BuildStack(object):
 
 	def __init__(self, manifest_path, username = None):
 		if not manifest_path:
-			raise ManifestError("missing manifest")
+			raise BuildError("missing manifest")
 		elif not os.path.exists(manifest_path):
-			raise ManifestError("%s: no such file" % manifest_path)
+			raise BuildError("%s: no such file" % manifest_path)
 		self.manifest_path = manifest_path
 		self.username = username
 		self.targets = []
 
 	@abc.abstractmethod
-	def get(self, packageid):
+	def get(self, packageid, repositoryid = None):
 		raise NotImplementedError()
 
 	def clean(self, all = False):
@@ -113,14 +112,14 @@ class BuildStack(object):
 	def package(self):
 		self.targets.append(Target("package"))
 
-	def publish(self, repository = None):
-		self.targets.append(Target("publish", repository = repository))
+	def publish(self, repositoryid = None):
+		self.targets.append(Target("publish", repositoryid = repositoryid))
 
 	def develop(self, uninstall = False):
 		self.targets.append(Target("develop", uninstall = uninstall))
 
-	def install(self, inventory = None, uninstall = False):
-		self.targets.append(Target("install", inventory = inventory, uninstall = uninstall))
+	def install(self, inventoryid = None, uninstall = False):
+		self.targets.append(Target("install", inventoryid = inventoryid, uninstall = uninstall))
 
 	@abc.abstractmethod
 	def build(self):
@@ -215,7 +214,11 @@ class SetupTools(BuildStack):
 			argv = ["sudo", "-u", self.username] + argv
 		subprocess.check_call(argv)
 
-	def get(self, packageid): self._pip("install", packageid)
+	def get(self, packageid, repositoryid = None):
+		argv = ["install", packageid]
+		if repositoryid:
+			argv += ["-i", repositoryid]
+		self._pip(*argv)
 
 	def build(self):
 		args = []
@@ -234,56 +237,103 @@ class SetupTools(BuildStack):
 			elif target == Target("package"):
 				args.append("sdist")
 			elif target.name == "publish":
-				self._setup(*args)
+				if args:
+					self._setup(*args)
 				args = []
-				_args = ["-r", target.repository] if target.repository else []
-				_args += ["upload"] + glob.glob("dist/*")
-				self._twine(*_args)
+				argv = ["upload"] + glob.glob("dist/*")
+				if target.repositoryid:
+					argv += ["-r", target.repositoryid]
+				self._twine(*argv)
 			elif target == Target("develop", uninstall = False):
 				args.append("develop")
 			elif target == Target("develop", uninstall = True):
 				args += ["develop",  "--uninstall"]
 			elif target.name == "install":
 				if target.uninstall:
-					self._setup(*args)
+					if args:
+						self._setup(*args)
 					args = []
 					self._pip("uninstall", os.path.basename(os.getcwd()))
 				else:
 					args.append("install")
 			else:
 				raise TargetError(target)
-		if args:
-			self._setup(*args)
+		self._setup(*args)
 
 class Ansible(BuildStack):
 
-	def get(self, packageid):
+	def get(self, packageid, repositoryid = None):
 		raise TargetError("ansible has no package management feature")
+
+	def _play(self, *args):
+		if self.username == "root":
+			argv = ["-u", "root", "--ask-pass"] + list(argv)
+		elif self.username:
+			argv = ["-u", self.username, "--sudo"] + list(argv)
+		else:
+			argv = list(argv)
+		subprocess.check_call(["ansible-playbook", self.manifest_path] + argv)
+
+	def build(self):
+		for target in self.targets:
+			if target = Target("test"):
+				self._play("--check")
+			elif target.name == "install" and not target.uninstall:
+				if target.inventoryid:
+					if not os.path.exists(target.inventoryid):
+						raise BuildError("%s: no such file" % target.inventoryid)
+					self._play("-i", target.inventoryid)
+				else:
+					self._play()
+			else:
+				raise TargetError(target)
+
+class Maven(BuildStack):
+
+	def _mvn(self, *args):
+		subprocess.check_call(("mvn",) + args)
+
+	def get(self, packageid, repositoryid = None):
+		argv = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "-Dartifact=%s" % packageid]
+		if repositoryid:
+			argv += ["-DrepoUrl=%s" % repositoryid]
+		self._mvn(*argv)
 
 	def build(self):
 		args = []
 		for target in self.targets:
-			if target.name == "install" and not target.uninstall:
-				if target.inventory:
-					args += ["-i", target.inventory]
-				if self.username == "root":
-					args += ["-u", "root", "--ask-pass"]
-				elif self.username:
-					args += ["-u", self.username, "--sudo"]
-				subprocess.check_call(["ansible-playbook", self.manifest_path] + args)
+			if target == Target("clean", all = False):
+				args += ["clean"]
+			elif target == Target("test"):
+				args += ["test"]
+			elif target == Target("compile"):
+				args += ["compile"]
+			elif target == Target("package"):
+				args += ["package"]
+			elif target == Target("publish"):
+				args += ["deploy"]
+			elif target.name == "install" and not target.uninstall:
+				args += ["install"]
 			else:
 				raise TargetError(target)
+		if args:
+			self._mvn(*args)
+
+class Ant(BuildStack): pass
 
 ###############
 # entry point #
 ###############
 
 def get_build_stack(username = None):
+	"autoguess the build stack to use depending on the build manifest found"
 	map = {
+		"playbook.yml": Ansible,
+		"build.xml": Ant,
+		"setup.py": SetupTools,
 		"Makefile": Make,
 		"makefile": Make,
-		"setup.py": SetupTools,
-		"playbook.yml": Ansible,
+		"pom.xml": Maven,
 	}
 	for basename in map:
 		if os.path.exists(basename):
@@ -301,14 +351,18 @@ def main(*argv):
 		vcs = Git()
 		if opts["--makefile"]:
 			bs = Make(opts["--makefile"], username = opts["--user"])
-		elif opts["--setuptools"]:
-			bs = SetupTools(opts["--setuptools"], username = opts["--user"])
-		elif opts["--ansible"]:
-			bs = Ansible(opts["--ansible"], username = opts["--user"])
+		elif opts["--setupscript"]:
+			bs = SetupTools(opts["--setupscript"], username = opts["--user"])
+		elif opts["--playbook"]:
+			bs = Ansible(opts["--playbook"], username = opts["--user"])
+		elif opts["--pom"]:
+			bs = Maven(opts["--pom"], username = opts["--user"])
 		else:
 			bs = get_build_stack(username = opts["--user"])
 		if opts["get"]:
-			bs.get(opts["<packageid>"])
+			bs.get(
+				packageid = opts["<packageid>"],
+				repositoryid = opts["--repository"])
 		else:
 			for target in opts["<target>"]:
 				{
@@ -321,7 +375,7 @@ def main(*argv):
 					"package": bs.package,
 					"publish": lambda: bs.publish(name = opts["--repository"]),
 					"develop": lambda: bs.develop(uninstall = opts["--uninstall"]),
-					"install": lambda: bs.install(inventory = opts["--inventory"], uninstall = opts["--uninstall"]),
+					"install": lambda: bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"]),
 				}[target]()
 			bs.build()
 	except (subprocess.CalledProcessError, BuildError) as exc:
