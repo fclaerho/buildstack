@@ -10,18 +10,19 @@ Usage:
   code --help
 
 Options:
-  -C <path>, --directory <path>  set working directory
-  -r <id>, --repository <id>     with get & publish: select repository
-  -i <id>, --inventory <id>      with install: select inventory
-  -u <name>, --user <name>       build on behalf of the specified user
-  --setupscript <path>           force python setup tools as build stack
-  --makefile <path>              force make as build stack
-  --playbook <path>              force ansible as build stack
-  -U, --uninstall                with develop & install: undo
-  -v, --version                  show version
-  --pom <path>                   force maven as build stack
-  -h, --help                     show help
-  -a, --all                      with clean: remove build artifacts
+  -S <path>, --setupscript <path>  force python setup tools as build stack
+  -C <path>, --directory <path>    set working directory
+  -M <path>, --makefile <path>     force make as build stack
+  -P <path>, --playbook <path>     force ansible as build stack
+  -r <id>, --repository <id>       with get & publish: select repository
+  -i <id>, --inventory <id>        with install: select inventory
+  -p <ids>, --profiles <ids>       comma-separated build profiles
+  -u <name>, --user <name>         build on behalf of the specified user
+  -X <path>, --pom <path>          force maven as build stack
+  -U, --uninstall                  with develop & install: undo
+  -v, --version                    show version
+  -h, --help                       show help
+  -a, --all                        with clean: remove build artifacts
 
 "Code" detects and drives the project build stack to reach well-known targets:
   * get [-r]: install dependency from a repository -- use a VE if possible
@@ -87,12 +88,13 @@ class BuildStack(object):
 
 	__metaclass__ = abc.ABCMeta
 
-	def __init__(self, manifest_path, username = None):
+	def __init__(self, manifest_path, username = None, profileid = None):
 		if not manifest_path:
 			raise BuildError("missing manifest")
 		elif not os.path.exists(manifest_path):
 			raise BuildError("%s: no such file" % manifest_path)
 		self.manifest_path = manifest_path
+		self.profileid = profileid
 		self.username = username
 		self.targets = []
 
@@ -266,12 +268,16 @@ class Ansible(BuildStack):
 		raise TargetError("ansible has no package management feature")
 
 	def _play(self, *args):
+		# user
 		if self.username == "root":
 			argv = ["-u", "root", "--ask-pass"] + list(argv)
 		elif self.username:
 			argv = ["-u", self.username, "--sudo"] + list(argv)
 		else:
 			argv = list(argv)
+		# tags
+		if self.profileids:
+			argv += ["--tags", self.profileids]
 		subprocess.check_call(["ansible-playbook", self.manifest_path] + argv)
 
 	def build(self):
@@ -351,15 +357,29 @@ def main(*argv):
 			os.chdir(opts["--directory"])
 		vcs = Git()
 		if opts["--makefile"]:
-			bs = Make(opts["--makefile"], username = opts["--user"])
+			bs = Make(
+				manifest_path = opts["--makefile"]
+				username = opts["--user"],
+				profileids = opts["--profiles"])
 		elif opts["--setupscript"]:
-			bs = SetupTools(opts["--setupscript"], username = opts["--user"])
+			bs = SetupTools(
+				manifest_path = opts["--setupscript"],
+				username = opts["--user"],
+				profileids = opts["--profiles"])
 		elif opts["--playbook"]:
-			bs = Ansible(opts["--playbook"], username = opts["--user"])
+			bs = Ansible(
+				manifest_path = opts["--playbook"],
+				username = opts["--user"],
+				profileids = opts["--profiles"])
 		elif opts["--pom"]:
-			bs = Maven(opts["--pom"], username = opts["--user"])
+			bs = Maven(
+				manifest_path = opts["--pom"],
+				username = opts["--user"],
+				profileids = opts["--profiles"])
 		else:
-			bs = get_build_stack(username = opts["--user"])
+			bs = get_build_stack(
+				username = username,
+				profileids = profileids)
 		if opts["get"]:
 			bs.get(
 				packageid = opts["<packageid>"],
@@ -374,9 +394,11 @@ def main(*argv):
 					"test": bs.test,
 					"compile": bs.compile,
 					"package": bs.package,
-					"publish": lambda: bs.publish(name = opts["--repository"]),
+					"publish": lambda: bs.publish(repositoryid = opts["--repository"]),
 					"develop": lambda: bs.develop(uninstall = opts["--uninstall"]),
-					"install": lambda: bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"]),
+					"install": lambda: bs.install(
+						inventoryid = opts["--inventory"],
+						uninstall = opts["--uninstall"]),
 				}[target]()
 			bs.build()
 	except (subprocess.CalledProcessError, BuildError) as exc:
