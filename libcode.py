@@ -88,13 +88,13 @@ class BuildStack(object):
 
 	__metaclass__ = abc.ABCMeta
 
-	def __init__(self, manifest_path, username = None, profileid = None):
+	def __init__(self, manifest_path, username = None, profileids = None):
 		if not manifest_path:
 			raise BuildError("missing manifest")
 		elif not os.path.exists(manifest_path):
 			raise BuildError("%s: no such file" % manifest_path)
 		self.manifest_path = manifest_path
-		self.profileid = profileid
+		self.profileids = profileids
 		self.username = username
 		self.targets = []
 
@@ -331,6 +331,8 @@ class Maven(BuildStack):
 
 class Ant(BuildStack): pass
 
+class Grunt(BuildStack): pass
+
 ###############
 # entry point #
 ###############
@@ -338,7 +340,9 @@ class Ant(BuildStack): pass
 def get_build_stack(username = None, profileids = None):
 	"autoguess the build stack to use depending on the build manifest found"
 	map = {
+		"Gruntfile.coffee": Grunt,
 		"playbook.yml": Ansible,
+		"Gruntfile.js": Grunt,
 		"build.xml": Ant,
 		"setup.py": SetupTools,
 		"Makefile": Make,
