@@ -276,8 +276,8 @@ class Ansible(BuildStack):
 
 	def build(self):
 		for target in self.targets:
-			if target = Target("test"):
-				self._play("--check")
+			if target == Target("test"):
+				self._play("--check") # dry run
 			elif target.name == "install" and not target.uninstall:
 				if target.inventoryid:
 					if not os.path.exists(target.inventoryid):
@@ -289,6 +289,7 @@ class Ansible(BuildStack):
 				raise TargetError(target)
 
 class Maven(BuildStack):
+	"convention over configuration"
 
 	def _mvn(self, *args):
 		subprocess.check_call(("mvn",) + args)
