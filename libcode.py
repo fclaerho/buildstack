@@ -335,7 +335,7 @@ class Ant(BuildStack): pass
 # entry point #
 ###############
 
-def get_build_stack(username = None):
+def get_build_stack(username = None, profileids = None):
 	"autoguess the build stack to use depending on the build manifest found"
 	map = {
 		"playbook.yml": Ansible,
@@ -347,7 +347,10 @@ def get_build_stack(username = None):
 	}
 	for basename in map:
 		if os.path.exists(basename):
-			return map[basename](basename, username = username)
+			return map[basename](
+				manifest_path = basename,
+				username = username,
+				profileids = profileids)
 	raise BuildError("failed to detect build stack")
 
 def main(*argv):
