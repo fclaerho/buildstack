@@ -298,7 +298,10 @@ class Maven(BuildStack):
 	"convention over configuration"
 
 	def _mvn(self, *args):
-		subprocess.check_call(("mvn",) + args)
+		argv = ["mvn"] + list(args)
+		if self.profileids:
+			argv += ["-P", self.profileids]
+		subprocess.check_call(argv)
 
 	def get(self, packageid, repositoryid = None):
 		argv = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "-Dartifact=%s" % packageid]
