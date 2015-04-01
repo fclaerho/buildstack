@@ -204,7 +204,7 @@ class SetupTools(BuildStack):
 		subprocess.check_call(argv)
 
 	def _setup(self, *args):
-		argv = [self._get_path("python"), self.manifest_path] + list(args)
+		argv = [self._get_path("python"), self.manifest_path] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
 		subprocess.check_call(argv)
