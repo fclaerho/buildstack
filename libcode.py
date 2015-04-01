@@ -361,7 +361,7 @@ def main(*argv):
 		vcs = Git()
 		if opts["--makefile"]:
 			bs = Make(
-				manifest_path = opts["--makefile"]
+				manifest_path = opts["--makefile"],
 				username = opts["--user"],
 				profileids = opts["--profiles"])
 		elif opts["--setupscript"]:
