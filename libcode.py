@@ -270,11 +270,11 @@ class Ansible(BuildStack):
 	def _play(self, *args):
 		# user
 		if self.username == "root":
-			argv = ["-u", "root", "--ask-pass"] + list(argv)
+			argv = ["-u", "root", "--ask-pass"] + list(args)
 		elif self.username:
-			argv = ["-u", self.username, "--sudo"] + list(argv)
+			argv = ["-u", self.username, "--sudo"] + list(args)
 		else:
-			argv = list(argv)
+			argv = list(args)
 		# tags
 		if self.profileids:
 			argv += ["--tags", self.profileids]
