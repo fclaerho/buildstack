@@ -13,8 +13,11 @@ Options:
   -r <name>, --repository <name>  with publish, select upload repository
   -C <path>, --directory <path>   set working directory
   -i <path>, --inventory <path>   set inventory file
-  -f <path>, --manifest <path>    set build manifest
-  -u, --uninstall                 with develop and install, uninstall
+  -S <path>, --setuptools <path>  force setup tools as build stack
+  -M <path>, --makefile <path>    force make as build stack
+  -A <path>, --ansible <path>     force ansible as build stack
+  -u <name>, --user <user>        set execution uid
+  -U, --uninstall                 undo develop or install
   -v, --version                   show version
   -h, --help                      show help
   -a, --all                       with clean, remove build artifacts
@@ -26,11 +29,13 @@ Options:
   * compile: compile code, for non-interpreted languages
   * package: package code
   * publish [-r]: publish package into a specified repository
-  * develop [-u]: install on localhost in development mode
-  * install [-u,-i]: provision inventory
-"""
+  * develop [-U]: [un]install locally in development mode
+  * install [-U,-i]: [un]install locally or [un]provision inventory
 
-# TODO: http://en.wikipedia.org/wiki/List_of_build_automation_software
+Example:
+  $ code clean -a test
+  $ code install -u root
+"""
 
 import pkg_resources, subprocess, glob, abc, os
 
@@ -43,6 +48,10 @@ class VCS(object):
 
 	@abc.abstractmethod
 	def log(self):
+		raise NotImplementedError()
+
+	@abc.abstractmethod
+	def status(self):
 		raise NotImplementedError()
 
 	@abc.abstractmethod
@@ -79,12 +88,13 @@ class BuildStack(object):
 
 	__metaclass__ = abc.ABCMeta
 
-	def __init__(self, manifest_path):
+	def __init__(self, manifest_path, username = None):
 		if not manifest_path:
 			raise ManifestError("missing manifest")
 		elif not os.path.exists(manifest_path):
 			raise ManifestError("%s: no such file" % manifest_path)
 		self.manifest_path = manifest_path
+		self.username = username
 		self.targets = []
 
 	@abc.abstractmethod
@@ -131,6 +141,9 @@ class Git(VCS):
 			"--pretty=format:%Cred%h%Creset:%C(yellow)%d%Creset %s %Cgreen- %an, %cr%Creset",
 			"--abbrev-commit"))
 
+	def status(self):
+		subprocess.check_call(("git", "status", "-s"))
+
 	def commit(self):
 		subprocess.check_call(("git", "commit", "-a"))
 		subprocess.check_call(("git", "push"))
@@ -143,7 +156,13 @@ class TargetError(BuildError):
 class Make(BuildStack):
 
 	def get(self, packageid):
-		raise TargetError("get")
+		raise TargetError("make has no package management feature")
+
+	def _make(self, *args):
+		argv = ["make", "-f", self.manifest_path] + args
+		if self.username:
+			argv = ["sudo", "-u", self.username] + argv
+		subprocess.check_call(argv)
 
 	def build(self):
 		args = []
@@ -163,7 +182,7 @@ class Make(BuildStack):
 			else:
 				raise TargetError(target)
 		if args:
-			subprocess.check_call(["make", "-f", self.manifest_path] + args)
+			self._make(*args)
 
 class SetupTools(BuildStack):
 
@@ -176,16 +195,25 @@ class SetupTools(BuildStack):
 			return basename
 
 	def _pip(self, *args):
-		if not os.path.exists("env"):
-			subprocess.check_call(("virtualenv", "_env"))
-			self.prefix = "_env/bin"
-		subprocess.check_call((self._get_path("pip"),) + args)
+		if not os.path.exists(".virtualenv"):
+			subprocess.check_call(("virtualenv", ".virtualenv"))
+			self.prefix = ".virtualenv/bin"
+		argv = [self._get_path("pip")] + list(args)
+		if self.username:
+			argv = ["sudo", "-u", self.username] + argv
+		subprocess.check_call(argv)
 
 	def _setup(self, *args):
-		subprocess.check_call((self._get_path("python"), self.manifest_path) + args)
+		argv = [self._get_path("python"), self.manifest_path] + list(args)
+		if self.username:
+			argv = ["sudo", "-u", self.username] + argv
+		subprocess.check_call(argv)
 
 	def _twine(self, *args):
-		subprocess.check_call((self._get_path("twine"),) + args)
+		argv = [self._get_path("twine")] + list(args)
+		if self.username:
+			argv = ["sudo", "-u", self.username] + argv
+		subprocess.check_call(argv)
 
 	def get(self, packageid): self._pip("install", packageid)
 
@@ -195,13 +223,10 @@ class SetupTools(BuildStack):
 			if target == Target("clean", all = False):
 				args.append("clean")
 			elif target == Target("clean", all = True):
-				# build everything up to this point:
 				args += ["clean", "--all"]
 				self._setup(*args)
-				# reset args:
 				args = []
-				# do deep clean:
-				subprocess.check_call(["rm", "-vrf", "_env", "dist", ".eggs"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
+				subprocess.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 			elif target == Target("test"):
 				args.append("test")
 			elif target == Target("compile"):
@@ -209,11 +234,8 @@ class SetupTools(BuildStack):
 			elif target == Target("package"):
 				args.append("sdist")
 			elif target.name == "publish":
-				# build everything up to this point:
 				self._setup(*args)
-				# reset args:
 				args = []
-				# do publish:
 				_args = ["-r", target.repository] if target.repository else []
 				_args += ["upload"] + glob.glob("dist/*")
 				self._twine(*_args)
@@ -223,11 +245,8 @@ class SetupTools(BuildStack):
 				args += ["develop",  "--uninstall"]
 			elif target.name == "install":
 				if target.uninstall:
-					# build everything up to this point:
 					self._setup(*args)
-					# reset args:
 					args = []
-					# do uninstall:
 					self._pip("uninstall", os.path.basename(os.getcwd()))
 				else:
 					args.append("install")
@@ -239,7 +258,7 @@ class SetupTools(BuildStack):
 class Ansible(BuildStack):
 
 	def get(self, packageid):
-		raise TargetError("get")
+		raise TargetError("ansible has no package management feature")
 
 	def build(self):
 		args = []
@@ -247,6 +266,10 @@ class Ansible(BuildStack):
 			if target.name == "install" and not target.uninstall:
 				if target.inventory:
 					args += ["-i", target.inventory]
+				if self.username == "root":
+					args += ["-u", "root", "--ask-pass"]
+				elif self.username:
+					args += ["-u", self.username, "--sudo"]
 				subprocess.check_call(["ansible-playbook", self.manifest_path] + args)
 			else:
 				raise TargetError(target)
@@ -255,7 +278,7 @@ class Ansible(BuildStack):
 # entry point #
 ###############
 
-def get_build_stack(manifest_path = None):
+def get_build_stack(manifest_path = None, username = None):
 	map = {
 		"Makefile": Make,
 		"makefile": Make,
@@ -265,9 +288,9 @@ def get_build_stack(manifest_path = None):
 	if not manifest_path:
 		for basename in map:
 			if os.path.exists(basename):
-				return map[basename](basename)
+				return map[basename](basename, username = username)
 	else:
-		return map[os.path.basename(manifest_path)](manifest_path)
+		return map[os.path.basename(manifest_path)](manifest_path, username = username)
 	raise BuildError("failed to detect build stack")
 
 def main(*argv):
@@ -280,13 +303,21 @@ def main(*argv):
 			os.chdir(opts["--directory"])
 		manifest_path = opts["--manifest"] or None
 		vcs = Git()
-		bs = get_build_stack(manifest_path)
+		if opts["--makefile"]:
+			bs = Make(opts["--makefile"], username = opts["--user"])
+		elif opts["--setuptools"]:
+			bs = SetupTools(opts["--setuptools"], username = opts["--user"])
+		elif opts["--ansible"]:
+			bs = Ansible(opts["--ansible"], username = opts["--user"])
+		else:
+			bs = get_build_stack(manifest_path, username = opts["--user"])
 		if opts["get"]:
 			bs.get(opts["<packageid>"])
 		else:
 			for target in opts["<target>"]:
 				{
 					"log": vcs.log,
+					"status": vcs.status,
 					"commit": vcs.commit,
 					"clean": lambda: bs.clean(all = opts["--all"]),
 					"test": bs.test,
