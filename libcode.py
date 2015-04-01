@@ -381,8 +381,8 @@ def main(*argv):
 				profileids = opts["--profiles"])
 		else:
 			bs = get_build_stack(
-				username = username,
-				profileids = profileids)
+				username = opts["--user"],
+				profileids = opts["--profiles"])
 		if opts["get"]:
 			bs.get(
 				packageid = opts["<packageid>"],
