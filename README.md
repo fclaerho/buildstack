@@ -18,11 +18,11 @@ See `code --help` for the full list of options.
 
 ### EXAMPLE
 
-Clone a random repository on github and use "code" to run its tests, whatever build stack that project may use:
+Clone a random repository on github and use "code" to run its tests and package it:
 
 	$ git clone $something
 	$ cd $something
-	$ code clean test
+	$ code clean test package
 
 
 ### END-USER INSTALLATION
