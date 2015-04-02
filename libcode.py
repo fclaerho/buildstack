@@ -225,7 +225,8 @@ class SetupTools(BuildStack):
 					args.append("install")
 			else:
 				raise TargetError(target)
-		self._setup(*args)
+		if args:
+			self._setup(*args)
 
 class Ansible(BuildStack):
 
