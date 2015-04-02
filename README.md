@@ -6,14 +6,14 @@
 Build stack helper.
 
 "Code" detects the project build stack and drives it to reach well-known targets:
-  * get [--repository <repositoryid>] <packageid>
+  * get [--repository \<repositoryid>] \<packageid>
   * clean [--all]
   * test
   * compile
-  * package [--repository <repositoryid>]
-  * publish [--inventory <repositoryid>]
+  * package [--repository \<repositoryid>]
+  * publish [--inventory \<repositoryid>]
   * develop [--uninstall]
-  * install [--uninstall] [--inventory <inventoryid>]
+  * install [--uninstall] [--inventory \<inventoryid>]
 
 Supported build stacks:
   - make
