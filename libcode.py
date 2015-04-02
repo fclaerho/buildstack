@@ -43,23 +43,6 @@ import pkg_resources, subprocess, glob, abc, os
 
 import docopt # 3rd-party
 
-class VCS(object):
-	"version control system interface"
-
-	__metaclass__ = abc.ABCMeta
-
-	@abc.abstractmethod
-	def log(self):
-		raise NotImplementedError()
-
-	@abc.abstractmethod
-	def status(self):
-		raise NotImplementedError()
-
-	@abc.abstractmethod
-	def commit(self, push = True):
-		raise NotImplementedError()
-
 class Target(object):
 
 	def __init__(self, name, **kwargs):
@@ -130,25 +113,6 @@ class BuildStack(object):
 #########################
 # concrete build stacks #
 #########################
-
-class Git(VCS):
-
-	def log(self):
-		subprocess.check_call((
-			"git",
-			"--no-pager",
-			"log",
-			"--color",
-			"--graph",
-			"--abbrev-commit",
-			"--pretty=format:%Cred%h%Creset:%C(yellow)%d%Creset %s %Cgreen- %an, %cr%Creset"))
-
-	def status(self):
-		subprocess.check_call(("git", "--no-pager", "status", "-s"))
-
-	def commit(self):
-		subprocess.check_call(("git", "commit", "-a"))
-		subprocess.check_call(("git", "push"))
 
 class TargetError(BuildError):
 
@@ -366,7 +330,6 @@ def main(*argv):
 	try:
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
-		vcs = Git()
 		if opts["--makefile"]:
 			bs = Make(
 				manifest_path = opts["--makefile"],
@@ -398,9 +361,6 @@ def main(*argv):
 		else:
 			for target in opts["<target>"]:
 				{
-					"log": vcs.log,
-					"status": vcs.status,
-					"commit": vcs.commit,
 					"clean": lambda: bs.clean(all = opts["--all"]),
 					"test": bs.test,
 					"compile": bs.compile,
