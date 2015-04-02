@@ -6,13 +6,14 @@
 Build stack helper.
 
 "Code" detects the project build stack and drives it to reach well-known targets:
+  * get [--repository <repositoryid>] <packageid>
   * clean [--all]
   * test
   * compile
-  * package [--repository …]
-  * publish [--inventory …]
+  * package [--repository <repositoryid>]
+  * publish [--inventory <repositoryid>]
   * develop [--uninstall]
-  * install [--uninstall] [--inventory …]
+  * install [--uninstall] [--inventory <inventoryid>]
 
 Supported build stacks:
   - make
@@ -27,7 +28,7 @@ Pick a random project on github:
 
 	$ git clone $something
 
-Use code to poke it:
+Whatever build stack it uses, code abstracts it, example:
 
 	$ code clean test
 
