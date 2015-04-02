@@ -24,12 +24,9 @@ Supported build stacks:
 
 **EXAMPLE**
 
-Pick a random project on github:
+Pick a random project on github. Whatever build stack it uses, code abstracts it:
 
 	$ git clone $something
-
-Whatever build stack it uses, code abstracts it, example:
-
 	$ code clean test
 
 
