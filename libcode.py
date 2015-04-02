@@ -136,14 +136,15 @@ class Git(VCS):
 	def log(self):
 		subprocess.check_call((
 			"git",
+			"--no-pager",
 			"log",
 			"--color",
 			"--graph",
-			"--pretty=format:%Cred%h%Creset:%C(yellow)%d%Creset %s %Cgreen- %an, %cr%Creset",
-			"--abbrev-commit"))
+			"--abbrev-commit",
+			"--pretty=format:%Cred%h%Creset:%C(yellow)%d%Creset %s %Cgreen- %an, %cr%Creset"))
 
 	def status(self):
-		subprocess.check_call(("git", "status", "-s"))
+		subprocess.check_call(("git", "--no-pager", "status", "-s"))
 
 	def commit(self):
 		subprocess.check_call(("git", "commit", "-a"))
