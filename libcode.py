@@ -35,7 +35,7 @@ Options:
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
 Example:
-  $ code clean -a test
+  $ code clean test
   $ code install -u root
 """
 
