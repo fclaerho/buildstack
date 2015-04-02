@@ -1,10 +1,24 @@
+   ___         _     
+  / __|___  __| |___ 
+ | (__/ _ \/ _` / -_)
+  \___\___/\__,_\___|
+
 Build stack helper.
 
-"Code" detects the project build stack and drives it to reach well-known targets.
+"Code" detects the project build stack and drives it to reach well-known targets:
+  * clean [--all]
+  * test
+  * compile
+  * package [--repository …]
+  * publish [--inventory …]
+  * develop [--uninstall]
+  * install [--uninstall] [--inventory …]
 
 Supported build stacks:
   - make
   - python setuptools, pip, twine
+  - maven
+  - ansible
 
 
 **EXAMPLE**
@@ -25,19 +39,19 @@ Use code to poke it:
 or, if that repository is not available:
 
 	$ git clone $this
-	$ python setup.py install
+	$ sudo python setup.py install
 
 To uninstall:
 
-	$ pip uninstall code
+	$ sudo pip uninstall code
 
 
 **DEVELOPER INSTALLATION**
 
 To install:
 
-	$ python setup.py develop
+	$ sudo python setup.py develop
 
 To uninstall:
 
-	$ python setup.py develop --uninstall # or code develop -u
+	$ sudo python setup.py develop --uninstall
