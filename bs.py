@@ -324,10 +324,10 @@ def get_build_stack(username = None, profileids = None):
 				profileids = profileids)
 	raise BuildError("failed to detect build stack")
 
-def main(*argv):
+def main(*args):
 	opts = docopt.docopt(
 		__doc__,
-		argv = argv or None,
+		args = args or None,
 		version = pkg_resources.require("bs")[0].version)
 	try:
 		if opts["--directory"]:
