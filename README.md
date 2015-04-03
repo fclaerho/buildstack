@@ -18,7 +18,7 @@ See `bs --help` for the full list of options.
 
 ### EXAMPLE
 
-Clone a random repository on github and use sc to run its tests and package it:
+Clone a random repository on github and use `bs` to run its tests and package it:
 
 	$ git clone $something
 	$ cd $something
