@@ -1,7 +1,7 @@
-	  ___         _     
-	 / __|___  __| |___ 
-	| (__/ _ \/ _` / -_)
-	 \___\___/\__,_\___|
+	 ___      _ _    _ ___ _           _   
+	| _ )_  _(_) |__| / __| |_ __ _ __| |__
+	| _ \ || | | / _` \__ \  _/ _` / _| / /
+	|___/\_,_|_|_\__,_|___/\__\__,_\__|_\_\
 
 Detect and drive any source code build stack to reach well-known targets:
   * get [-r]: install dependency from a repository -- use a VE if possible
