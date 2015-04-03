@@ -327,7 +327,7 @@ def get_build_stack(username = None, profileids = None):
 def main(*args):
 	opts = docopt.docopt(
 		__doc__,
-		args = args or None,
+		argv = args or None,
 		version = pkg_resources.require("bs")[0].version)
 	try:
 		if opts["--directory"]:
