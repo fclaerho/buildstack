@@ -22,11 +22,11 @@ Clone a random repository on github and use sc to run its tests and package it:
 
 	$ git clone $something
 	$ cd $something
-	$ sc clean -a test package
+	$ bs clean -a test package
 
 ### END-USER INSTALLATION
 
-	$ pip install -i https://pypi.fclaerhout.fr/simple/ sc
+	$ pip install -i https://pypi.fclaerhout.fr/simple/ bs
 
 or, if that repository is not available:
 
@@ -35,7 +35,7 @@ or, if that repository is not available:
 
 To uninstall:
 
-	$ sudo pip uninstall sc
+	$ sudo pip uninstall bs
 
 
 ### DEVELOPER INSTALLATION
