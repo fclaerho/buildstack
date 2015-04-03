@@ -13,7 +13,7 @@ Detect and drive any source code build stack to reach well-known targets:
   * develop [-U]: [un]install locally in development mode
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
-See `sc --help` for the full list of options.
+See `bs --help` for the full list of options.
 
 
 ### EXAMPLE
