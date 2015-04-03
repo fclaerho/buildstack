@@ -1,13 +1,13 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
 """
-Build stack helper.
+Detect and drive a build stack to reach well-known targets.
 
 Usage:
-  code [options] get <packageid>
-  code [options] <target>...
-  code --version
-  code --help
+  bs [options] get <packageid>
+  bs [options] <target>...
+  bs --version
+  bs --help
 
 Options:
   -S <path>, --setupscript <path>  force python setup tools as build stack
@@ -19,24 +19,25 @@ Options:
   -p <ids>, --profiles <ids>       comma-separated build profiles
   -u <name>, --user <name>         build on behalf of the specified user
   -X <path>, --pom <path>          force maven as build stack
+  -f <id>, --format <id>           set package format
   -U, --uninstall                  with develop & install: undo
   -v, --version                    show version
   -h, --help                       show help
   -a, --all                        with clean: remove build artifacts
 
-"Code" detects and drives the project build stack to reach well-known targets:
+Targets:
   * get [-r]: install dependency from a repository -- use a VE if possible
   * clean [-a]: delete objects generated during the build
   * test: run unit tests
   * compile: compile code, for non-interpreted languages
-  * package: package code
+  * package [-f]: package code
   * publish [-r]: publish package to a repository
   * develop [-U]: [un]install locally in development mode
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
-Example:
-  $ code clean test
-  $ code install -u root
+Examples:
+  $ bs test clean -a
+  $ bs install -u root
 """
 
 import pkg_resources, subprocess, glob, abc, os
@@ -327,7 +328,7 @@ def main(*argv):
 	opts = docopt.docopt(
 		__doc__,
 		argv = argv or None,
-		version = pkg_resources.require("code")[0].version)
+		version = pkg_resources.require("sc")[0].version)
 	try:
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
@@ -361,17 +362,22 @@ def main(*argv):
 				repositoryid = opts["--repository"])
 		else:
 			for target in opts["<target>"]:
-				{
-					"clean": lambda: bs.clean(all = opts["--all"]),
-					"test": bs.test,
-					"compile": bs.compile,
-					"package": bs.package,
-					"publish": lambda: bs.publish(repositoryid = opts["--repository"]),
-					"develop": lambda: bs.develop(uninstall = opts["--uninstall"]),
-					"install": lambda: bs.install(
-						inventoryid = opts["--inventory"],
-						uninstall = opts["--uninstall"]),
-				}[target]()
+				if target == "clean":
+					bs.clean(all = opts["--all"])
+				elif target == "test":
+					bs.test()
+				elif target == "compile":
+					bs.compile()
+				elif target == "package":
+					bs.package()
+				elif target == "publish":
+					bs.publish(repositoryid = opts["--repository"])
+				elif target == "develop":
+					bs.develop(uninstall = opts["--uninstall"])
+				elif target == "install":
+					bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"])
+				else:
+					raise BuildError("%s: unknown target" % target)
 			bs.build()
 	except (subprocess.CalledProcessError, BuildError) as exc:
 		raise SystemExit("** fatal error! %s" % exc)
