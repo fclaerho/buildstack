@@ -328,7 +328,7 @@ def main(*argv):
 	opts = docopt.docopt(
 		__doc__,
 		argv = argv or None,
-		version = pkg_resources.require("sc")[0].version)
+		version = pkg_resources.require("bs")[0].version)
 	try:
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
