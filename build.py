@@ -19,7 +19,7 @@ Options:
   -p <ids>, --profiles <ids>       comma-separated build profiles
   -u <name>, --user <name>         build on behalf of the specified user
   -X <path>, --pom <path>          force maven as build stack
-  -f <id>, --format <id>           set package format
+  -f <id>, --format <id>           set package format, use help to list ids
   -U, --uninstall                  with develop & install: undo
   -v, --version                    show version
   -h, --help                       show help
@@ -44,6 +44,10 @@ import pkg_resources, subprocess, glob, abc, os
 
 import docopt # 3rd-party
 
+#############
+# interface #
+#############
+
 class Target(object):
 
 	def __init__(self, name, **kwargs):
@@ -54,7 +58,11 @@ class Target(object):
 		return "%s %s" % (self.name, " ".join("%s=%s" % (k, v) for k, v in self.kwargs.items()))
 
 	def __eq__(self, other):
-		return self.name == other.name and self.kwargs == other.kwargs
+		if isinstance(other, (str, unicode)):
+			return self.name == other
+		else:
+			assert isinstance(other, Target), "%s: not a Target" % other
+			return self.name == other.name and self.kwargs == other.kwargs
 
 	def __getattr__(self, key):
 		try:
@@ -95,8 +103,8 @@ class BuildStack(object):
 	def compile(self):
 		self.targets.append(Target("compile"))
 
-	def package(self):
-		self.targets.append(Target("package"))
+	def package(self, formatid = None):
+		self.targets.append(Target("package", formatid = formatid))
 
 	def publish(self, repositoryid = None):
 		self.targets.append(Target("publish", repositoryid = repositoryid))
@@ -111,9 +119,9 @@ class BuildStack(object):
 	def build(self):
 		raise NotImplementedError()
 
-#########################
-# concrete build stacks #
-#########################
+##################
+# implementation #
+##################
 
 class TargetError(BuildError):
 
@@ -138,13 +146,13 @@ class Make(BuildStack):
 				args.append("clean")
 			elif target == Target("clean", all = True):
 				args.append("distclean")
-			elif target == Target("test"):
+			elif target == "test":
 				args.append("check")
-			elif target == Target("compile"):
+			elif target == "compile":
 				args.append("all")
-			elif target == Target("package"):
+			elif target == "package":
 				args.append("dist")
-			elif target.name == "install":
+			elif target == "install":
 				args.append("uninstall" if target.uninstall else "install")
 			else:
 				raise TargetError(target)
@@ -198,13 +206,45 @@ class SetupTools(BuildStack):
 				self._setup(*args)
 				args = []
 				subprocess.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
-			elif target == Target("test"):
+			elif target == "test":
 				args.append("test")
-			elif target == Target("compile"):
+			elif target == "compile":
 				args.append("build")
-			elif target == Target("package"):
-				args.append("sdist")
-			elif target.name == "publish":
+			elif target == "package":
+				def bdist_deb():
+					args += ["sdist"]
+					self._setup(*args)
+					#subprocess.check_call(("fakeroot", "dpkg-deb", "--build", path, self.path))
+				def bdist_pkg():
+					args += ["sdist"]
+					self._setup(*args)
+					#_exec("pkgbuild", self.path, "--root", path, "--version", version, "--identifier", identifier)
+				func = {
+					"sdist": lambda: args.append("sdist"),
+					"sdist:zip": lambda: args.extend(["sdist", "--format=zip"]),
+					"sdist:gztar": lambda: args.extend(["sdist", "--format=gztar"]),
+					"sdist:bztar": lambda: args.extend(["sdist", "--format=bztar"]),
+					"sdist:ztar": lambda: args.extend(["sdist", "--format=ztar"]),
+					"sdist:tar": lambda: args.extend(["sdist", "--format=tar"]),
+					"bdist": lambda: args.append("bdist"),
+					"bdist:gztar": lambda: args.extend(["sdist", "--format=gztar"]), # unix default
+					"bdist:ztar": lambda: args.extend(["sdist", "--format=ztar"]),
+					"bdist:tar": lambda: args.extend(["sdist", "--format=tar"]),
+					"bdist:zip": lambda: args.extend(["sdist", "--format=zip"]), # windows default
+					"rpm": lambda: args.extend(["sdist", "--format=rpm"]),
+					"pkgtool": lambda: args.extend(["sdist", "--format=pkgtool"]),
+					"sdux": lambda: args.extend(["sdist", "--format=sdux"]),
+					"wininst": lambda: args.extend(["sdist", "--format=wininst"]),
+					"msi": lambda: args.extend(["sdist", "--format=msi"]),
+					"deb": bdist_deb,
+					"pkg": bdist_pkg,
+				}
+				if not hasattr(target, "formatid") or target.formatid is None:
+					target.formatid = "sdist"
+				elif target.formatid == "help":
+					raise SystemExit("\n".join(func.keys()))
+				func[target.formatid]()
+			elif target == "publish":
 				if args:
 					self._setup(*args)
 				args = []
@@ -216,7 +256,7 @@ class SetupTools(BuildStack):
 				args.append("develop")
 			elif target == Target("develop", uninstall = True):
 				args += ["develop",  "--uninstall"]
-			elif target.name == "install":
+			elif target == "install":
 				if target.uninstall:
 					if args:
 						self._setup(*args)
@@ -249,7 +289,7 @@ class Ansible(BuildStack):
 
 	def build(self):
 		for target in self.targets:
-			if target == Target("test"):
+			if target == "test":
 				self._play("--check") # dry run
 			elif target.name == "install" and not target.uninstall:
 				if target.inventoryid:
@@ -281,13 +321,13 @@ class Maven(BuildStack):
 		for target in self.targets:
 			if target == Target("clean", all = False):
 				args += ["clean"]
-			elif target == Target("test"):
+			elif target == "test":
 				args += ["test"]
-			elif target == Target("compile"):
+			elif target == "compile":
 				args += ["compile"]
-			elif target == Target("package"):
+			elif target == "package":
 				args += ["package"]
-			elif target == Target("publish"):
+			elif target == "publish":
 				args += ["deploy"]
 			elif target.name == "install" and not target.uninstall:
 				args += ["install"]
@@ -369,7 +409,7 @@ def main(*args):
 				elif target == "compile":
 					bs.compile()
 				elif target == "package":
-					bs.package()
+					bs.package(formatid = opts["--format"])
 				elif target == "publish":
 					bs.publish(repositoryid = opts["--repository"])
 				elif target == "develop":
