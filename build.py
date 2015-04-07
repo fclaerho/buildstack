@@ -4,10 +4,10 @@
 Detect and drive any source code build stack to reach well-known targets.
 
 Usage:
-  bs [options] get <packageid>
-  bs [options] <target>...
-  bs --version
-  bs --help
+  build [options] get <packageid>
+  build [options] <target>...
+  build --version
+  build --help
 
 Options:
   -S <path>, --setupscript <path>  force python setup tools as build stack
@@ -36,8 +36,8 @@ Targets:
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
 Examples:
-  $ bs test clean -a
-  $ bs install -u root
+  $ build test clean -a   # run unittests then cleanup
+  $ build install -u root # install as root
 """
 
 import pkg_resources, subprocess, glob, abc, os

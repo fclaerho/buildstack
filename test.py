@@ -2,7 +2,7 @@
 
 import unittest, tempfile, shutil, os
 
-import bs # 3rd-party
+import build # 3rd-party
 
 class Test(unittest.TestCase):
 
@@ -11,7 +11,7 @@ class Test(unittest.TestCase):
 		dirname = tempfile.mkdtemp()
 		with open(os.path.join(dirname, "Makefile"), "w") as f:
 			f.write("all: ; touch %s/success" % dirname)
-		bs.main("-C", dirname, "compile")
+		build.main("-C", dirname, "compile")
 		self.assertTrue(os.path.exists(os.path.join(dirname, "success")))
 		shutil.rmtree(dirname)
 

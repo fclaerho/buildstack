@@ -3,15 +3,15 @@
 import setuptools
 
 setuptools.setup(
-	name = "bs",
+	name = "build",
 	author = "fclaerhout.fr",
 	version = "1.0.1",
 	license = "MIT",
 	test_suite = "test",
-	py_modules = ["bs"],
+	py_modules = ["build"],
 	description = "build stack helper",
 	author_email = "contact@fclaerhout.fr",
-	entry_points = {"console_scripts": ["bs=bs:main"]},
+	entry_points = {"console_scripts": ["build=build:main"]},
 	tests_require = ["docopt"],
 	install_requires = ["docopt"],
 )
