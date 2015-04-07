@@ -211,14 +211,23 @@ class SetupTools(BuildStack):
 			elif target == "compile":
 				args.append("build")
 			elif target == "package":
-				def bdist_deb():
-					args += ["sdist"]
-					self._setup(*args)
+				def bdist_deb(args):
+					raise NotImplementedError()
 					#subprocess.check_call(("fakeroot", "dpkg-deb", "--build", path, self.path))
-				def bdist_pkg():
-					args += ["sdist"]
+				def bdist_pkg(args):
+					# *** EXPERIMENTAL ***
+					args += ["bdist", "--format=tar"]
 					self._setup(*args)
-					#_exec("pkgbuild", self.path, "--root", path, "--version", version, "--identifier", identifier)
+					del args[:]
+					for path in glob.glob("dist/*.tar"):
+						subprocess.check_call(("mkdir", "-p", "dist/root"))
+						subprocess.check_call(("tar", "-C", "dist/root", "-xf", path))
+						basename, extname = os.path.splitext(path)
+						name, tail = basename.split("-", 1)
+						version, _ = tail.split(".macosx", 1)
+						identifier = "fr.fclaerhout.%s" % name
+						subprocess.check_call(("pkgbuild", basename + ".pkg", "--root", "dist/root", "--version", version, "--identifier", identifier))
+						return
 				func = {
 					"sdist": lambda: args.append("sdist"),
 					"sdist:zip": lambda: args.extend(["sdist", "--format=zip"]),
@@ -236,8 +245,8 @@ class SetupTools(BuildStack):
 					"sdux": lambda: args.extend(["sdist", "--format=sdux"]),
 					"wininst": lambda: args.extend(["sdist", "--format=wininst"]),
 					"msi": lambda: args.extend(["sdist", "--format=msi"]),
-					"deb": bdist_deb,
-					"pkg": bdist_pkg,
+					"deb": lambda: bdist_deb(args),
+					"pkg": lambda: bdist_pkg(args),
 				}
 				if not hasattr(target, "formatid") or target.formatid is None:
 					target.formatid = "sdist"
