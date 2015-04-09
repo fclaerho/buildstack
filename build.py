@@ -36,8 +36,10 @@ Targets:
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
 Examples:
-  $ build test clean -a   # run unittests then cleanup
-  $ build install -u root # install as root
+  Run unit tests then cleanup everything:
+    $ build test clean -a
+  Install deliverable as root:
+    $ build install -u root
 """
 
 import pkg_resources, subprocess, glob, abc, os

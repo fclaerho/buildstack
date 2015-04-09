@@ -21,7 +21,7 @@
 	  -p <ids>, --profiles <ids>       comma-separated build profiles
 	  -u <name>, --user <name>         build on behalf of the specified user
 	  -X <path>, --pom <path>          force maven as build stack
-	  -f <id>, --format <id>           set package format
+	  -f <id>, --format <id>           set package format, use help to list ids
 	  -U, --uninstall                  with develop & install: undo
 	  -v, --version                    show version
 	  -h, --help                       show help
@@ -38,8 +38,14 @@
 	  * install [-U,-i]: [un]install locally or [un]provision inventory
 	
 	Examples:
-	  $ build test clean -a   # run unittests then cleanup
-	  $ build install -u root # install as root
+	  Run unit tests then cleanup everything:
+	    $ build test clean -a
+	  Install deliverable as root:
+	    $ build install -u root
+
+### EXTRA FEATURES
+
+  * For python projects, use "package -f pkg" to build native OS/X packages.
 
 ### END-USER INSTALLATION
 
@@ -63,3 +69,7 @@ To install:
 To uninstall:
 
 	$ sudo python setup.py develop --uninstall
+
+### TODO
+
+  * Add debian packaging support to python projects
