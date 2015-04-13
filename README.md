@@ -43,11 +43,13 @@
 	  Install deliverable as root:
 	    $ build install -u root
 
-### EXTRA FEATURES
+EXTRA FEATURES
+--------------
 
   * For python projects, use "package -f pkg" to build native OS/X packages.
 
-### END-USER INSTALLATION
+END-USER INSTALLATION
+---------------------
 
 	$ pip install -i https://pypi.fclaerhout.fr/simple/ build
 
@@ -60,7 +62,8 @@ To uninstall:
 
 	$ sudo pip uninstall build
 
-### DEVELOPER INSTALLATION
+DEVELOPER INSTALLATION
+----------------------
 
 To install:
 
@@ -70,6 +73,7 @@ To uninstall:
 
 	$ sudo python setup.py develop --uninstall
 
-### TODO
+TODO
+----
 
   * Add debian packaging support to python projects
