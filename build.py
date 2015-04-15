@@ -419,7 +419,7 @@ def configure(toolid, vars = None):
 			raise BuildError("%s: unknown tool" % toolid)
 		path = os.path.expanduser(tool[toolid]["path"])
 		vars = dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}
-		if not os.path.exists(path):
+		if not os.path.exists(path) or vars.get("overwrite", "no") == "yes":
 			with open(path, "w") as f:
 				f.write(textwrap.dedent(tool[toolid]["template"]).lstrip() % vars)
 		else:
