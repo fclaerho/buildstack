@@ -213,7 +213,7 @@ class SetupTools(BuildStack):
 			elif target == Target("clean", all = True):
 				args += ["clean", "--all"]
 				self._setup(*args)
-				args = []
+				del args[:]
 				subprocess.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs", "nose2-junit.xml"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 			elif target == "test":
 				setup = open("setup.py").read()
@@ -224,6 +224,11 @@ class SetupTools(BuildStack):
 					with open("setup.py", "w") as f:
 						f.write(setup)
 				args.append("test")
+				# BUG:
+				# - "python setup.py sdist test" does what's expected
+				# - "python setup.py test sdist" does not run sdist
+				self._setup(*args)
+				del args[:]
 			elif target == "compile":
 				args.append("build")
 			elif target == "package":
@@ -272,7 +277,7 @@ class SetupTools(BuildStack):
 			elif target == "publish":
 				if args:
 					self._setup(*args)
-				args = []
+				del args[:]
 				argv = ["upload"] + glob.glob("dist/*")
 				if target.repositoryid:
 					argv += ["-r", target.repositoryid]
@@ -285,13 +290,14 @@ class SetupTools(BuildStack):
 				if target.uninstall:
 					if args:
 						self._setup(*args)
-					args = []
+					del args[:]
 					self._pip("uninstall", os.path.basename(os.getcwd()))
 				else:
 					args.append("install")
 			else:
 				raise TargetError(target)
 		if args:
+			print "args=", args
 			self._setup(*args)
 
 class Ansible(BuildStack):
