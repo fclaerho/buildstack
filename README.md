@@ -48,7 +48,7 @@ EXTRA FEATURES
 
   * Python:
     * use `package -f pkg` to build native OS/X packages.
-    * on testing, if nose2 is installed, it'll be used to generate xunit reports.
+    * on testing, if nose2.cfg is present and setup.py does use it, nose2 will be called directly.
 
 END-USER INSTALLATION
 ---------------------

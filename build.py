@@ -212,20 +212,16 @@ class SetupTools(BuildStack):
 				args = []
 				subprocess.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 			elif target == "test":
-				# *** EXPERIMENTAL ***
 				# with nose2:
-				if subprocess.call(("which", "nose2"), stdout = DEVNULL, stderr = DEVNULL) == 0:
-					print "using nose2"
-					if args:
-						self._setup(*args)
-					args = []
-					if not os.path.exists("nose2.cfg"):
-						with open("nose2.cfg", "w") as f:
-							f.write(NOSE2CFG)
-					subprocess.check_call(("nose2", "--verbose"))
-				# default:
-				else:
-					args.append("test")
+				with open("setup.py") as f:
+					if os.path.exists("nose2.cfg") and "nose2.collector.collector" not in f.read():
+						if args:
+							self._setup(*args)
+						args = []
+						subprocess.check_call(("nose2", "--verbose"))
+					# default:
+					else:
+						args.append("test")
 			elif target == "compile":
 				args.append("build")
 			elif target == "package":
