@@ -5,7 +5,7 @@ import setuptools
 setuptools.setup(
 	name = "build",
 	author = "fclaerhout.fr",
-	version = "1.0.1",
+	version = "1.0.0",
 	license = "MIT",
 	test_suite = "test",
 	py_modules = ["build"],

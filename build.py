@@ -4,6 +4,7 @@
 Detect and drive any source code build stack to reach well-known targets.
 
 Usage:
+  build [options] configure <toolid> [<vars>]
   build [options] get <packageid>
   build [options] <target>...
   build --version
@@ -19,7 +20,7 @@ Options:
   -p <ids>, --profiles <ids>       common, comma-separated build profiles
   -u <name>, --user <name>         common, build on behalf of the specified user
   -X <path>, --pom <path>          force maven as build stack
-  -f <id>, --format <id>           with package: set format, use -f help to list ids
+  -f <id>, --format <id>           with package: set format, use '-f help' to list ids
   -U, --uninstall                  with develop & install: undo
   -v, --version                    show version
   -h, --help                       show help
@@ -42,7 +43,7 @@ Examples:
     $ build install -u root
 """
 
-import pkg_resources, subprocess, glob, abc, os
+import pkg_resources, subprocess, textwrap, glob, abc, os
 
 import docopt # 3rd-party
 
@@ -77,7 +78,7 @@ class BuildError(Exception):
 	def __str__(self):
 		return "build error: %s" % " ".join(self.args)
 
-DEVNULL = open(os.devnull)
+DEVNULL = open(os.devnull, "w")
 
 class BuildStack(object):
 	"build stack interface"
@@ -163,17 +164,6 @@ class Make(BuildStack):
 		if args:
 			self._make(*args)
 
-NOSE2CFG = """
-[unittest]
-plugins = nose2.plugins.junitxml
-
-[junit-xml]
-always-on = True
-
-[load_tests]
-always-on = True
-"""
-
 class SetupTools(BuildStack):
 
 	prefix = None
@@ -224,9 +214,8 @@ class SetupTools(BuildStack):
 			elif target == "test":
 				# *** EXPERIMENTAL ***
 				# with nose2:
-				subprocess.check_call(("which", "nose2"))
-				subprocess.check_call(("nose2", "-h"))
 				if subprocess.call(("which", "nose2"), stdout = DEVNULL, stderr = DEVNULL) == 0:
+					print "using nose2"
 					if args:
 						self._setup(*args)
 					args = []
@@ -384,7 +373,7 @@ class Grunt(BuildStack): pass
 
 def get_build_stack(username = None, profileids = None):
 	"autoguess the build stack to use depending on the build manifest found"
-	map = {
+	stack = {
 		"Gruntfile.coffee": Grunt,
 		"playbook.yml": Ansible,
 		"Gruntfile.js": Grunt,
@@ -394,13 +383,51 @@ def get_build_stack(username = None, profileids = None):
 		"makefile": Make,
 		"pom.xml": Maven,
 	}
-	for basename in map:
+	for basename in stack:
 		if os.path.exists(basename):
-			return map[basename](
+			return stack[basename](
 				manifest_path = basename,
 				username = username,
 				profileids = profileids)
 	raise BuildError("failed to detect build stack")
+
+def configure(toolid, vars = None):
+	tool = {
+		"nose2": {
+			"path": "nose2.cfg",
+			"template": """
+				[unittest]
+				plugins = nose2.plugins.junitxml
+				[junit-xml]
+				always-on = True
+				[load_tests]
+				always-on = True
+			"""
+		},
+		"pypi": {
+			"path": "~/.pypirc",
+			"template": """
+				[distutils]
+				index-servers = %(name)s
+				[%(name)s]
+				repository = %(url)s
+				username = %(user)s
+				password = %(pass)s
+			"""
+		},
+	}
+	if toolid == "help":
+		print "\n".join(tool.keys())
+	else:
+		if not toolid in tool:
+			raise BuildError("%s: unknown tool" % toolid)
+		path = os.path.expanduser(tool[toolid]["path"])
+		vars = dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}
+		if not os.path.exists(path):
+			with open(path, "w") as f:
+				f.write(textwrap.dedent(tool[toolid]["template"]).lstrip() % vars)
+		else:
+			raise BuildError("%s: file already exists" % path)
 
 def main(*args):
 	opts = docopt.docopt(
@@ -408,8 +435,10 @@ def main(*args):
 		argv = args or None,
 		version = pkg_resources.require("build")[0].version)
 	try:
+		# change directory
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
+		# instantiate build stack
 		if opts["--makefile"]:
 			bs = Make(
 				manifest_path = opts["--makefile"],
@@ -434,7 +463,10 @@ def main(*args):
 			bs = get_build_stack(
 				username = opts["--user"],
 				profileids = opts["--profiles"])
-		if opts["get"]:
+		# handle use cases:
+		if opts["configure"]:
+			configure(opts["<toolid>"], opts["<vars>"])
+		elif opts["get"]:
 			bs.get(
 				packageid = opts["<packageid>"],
 				repositoryid = opts["--repository"])
