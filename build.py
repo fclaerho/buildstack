@@ -224,6 +224,8 @@ class SetupTools(BuildStack):
 			elif target == "test":
 				# *** EXPERIMENTAL ***
 				# with nose2:
+				subprocess.check_call(("which", "nose2"))
+				subprocess.check_call(("nose2", "-h"))
 				if subprocess.call(("which", "nose2"), stdout = DEVNULL, stderr = DEVNULL) == 0:
 					if args:
 						self._setup(*args)
