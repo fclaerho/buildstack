@@ -11,15 +11,15 @@ Usage:
 
 Options:
   -S <path>, --setupscript <path>  force python setup tools as build stack
-  -C <path>, --directory <path>    set working directory
+  -C <path>, --directory <path>    common, set working directory
   -M <path>, --makefile <path>     force make as build stack
   -P <path>, --playbook <path>     force ansible as build stack
   -r <id>, --repository <id>       with get & publish: select repository
   -i <id>, --inventory <id>        with install: select inventory
-  -p <ids>, --profiles <ids>       comma-separated build profiles
-  -u <name>, --user <name>         build on behalf of the specified user
+  -p <ids>, --profiles <ids>       common, comma-separated build profiles
+  -u <name>, --user <name>         common, build on behalf of the specified user
   -X <path>, --pom <path>          force maven as build stack
-  -f <id>, --format <id>           set package format, use help to list ids
+  -f <id>, --format <id>           with package: set format, use -f help to list ids
   -U, --uninstall                  with develop & install: undo
   -v, --version                    show version
   -h, --help                       show help
@@ -76,6 +76,8 @@ class BuildError(Exception):
 
 	def __str__(self):
 		return "build error: %s" % " ".join(self.args)
+
+DEVNULL = open(os.devnull)
 
 class BuildStack(object):
 	"build stack interface"
@@ -161,6 +163,17 @@ class Make(BuildStack):
 		if args:
 			self._make(*args)
 
+NOSE2CFG = """
+[unittest]
+plugins = nose2.plugins.junitxml
+
+[junit-xml]
+always-on = True
+
+[load_tests]
+always-on = True
+"""
+
 class SetupTools(BuildStack):
 
 	prefix = None
@@ -209,7 +222,19 @@ class SetupTools(BuildStack):
 				args = []
 				subprocess.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 			elif target == "test":
-				args.append("test")
+				# *** EXPERIMENTAL ***
+				# with nose2:
+				if subprocess.call(("which", "nose2"), stdout = DEVNULL, stderr = DEVNULL) == 0:
+					if args:
+						self._setup(*args)
+					args = []
+					if not os.path.exists("nose2.cfg"):
+						with open("nose2.cfg", "w") as f:
+							f.write(NOSE2CFG)
+					subprocess.check_call(("nose2", "--verbose"))
+				# default:
+				else:
+					args.append("test")
 			elif target == "compile":
 				args.append("build")
 			elif target == "package":
