@@ -47,7 +47,7 @@ Examples:
     $ build test
 """
 
-import pkg_resources, subprocess, textwrap, glob, abc, os
+import pkg_resources, subprocess, textwrap, glob, abc, os, re
 
 import docopt # 3rd-party
 
@@ -214,18 +214,16 @@ class SetupTools(BuildStack):
 				args += ["clean", "--all"]
 				self._setup(*args)
 				args = []
-				subprocess.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
+				subprocess.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs", "nose2-junit.xml"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 			elif target == "test":
-				# with nose2:
-				with open("setup.py") as f:
-					if os.path.exists("nose2.cfg") and "nose2.collector.collector" not in f.read():
-						if args:
-							self._setup(*args)
-						args = []
-						subprocess.check_call(("nose2", "--verbose"))
-					# default:
-					else:
-						args.append("test")
+				setup = open("setup.py").read()
+				if os.path.exists("nose2.cfg") and "nose2.collector.collector" not in setup:
+					with open("setup.py.bak", "w") as f:
+						f.write(setup)
+					setup = re.sub("test_suite.*?,", "test_suite = \"nose2.collector.collector\",", setup)
+					with open("setup.py", "w") as f:
+						f.write(setup)
+				args.append("test")
 			elif target == "compile":
 				args.append("build")
 			elif target == "package":
@@ -396,6 +394,7 @@ def configure(toolid, vars = None):
 		"nose2": {
 			"path": "nose2.cfg",
 			"template": """
+				# this is a generated file
 				[unittest]
 				plugins = nose2.plugins.junitxml
 				[junit-xml]
@@ -407,6 +406,7 @@ def configure(toolid, vars = None):
 		"pypi": {
 			"path": "~/.pypirc",
 			"template": """
+				# this is a generated file
 				[distutils]
 				index-servers = %(name)s
 				[%(name)s]
