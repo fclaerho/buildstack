@@ -53,7 +53,7 @@ EXTRA FEATURES
 END-USER INSTALLATION
 ---------------------
 
-	$ pip install --extra-index-url https://pypi.fclaerhout.fr/simple/ build
+	$ sudo pip install --extra-index-url https://pypi.fclaerhout.fr/simple/ build
 
 or, if that repository is not available:
 
