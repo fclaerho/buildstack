@@ -28,9 +28,7 @@
 	  -h, --help                       show help
 	  -a, --all                        with clean: remove build artifacts
 	
-	Targets:
-	  * configure: generate tool configuration file
-	  * get [-r]: install dependency from a repository -- use a VE if possible
+	Where <target> is one of:
 	  * clean [-a]: delete objects generated during the build
 	  * test: run unit tests
 	  * compile: compile code, for non-interpreted languages
@@ -45,7 +43,7 @@
 	  Install deliverable as root:
 	    $ build install -u root
 	  For a python project, export xunit test report:
-	    $ build configure nose2
+	    $ build configure nose2 overwrite=yes
 	    $ build test
 
 EXTRA FEATURES
