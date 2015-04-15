@@ -46,12 +46,14 @@
 EXTRA FEATURES
 --------------
 
-  * For python projects, use "package -f pkg" to build native OS/X packages.
+  * Python:
+    * use `package -f pkg` to build native OS/X packages.
+    * on testing, if nose2 is installed, it'll be used to generate xunit reports.
 
 END-USER INSTALLATION
 ---------------------
 
-	$ pip install -i https://pypi.fclaerhout.fr/simple/ build
+	$ pip install --extra-index-url https://pypi.fclaerhout.fr/simple/ build
 
 or, if that repository is not available:
 
