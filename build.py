@@ -26,7 +26,7 @@ Options:
   -h, --help                       show help
   -a, --all                        with clean: remove build artifacts
 
-Where <target> is one of:
+Targets:
   * clean [-a]: delete objects generated during the build
   * test: run unit tests
   * compile: compile code, for non-interpreted languages
