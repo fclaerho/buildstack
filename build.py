@@ -101,7 +101,7 @@ class BuildStack(object):
 
 	def check_call(self, args):
 		if self.verbose:
-			sys.stderr.write("\033[1;31m+ %s\033[0m\n" % " ".join(args))
+			sys.stderr.write("\033[1;33m+ %s\033[0m\n" % " ".join(args))
 		subprocess.check_call(args)
 
 	@abc.abstractmethod
@@ -148,7 +148,7 @@ class Make(BuildStack):
 		raise TargetError("make has no package management feature")
 
 	def _make(self, *args):
-		argv = ["make", "-f", self.manifest_path] + list(args)
+		argv = ["make", "--file", self.manifest_path] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
 		self.check_call(argv)
@@ -304,9 +304,9 @@ class Ansible(BuildStack):
 	def _play(self, *args):
 		# user
 		if self.username == "root":
-			argv = ["-u", "root", "--ask-pass"] + list(args)
+			argv = ["--user", "root", "--ask-pass"] + list(args)
 		elif self.username:
-			argv = ["-u", self.username, "--sudo"] + list(args)
+			argv = ["--user", self.username, "--sudo"] + list(args)
 		else:
 			argv = list(args)
 		# tags
@@ -322,7 +322,7 @@ class Ansible(BuildStack):
 				if target.inventoryid:
 					if not os.path.exists(target.inventoryid):
 						raise BuildError("%s: no such file" % target.inventoryid)
-					self._play("-i", target.inventoryid)
+					self._play("--inventory-file", target.inventoryid)
 				else:
 					self._play()
 			else:
@@ -334,13 +334,13 @@ class Maven(BuildStack):
 	def _mvn(self, *args):
 		argv = ["mvn"] + list(args)
 		if self.profileids:
-			argv += ["-P", self.profileids]
+			argv += ["--activate-profiles", self.profileids]
 		self.check_call(argv)
 
 	def get(self, packageid, repositoryid = None):
-		argv = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "-Dartifact=%s" % packageid]
+		argv = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % packageid]
 		if repositoryid:
-			argv += ["-DrepoUrl=%s" % repositoryid]
+			argv += ["--define", "repoUrl=%s" % repositoryid]
 		self._mvn(*argv)
 
 	def build(self):
