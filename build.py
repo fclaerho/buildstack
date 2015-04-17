@@ -101,7 +101,7 @@ class BuildStack(object):
 
 	def check_call(self, args):
 		if self.verbose:
-			sys.stderr.write("+ %s\n" % " ".join(args))
+			sys.stderr.write("\033[1;31m%s\033[0m\n" % " ".join(args))
 		subprocess.check_call(args)
 
 	@abc.abstractmethod
