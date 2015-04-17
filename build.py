@@ -22,7 +22,8 @@ Options:
   -X <path>, --pom <path>          force maven as build stack
   -f <id>, --format <id>           with package: set format, use '-f help' to list ids
   -U, --uninstall                  with develop & install: undo
-  -v, --version                    show version
+  -V, --version                    show version
+  -v, --verbose                    output commands
   -h, --help                       show help
   -a, --all                        with clean: remove build artifacts
 
@@ -45,7 +46,7 @@ Examples:
     $ build test
 """
 
-import pkg_resources, subprocess, textwrap, glob, abc, os, re
+import pkg_resources, subprocess, textwrap, glob, abc, sys, os, re
 
 import docopt # 3rd-party
 
@@ -87,7 +88,7 @@ class BuildStack(object):
 
 	__metaclass__ = abc.ABCMeta
 
-	def __init__(self, manifest_path, username = None, profileids = None):
+	def __init__(self, manifest_path, profileids = None, username = None, verbose = None):
 		if not manifest_path:
 			raise BuildError("missing manifest")
 		elif not os.path.exists(manifest_path):
@@ -95,7 +96,13 @@ class BuildStack(object):
 		self.manifest_path = manifest_path
 		self.profileids = profileids
 		self.username = username
+		self.verbose = verbose
 		self.targets = []
+
+	def check_call(self, *args):
+		if self.verbose:
+			sys.stderr.write("+ %s" % " ".join(args))
+		subprocess.check_call(args)
 
 	@abc.abstractmethod
 	def get(self, packageid, repositoryid = None):
@@ -144,7 +151,7 @@ class Make(BuildStack):
 		argv = ["make", "-f", self.manifest_path] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
-		subprocess.check_call(argv)
+		self.check_call(argv)
 
 	def build(self):
 		args = []
@@ -178,24 +185,24 @@ class SetupTools(BuildStack):
 
 	def _pip(self, *args):
 		if not os.path.exists(".virtualenv"):
-			subprocess.check_call(("virtualenv", ".virtualenv"))
+			self.check_call(("virtualenv", ".virtualenv"))
 			self.prefix = ".virtualenv/bin"
 		argv = [self._get_path("pip")] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
-		subprocess.check_call(argv)
+		self.check_call(argv)
 
 	def _setup(self, *args):
 		argv = [self._get_path("python"), self.manifest_path] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
-		subprocess.check_call(argv)
+		self.check_call(argv)
 
 	def _twine(self, *args):
 		argv = [self._get_path("twine")] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
-		subprocess.check_call(argv)
+		self.check_call(argv)
 
 	def get(self, packageid, repositoryid = None):
 		argv = ["install", packageid]
@@ -212,7 +219,7 @@ class SetupTools(BuildStack):
 				args += ["clean", "--all"]
 				self._setup(*args)
 				del args[:]
-				subprocess.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs", "nose2-junit.xml"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
+				self.check_call(["rm", "-vrf", ".virtualenv", "dist", ".eggs", "nose2-junit.xml"] + glob.glob("*.egg-info") + glob.glob("*.pyc"))
 			elif target == "test":
 				setup = open("setup.py").read()
 				if os.path.exists("nose2.cfg") and "nose2.collector.collector" not in setup:
@@ -239,13 +246,13 @@ class SetupTools(BuildStack):
 					self._setup(*args)
 					del args[:]
 					for path in glob.glob("dist/*.tar"):
-						subprocess.check_call(("mkdir", "-p", "dist/root"))
-						subprocess.check_call(("tar", "-C", "dist/root", "-xf", path))
+						self.check_call(("mkdir", "-p", "dist/root"))
+						self.check_call(("tar", "-C", "dist/root", "-xf", path))
 						basename, extname = os.path.splitext(path)
 						name, tail = basename.split("-", 1)
 						version, _ = tail.split(".macosx", 1)
 						identifier = "fr.fclaerhout.%s" % name
-						subprocess.check_call(("pkgbuild", basename + ".pkg", "--root", "dist/root", "--version", version, "--identifier", identifier))
+						self.check_call(("pkgbuild", basename + ".pkg", "--root", "dist/root", "--version", version, "--identifier", identifier))
 						return
 				func = {
 					"sdist": lambda: args.append("sdist"),
@@ -314,7 +321,7 @@ class Ansible(BuildStack):
 		# tags
 		if self.profileids:
 			argv += ["--tags", self.profileids]
-		subprocess.check_call(["ansible-playbook", self.manifest_path] + argv)
+		self.check_call(["ansible-playbook", self.manifest_path] + argv)
 
 	def build(self):
 		for target in self.targets:
@@ -337,7 +344,7 @@ class Maven(BuildStack):
 		argv = ["mvn"] + list(args)
 		if self.profileids:
 			argv += ["-P", self.profileids]
-		subprocess.check_call(argv)
+		self.check_call(argv)
 
 	def get(self, packageid, repositoryid = None):
 		argv = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "-Dartifact=%s" % packageid]
@@ -373,7 +380,7 @@ class Grunt(BuildStack): pass
 # entry point #
 ###############
 
-def get_build_stack(username = None, profileids = None):
+def get_build_stack(profileids = None, username = None, verbose = None):
 	"autoguess the build stack to use depending on the build manifest found"
 	stack = {
 		"Gruntfile.coffee": Grunt,
@@ -389,8 +396,9 @@ def get_build_stack(username = None, profileids = None):
 		if os.path.exists(basename):
 			return stack[basename](
 				manifest_path = basename,
+				profileids = profileids,
 				username = username,
-				profileids = profileids)
+				verbose = verbose)
 	raise BuildError("failed to detect build stack")
 
 def configure(toolid, vars = None):
@@ -446,27 +454,32 @@ def main(*args):
 		if opts["--makefile"]:
 			bs = Make(
 				manifest_path = opts["--makefile"],
+				profileids = opts["--profiles"],
 				username = opts["--user"],
-				profileids = opts["--profiles"])
+				verbose = opts["--verbose"])
 		elif opts["--setupscript"]:
 			bs = SetupTools(
 				manifest_path = opts["--setupscript"],
+				profileids = opts["--profiles"],
 				username = opts["--user"],
-				profileids = opts["--profiles"])
+				verbose = opts["--verbose"])
 		elif opts["--playbook"]:
 			bs = Ansible(
 				manifest_path = opts["--playbook"],
+				profileids = opts["--profiles"],
 				username = opts["--user"],
-				profileids = opts["--profiles"])
+				verbose = opts["--verbose"])
 		elif opts["--pom"]:
 			bs = Maven(
 				manifest_path = opts["--pom"],
+				profileids = opts["--profiles"],
 				username = opts["--user"],
-				profileids = opts["--profiles"])
+				verbose = opts["--verbose"])
 		else:
 			bs = get_build_stack(
+				profileids = opts["--profiles"],
 				username = opts["--user"],
-				profileids = opts["--profiles"])
+				verbose = opts["--verbose"])
 		# handle use cases:
 		if opts["configure"]:
 			configure(opts["<toolid>"], opts["<vars>"])
