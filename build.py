@@ -312,6 +312,8 @@ class Ansible(BuildStack):
 		# tags
 		if self.profileids:
 			argv += ["--tags", self.profileids]
+		if self.verbose:
+			args += ["--verbose"]
 		self.check_call(["ansible-playbook", self.manifest_path] + argv)
 
 	def build(self):
