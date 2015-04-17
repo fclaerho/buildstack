@@ -198,7 +198,7 @@ class SetupTools(BuildStack):
 	def get(self, packageid, repositoryid = None):
 		argv = ["install", packageid]
 		if repositoryid:
-			argv += ["-i", repositoryid]
+			argv += ["--extra-index-url", repositoryid]
 		self._pip(*argv)
 
 	def build(self):
@@ -276,7 +276,7 @@ class SetupTools(BuildStack):
 				del args[:]
 				argv = ["upload"] + glob.glob("dist/*")
 				if target.repositoryid:
-					argv += ["-r", target.repositoryid]
+					argv += ["--repository", target.repositoryid]
 				self._twine(*argv)
 			elif target == Target("develop", uninstall = False):
 				args.append("develop")
