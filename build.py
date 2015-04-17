@@ -101,7 +101,7 @@ class BuildStack(object):
 
 	def check_call(self, args):
 		if self.verbose:
-			sys.stderr.write("\033[1;35m+ %s\033[0m\n" % " ".join(args))
+			sys.stderr.write("\033[1;34m+ %s\033[0m\n" % " ".join(args))
 		subprocess.check_call(args)
 
 	@abc.abstractmethod
@@ -220,9 +220,9 @@ class SetupTools(BuildStack):
 					with open("setup.py", "w") as f:
 						f.write(setup)
 				args.append("test")
-				# BUG:
-				# - "python setup.py sdist test" does what's expected
-				# - "python setup.py test sdist" does not run sdist
+				# Setuptools BUG?
+				# - "python setup.py sdist test" handles both targets as expected
+				# - "python setup.py test sdist" handles "test" only :-(
 				self._setup(*args)
 				del args[:]
 			elif target == "compile":
@@ -306,7 +306,7 @@ class Ansible(BuildStack):
 		if self.username == "root":
 			argv = ["--user", "root", "--ask-pass"] + list(args)
 		elif self.username:
-			argv = ["--user", self.username, "--sudo"] + list(args)
+			argv = ["--user", self.username] + list(args)
 		else:
 			argv = list(args)
 		# tags
