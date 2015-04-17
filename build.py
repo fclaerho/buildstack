@@ -22,8 +22,8 @@ Options:
   -X <path>, --pom <path>          force maven as build stack
   -f <id>, --format <id>           with package: set format, use '-f help' to list ids
   -U, --uninstall                  with develop & install: undo
-  -V, --version                    show version
   -v, --verbose                    output commands
+  -V, --version                    show version
   -h, --help                       show help
   -a, --all                        with clean: remove build artifacts
 
@@ -101,7 +101,7 @@ class BuildStack(object):
 
 	def check_call(self, args):
 		if self.verbose:
-			sys.stderr.write("\033[1;31m%s\033[0m\n" % " ".join(args))
+			sys.stderr.write("\033[1;31m+ %s\033[0m\n" % " ".join(args))
 		subprocess.check_call(args)
 
 	@abc.abstractmethod
@@ -175,31 +175,22 @@ class Make(BuildStack):
 
 class SetupTools(BuildStack):
 
-	prefix = None
-
-	def _get_path(self, basename):
-		if self.prefix:
-			return os.path.join(self.prefix, basename)
-		else:
-			return basename
-
 	def _pip(self, *args):
 		if not os.path.exists(".virtualenv"):
 			self.check_call(("virtualenv", ".virtualenv"))
-			self.prefix = ".virtualenv/bin"
-		argv = [self._get_path("pip")] + list(args)
+		argv = ["pip"] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
 		self.check_call(argv)
 
 	def _setup(self, *args):
-		argv = [self._get_path("python"), self.manifest_path] + list(args)
+		argv = ["python", self.manifest_path] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
 		self.check_call(argv)
 
 	def _twine(self, *args):
-		argv = [self._get_path("twine")] + list(args)
+		argv = ["twine"] + list(args)
 		if self.username:
 			argv = ["sudo", "-u", self.username] + argv
 		self.check_call(argv)
