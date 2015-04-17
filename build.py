@@ -99,7 +99,7 @@ class BuildStack(object):
 		self.verbose = verbose
 		self.targets = []
 
-	def check_call(self, *args):
+	def check_call(self, args):
 		if self.verbose:
 			sys.stderr.write("+ %s" % " ".join(args))
 		subprocess.check_call(args)
