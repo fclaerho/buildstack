@@ -51,7 +51,7 @@ EXTRA FEATURES
 
   * Python:
     * use `package -f pkg` to build native OS/X packages.
-    * on testing, if nose2.cfg is present and setup.py does use it, nose2 will be called directly.
+    * on testing, if nose2.cfg is present and setup.py does not use it, the original setup.py will be backed up and a new one will be generated to call nose2.
 
 END-USER INSTALLATION
 ---------------------
