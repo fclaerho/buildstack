@@ -293,7 +293,6 @@ class SetupTools(BuildStack):
 			else:
 				raise TargetError(target)
 		if args:
-			print "args=", args
 			self._setup(*args)
 
 class Ansible(BuildStack):
@@ -303,9 +302,7 @@ class Ansible(BuildStack):
 
 	def _play(self, *args):
 		# user
-		if self.username == "root":
-			argv = ["--user", "root", "--ask-pass"] + list(args)
-		elif self.username:
+		if self.username:
 			argv = ["--user", self.username] + list(args)
 		else:
 			argv = list(args)
