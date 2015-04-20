@@ -474,6 +474,10 @@ def main(*args):
 		# change directory
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
+		# handle configure
+		if opts["configure"]:
+			configure(opts["<toolid>"], opts["<vars>"])
+			return
 		# instantiate build stack
 		if opts["--makefile"]:
 			bs = Make(
@@ -504,10 +508,8 @@ def main(*args):
 				profileids = opts["--profiles"],
 				username = opts["--user"],
 				verbose = opts["--verbose"])
-		# handle use cases:
-		if opts["configure"]:
-			configure(opts["<toolid>"], opts["<vars>"])
-		elif opts["get"]:
+		# handle build stack use cases:
+		if opts["get"]:
 			bs.get(
 				packageid = opts["<packageid>"],
 				repositoryid = opts["--repository"])
