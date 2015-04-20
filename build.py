@@ -223,6 +223,7 @@ class SetupTools(BuildStack):
 				# Setuptools BUG?
 				# - "python setup.py sdist test" handles both targets as expected
 				# - "python setup.py test sdist" handles "test" only :-(
+				# solution: flush targets after test
 				self._setup(*args)
 				del args[:]
 			elif target == "compile":
