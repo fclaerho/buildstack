@@ -41,7 +41,7 @@ Examples:
     $ build test clean -a
   Install deliverable as root:
     $ build install -u root
-  For a python project, export xunit test report:
+  For a python project, use nose2 to generate xunit reports:
     $ build configure nose2 overwrite=yes
     $ build test
 """
@@ -101,7 +101,7 @@ class BuildStack(object):
 
 	def check_call(self, args):
 		if self.verbose:
-			sys.stderr.write("\033[1;34m+ %s\033[0m\n" % " ".join(args))
+			sys.stderr.write("\033[34m+ %s\033[0m\n" % " ".join(args))
 		subprocess.check_call(args)
 
 	@abc.abstractmethod
@@ -393,41 +393,74 @@ def get_build_stack(profileids = None, username = None, verbose = None):
 
 def configure(toolid, vars = None):
 	tool = {
-		"nose2": {
-			"path": "nose2.cfg",
+		"ansible": {
+			"required_vars": ["user", "inventory"],
+			"defaults": {
+				"host_key_checking": "yes",
+				"ask_sudo_pass": "no",
+				"ask_pass": "no",
+				"sudo": "no",
+			},
 			"template": """
-				# this is a generated file
+				[defaults]
+				host_key_checking = %(host_key_checking)s
+				ask_sudo_pass = %(ask_sudo_pass)s
+				remote_user = %(user)s
+				# inventory file w/ ansible > 1.9:
+				inventory = %(inventory)s
+				# inventory file w/ ansible < 1.9:
+				hostfile = %(inventory)s
+				ask_pass = %(ask_pass)s
+				sudo = %(sudo)s
+			""",
+			"path": "ansible.cfg",
+		},
+		"nose2": {
+			"required_vars": [],
+			"defaults": {},
+			"template": """
 				[unittest]
 				plugins = nose2.plugins.junitxml
 				[junit-xml]
 				always-on = True
 				[load_tests]
 				always-on = True
-			"""
+			""",
+			"path": "nose2.cfg",
 		},
 		"pypi": {
-			"path": "~/.pypirc",
+			"required_vars": ["name", "url", "user", "pass"],
+			"defaults": {},
 			"template": """
-				# this is a generated file
 				[distutils]
 				index-servers = %(name)s
 				[%(name)s]
 				repository = %(url)s
 				username = %(user)s
 				password = %(pass)s
-			"""
+			""",
+			"path": "~/.pypirc",
 		},
 	}
 	if toolid == "help":
-		print "\n".join(tool.keys())
+		def print_help(key):
+			vars = tool[key]["defaults"]
+			for name in tool[key]["required_vars"]:
+				vars[name] = "REQUIRED"
+			print "\033[34m%s\033[0m %s" % (key, ",".join("%s=%s" % (key, vars[key]) for key in vars))
+		map(print_help, tool.keys())
 	else:
 		if not toolid in tool:
 			raise BuildError("%s: unknown tool" % toolid)
 		path = os.path.expanduser(tool[toolid]["path"])
-		vars = dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}
+		vars = dict(tool[toolid]["defaults"], **(dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}))
 		if not os.path.exists(path) or vars.get("overwrite", "no") == "yes":
+			try:
+				text = textwrap.dedent(tool[toolid]["template"]).lstrip() % vars
+			except KeyError as exc:
+				raise BuildError("%s: missing required variable" % exc)
 			with open(path, "w") as f:
-				f.write(textwrap.dedent(tool[toolid]["template"]).lstrip() % vars)
+				f.write(text)
 		else:
 			raise BuildError("%s: file already exists" % path)
 
@@ -497,6 +530,6 @@ def main(*args):
 					raise BuildError("%s: unknown target" % target)
 			bs.build()
 	except (subprocess.CalledProcessError, BuildError) as exc:
-		raise SystemExit("** fatal error! %s" % exc)
+		raise SystemExit("\033[31m%s\033[0m" % exc)
 
 if __name__ == "__main__": main()
