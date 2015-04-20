@@ -24,7 +24,8 @@
 	  -X <path>, --pom <path>          force maven as build stack
 	  -f <id>, --format <id>           with package: set format, use '-f help' to list ids
 	  -U, --uninstall                  with develop & install: undo
-	  -v, --version                    show version
+	  -v, --verbose                    output commands
+	  -V, --version                    show version
 	  -h, --help                       show help
 	  -a, --all                        with clean: remove build artifacts
 	
@@ -42,13 +43,17 @@
 	    $ build test clean -a
 	  Install deliverable as root:
 	    $ build install -u root
-	  For a python project, export xunit test report:
+	  For a python project, use nose2 to generate xunit reports:
 	    $ build configure nose2 overwrite=yes
 	    $ build test
 
 EXTRA FEATURES
 --------------
 
+  * Generate configuration files:
+    * ansible
+    * nose2
+    * pypi
   * Python:
     * use `package -f pkg` to build native OS/X packages.
     * on testing, if nose2.cfg is present and setup.py does not use it, the original setup.py will be backed up and a new one will be generated to call nose2.
