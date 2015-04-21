@@ -409,7 +409,8 @@ def configure(toolid, vars = None):
 				remote_user = %(user)s
 				hostfile = %(inventory)s
 				ask_pass = %(ask_pass)s
-				sudo = %(sudo)s # NOTICE: ansible 1.9.0 breaks this, downgrade to 1.8.4
+				# NOTICE: ansible 1.9 breaks the 'sudo' parameter below, downgrade to 1.8.4
+				sudo = %(sudo)s
 			""",
 			"path": "ansible.cfg",
 		},
