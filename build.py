@@ -407,9 +407,6 @@ def configure(toolid, vars = None):
 				host_key_checking = %(host_key_checking)s
 				ask_sudo_pass = %(ask_sudo_pass)s
 				remote_user = %(user)s
-				# inventory file w/ ansible > 1.9:
-				inventory = %(inventory)s
-				# inventory file w/ ansible < 1.9:
 				hostfile = %(inventory)s
 				ask_pass = %(ask_pass)s
 				sudo = %(sudo)s # NOTICE: ansible 1.9.0 breaks this, downgrade to 1.8.4
