@@ -344,7 +344,6 @@ class Ansible(BuildStack):
 				raise TargetError(target)
 
 class Maven(BuildStack):
-	"convention over configuration"
 
 	def _mvn(self, *args):
 		argv = ["mvn"] + list(args)
