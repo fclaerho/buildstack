@@ -196,7 +196,13 @@ class SetupTools(BuildStack):
 		self.check_call(argv)
 
 	def get(self, packageid, repositoryid = None):
-		argv = ["install", packageid]
+		argv = ["install"]
+		if os.path.exists(packageid):
+			# requirements file
+			argv += ["-r", packageid]
+		else:
+			# single module
+			argv += [packageid]
 		if repositoryid:
 			argv += ["--extra-index-url", repositoryid]
 		self._pip(*argv)
@@ -299,7 +305,16 @@ class SetupTools(BuildStack):
 class Ansible(BuildStack):
 
 	def get(self, packageid, repositoryid = None):
-		raise TargetError("ansible has no package management feature")
+		argv = ["ansible-galaxy", "install"]
+		if os.path.exists(packageid):
+			# requirements file
+			argv += ["-r", packageid]
+		else:
+			# single module
+			if not re.match("\w\.\w(,\w)?", packageid):
+				raise BuildError("%s: expected username.rolename[,version] format")
+			argv += [packageid]
+		self.check_call(*argv)
 
 	def _play(self, *args):
 		# user
