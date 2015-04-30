@@ -314,7 +314,7 @@ class Ansible(BuildStack):
 			if not re.match("\w\.\w(,\w)?", packageid):
 				raise BuildError("%s: expected username.rolename[,version] format")
 			argv += [packageid]
-		self.check_call(*argv)
+		self.check_call(argv)
 
 	def _play(self, *args):
 		# user
