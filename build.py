@@ -331,7 +331,9 @@ class Ansible(BuildStack):
 
 	def build(self):
 		for target in self.targets:
-			if target == "test":
+			if target == Target("clean", all = True):
+				self.check_call(("rm", "-vrf", "dist"))
+			elif target == "test":
 				self._play("--check") # dry run
 			elif target.name == "install" and not target.uninstall:
 				if target.inventoryid:
@@ -340,6 +342,12 @@ class Ansible(BuildStack):
 					self._play("--inventory-file", target.inventoryid)
 				else:
 					self._play()
+			elif target.name == "publish":
+				if not os.path.exists("dist"):
+					os.mkdir("dist")
+				for name in os.listdir():
+					if os.path.isdir(name):
+						self.check_call(("tar", "zcf", "target/%s.tgz" % name, name))
 			else:
 				raise TargetError(target)
 
