@@ -36,6 +36,8 @@ Targets:
   * develop [-U]: [un]install locally in development mode
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
+Note: if <packageid> is a file path, it is considered to a be requirements file.
+
 Examples:
   Run unit tests then cleanup everything:
     $ build test clean -a
@@ -44,6 +46,8 @@ Examples:
   For a python project, use nose2 to generate xunit reports:
     $ build configure nose2 overwrite=yes
     $ build test
+  Install dependencies from requirements:
+    $ build get requirements.yml
 """
 
 import pkg_resources, subprocess, textwrap, glob, abc, sys, os, re
