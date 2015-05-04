@@ -304,6 +304,8 @@ class SetupTools(BuildStack):
 
 class Ansible(BuildStack):
 
+	distdir = "dist"
+
 	def get(self, packageid, repositoryid = None):
 		argv = ["ansible-galaxy", "install"]
 		if os.path.exists(packageid):
@@ -332,7 +334,7 @@ class Ansible(BuildStack):
 	def build(self):
 		for target in self.targets:
 			if target == Target("clean", all = True):
-				self.check_call(("rm", "-vrf", "dist"))
+				self.check_call(("rm", "-vrf", self.distdir))
 			elif target == "test":
 				self._play("--check") # dry run
 			elif target.name == "install" and not target.uninstall:
@@ -343,12 +345,12 @@ class Ansible(BuildStack):
 				else:
 					self._play()
 			elif target.name == "publish":
-				if not os.path.exists("dist"):
-					os.mkdir("dist")
+				if not os.path.exists(self.distdir):
+					os.mkdir(self.distdir)
 				for name in os.listdir("roles"):
 					path = os.path.join("roles", name)
 					if os.path.isdir(path):
-						self.check_call(("tar", "zcf", "dist/%s.tgz" % name, path))
+						self.check_call(("tar", "zcf", "%s/%s.tgz" % (self.distdir, name), path))
 			else:
 				raise TargetError(target)
 
