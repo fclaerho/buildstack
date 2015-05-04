@@ -38,6 +38,8 @@
 	  * develop [-U]: [un]install locally in development mode
 	  * install [-U,-i]: [un]install locally or [un]provision inventory
 	
+	Note: if <packageid> is a file path, it is considered to a be requirements file.
+	
 	Examples:
 	  Run unit tests then cleanup everything:
 	    $ build test clean -a
@@ -46,6 +48,8 @@
 	  For a python project, use nose2 to generate xunit reports:
 	    $ build configure nose2 overwrite=yes
 	    $ build test
+	  Install dependencies from requirements:
+	    $ build get requirements.yml
 
 EXTRA FEATURES
 --------------
@@ -58,7 +62,7 @@ EXTRA FEATURES
     * use `package -f pkg` to build native OS/X packages.
     * on testing, if nose2.cfg is present and setup.py does not use it, the original setup.py will be backed up and a new one will be generated to call nose2.
   * Ansible:
-    * publish your roles to a private http server (e.g. nginx + dav module) and use galaxy to check them out.
+    * publish your roles to a private http server (e.g. nginx + dav module).
 
 END-USER INSTALLATION
 ---------------------
