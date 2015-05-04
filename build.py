@@ -355,7 +355,7 @@ class Ansible(BuildStack):
 					srcpath = os.path.join("roles", name)
 					tgtpath = os.path.join(self.distdir, "%s.tgz" % name)
 					if os.path.isdir(srcpath):
-						self.check_call(("tar", "zcf", tgtpath, srcpath))
+						self.check_call(("tar", "zcf", tgtpath, "%s/" % srcpath))
 						if target.repositoryid:
 							self.check_call(("curl", "-k", "-T", tgtpath, target.repositoryid)) # HTTP upload
 			else:
