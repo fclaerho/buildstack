@@ -348,9 +348,12 @@ class Ansible(BuildStack):
 				if not os.path.exists(self.distdir):
 					os.mkdir(self.distdir)
 				for name in os.listdir("roles"):
-					path = os.path.join("roles", name)
+					srcpath = os.path.join("roles", name)
+					tgtpath = os.path.join(self.distdir, "%s.tgz" % name)
 					if os.path.isdir(path):
-						self.check_call(("tar", "zcf", "%s/%s.tgz" % (self.distdir, name), path))
+						self.check_call(("tar", "zcf", tgtpath, srcpath))
+						if target.repositoryid:
+							self.check_call(("curl", "-k", "-T", tgtpath, repositoryid)) # HTTP upload
 			else:
 				raise TargetError(target)
 
