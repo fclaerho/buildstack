@@ -345,9 +345,10 @@ class Ansible(BuildStack):
 			elif target.name == "publish":
 				if not os.path.exists("dist"):
 					os.mkdir("dist")
-				for name in os.listdir():
-					if os.path.isdir(name):
-						self.check_call(("tar", "zcf", "target/%s.tgz" % name, name))
+				for name in os.listdir("roles"):
+					path = os.path.join("roles", name)
+					if os.path.isdir(path):
+						self.check_call(("tar", "zcf", "target/%s.tgz" % name, pathc))
 			else:
 				raise TargetError(target)
 
