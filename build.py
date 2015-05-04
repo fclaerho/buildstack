@@ -348,7 +348,7 @@ class Ansible(BuildStack):
 				for name in os.listdir("roles"):
 					path = os.path.join("roles", name)
 					if os.path.isdir(path):
-						self.check_call(("tar", "zcf", "target/%s.tgz" % name, pathc))
+						self.check_call(("tar", "zcf", "target/%s.tgz" % name, path))
 			else:
 				raise TargetError(target)
 
