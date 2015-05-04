@@ -353,7 +353,7 @@ class Ansible(BuildStack):
 					if os.path.isdir(srcpath):
 						self.check_call(("tar", "zcf", tgtpath, srcpath))
 						if target.repositoryid:
-							self.check_call(("curl", "-k", "-T", tgtpath, repositoryid)) # HTTP upload
+							self.check_call(("curl", "-k", "-T", tgtpath, target.repositoryid)) # HTTP upload
 			else:
 				raise TargetError(target)
 
