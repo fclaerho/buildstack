@@ -58,7 +58,7 @@ EXTRA FEATURES
     * use `package -f pkg` to build native OS/X packages.
     * on testing, if nose2.cfg is present and setup.py does not use it, the original setup.py will be backed up and a new one will be generated to call nose2.
   * Ansible:
-    * publish your roles to an http server (e.g. nginx + dav module)
+    * publish your roles to a private http server (e.g. nginx + dav module) and use galaxy to check them out.
 
 END-USER INSTALLATION
 ---------------------
