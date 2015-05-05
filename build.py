@@ -12,20 +12,20 @@ Usage:
 
 Options:
   -S <path>, --setupscript <path>  force python setup tools as build stack
-  -C <path>, --directory <path>    common, set working directory
+  -C <path>, --directory <path>    set working directory
   -M <path>, --makefile <path>     force make as build stack
   -P <path>, --playbook <path>     force ansible as build stack
-  -r <id>, --repository <id>       with get & publish: select repository
-  -i <id>, --inventory <id>        with install: select inventory
-  -p <ids>, --profiles <ids>       common, comma-separated build profiles
-  -u <name>, --user <name>         common, build on behalf of the specified user
+  -r <id>, --repository <id>       with 'get' and 'publish': select repository
+  -i <id>, --inventory <id>        with 'install': select inventory
+  -p <ids>, --profiles <ids>       comma-separated build profiles
+  -u <name>, --user <name>         build on behalf of the specified user
   -X <path>, --pom <path>          force maven as build stack
-  -f <id>, --format <id>           with package: set format, use '-f help' to list ids
-  -U, --uninstall                  with develop & install: undo
-  -v, --verbose                    output commands
+  -f <id>, --format <id>           with 'package': set format, use '-f help' to list ids
+  -U, --uninstall                  with 'develop' and 'install': undo
+  -v, --verbose                    output executed commands
   -V, --version                    show version
   -h, --help                       show help
-  -a, --all                        with clean: remove build artifacts
+  -a, --all                        with 'clean': remove build artifacts
 
 Targets:
   * clean [-a]: delete objects generated during the build
@@ -43,9 +43,6 @@ Examples:
     $ build test clean -a
   Install deliverable as root:
     $ build install -u root
-  For a python project, use nose2 to generate xunit reports:
-    $ build configure nose2 overwrite=yes
-    $ build test
   Install dependencies from requirements:
     $ build get requirements.yml
 """
