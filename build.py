@@ -4,7 +4,7 @@
 Detect and drive any source code build stack to reach well-known targets.
 
 Usage:
-  build [options] configure <toolid> [<vars>]
+  build [options] configure (<toolid>|help) [<vars>]
   build [options] get <packageid>
   build [options] <target>...
   build --version
@@ -22,6 +22,7 @@ Options:
   -X <path>, --pom <path>          force maven as build stack
   -f <id>, --format <id>           with 'package': set format, use '-f help' to list ids
   -U, --uninstall                  with 'develop' and 'install': undo
+  -c, --no-colors                  disable ANSI color codes
   -v, --verbose                    output executed commands
   -V, --version                    show version
   -h, --help                       show help
@@ -84,10 +85,19 @@ class BuildError(Exception):
 
 DEVNULL = open(os.devnull, "w")
 
+def blue(string):
+	return "\033[34m%s\033[0m" % string
+
+def red(string):
+	return "\033[31m%s\033[0m" % string
+
 class BuildStack(object):
 	"build stack interface"
 
 	__metaclass__ = abc.ABCMeta
+
+	def reset(self):
+		self.targets = []
 
 	def __init__(self, manifest_path, profileids = None, username = None, verbose = None):
 		if not manifest_path:
@@ -98,11 +108,11 @@ class BuildStack(object):
 		self.profileids = profileids
 		self.username = username
 		self.verbose = verbose
-		self.targets = []
+		self.reset()
 
 	def check_call(self, args):
 		if self.verbose:
-			sys.stderr.write("\033[34m+ %s\033[0m\n" % " ".join(args))
+			sys.stderr.write(blue("+ %s\n") % " ".join(args))
 		subprocess.check_call(args)
 
 	@abc.abstractmethod
@@ -276,7 +286,7 @@ class SetupTools(BuildStack):
 				if not hasattr(target, "formatid") or target.formatid is None:
 					target.formatid = "sdist"
 				elif target.formatid == "help":
-					raise SystemExit("\n".join(func.keys()))
+					raise SystemExit("\n".join(func.kes()))
 				func[target.formatid]()
 			elif target == "publish":
 				if args:
@@ -475,7 +485,7 @@ def configure(toolid, vars = None):
 			vars = tool[key]["defaults"]
 			for name in tool[key]["required_vars"]:
 				vars[name] = "REQUIRED"
-			print "\033[34m%s\033[0m %s" % (key, ",".join("%s=%s" % (key, vars[key]) for key in vars))
+			print blue(key) + " %s" % ",".join("%s=%s" % (key, vars[key]) for key in vars)
 		map(print_help, tool.keys())
 	else:
 		if not toolid in tool:
@@ -492,74 +502,81 @@ def configure(toolid, vars = None):
 		else:
 			raise BuildError("%s: file already exists" % path)
 
+def build(opts):
+	# instantiate build stack
+	if opts["--makefile"]:
+		bs = Make(
+			manifest_path = opts["--makefile"],
+			profileids = opts["--profiles"],
+			username = opts["--user"],
+			verbose = opts["--verbose"])
+	elif opts["--setupscript"]:
+		bs = SetupTools(
+			manifest_path = opts["--setupscript"],
+			profileids = opts["--profiles"],
+			username = opts["--user"],
+			verbose = opts["--verbose"])
+	elif opts["--playbook"]:
+		bs = Ansible(
+			manifest_path = opts["--playbook"],
+			profileids = opts["--profiles"],
+			username = opts["--user"],
+			verbose = opts["--verbose"])
+	elif opts["--pom"]:
+		bs = Maven(
+			manifest_path = opts["--pom"],
+			profileids = opts["--profiles"],
+			username = opts["--user"],
+			verbose = opts["--verbose"])
+	else:
+		bs = get_build_stack(
+			profileids = opts["--profiles"],
+			username = opts["--user"],
+			verbose = opts["--verbose"])
+	# process build targets
+	if opts["get"]:
+		bs.get(
+			packageid = opts["<packageid>"],
+			repositoryid = opts["--repository"])
+	else:
+		for target in opts["<target>"]:
+			if target == "clean":
+				bs.clean(all = opts["--all"])
+			elif target == "test":
+				bs.test()
+			elif target == "compile":
+				bs.compile()
+			elif target == "package":
+				bs.package(formatid = opts["--format"])
+			elif target == "publish":
+				bs.publish(repositoryid = opts["--repository"])
+			elif target == "develop":
+				bs.develop(uninstall = opts["--uninstall"])
+			elif target == "install":
+				bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"])
+			else:
+				raise BuildError("%s: unknown target" % target)
+		bs.build()
+
 def main(*args):
 	opts = docopt.docopt(
 		__doc__,
 		argv = args or None,
 		version = pkg_resources.require("build")[0].version)
 	try:
+		# disable ANSI color codes
+		if opts["--no-colors"]:
+			globals()["notice"] = lambda s: s
+			globals()["error"] = lambda s: s
 		# change directory
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
 		# handle configure
 		if opts["configure"]:
 			configure(opts["<toolid>"], opts["<vars>"])
-			return
-		# instantiate build stack
-		if opts["--makefile"]:
-			bs = Make(
-				manifest_path = opts["--makefile"],
-				profileids = opts["--profiles"],
-				username = opts["--user"],
-				verbose = opts["--verbose"])
-		elif opts["--setupscript"]:
-			bs = SetupTools(
-				manifest_path = opts["--setupscript"],
-				profileids = opts["--profiles"],
-				username = opts["--user"],
-				verbose = opts["--verbose"])
-		elif opts["--playbook"]:
-			bs = Ansible(
-				manifest_path = opts["--playbook"],
-				profileids = opts["--profiles"],
-				username = opts["--user"],
-				verbose = opts["--verbose"])
-		elif opts["--pom"]:
-			bs = Maven(
-				manifest_path = opts["--pom"],
-				profileids = opts["--profiles"],
-				username = opts["--user"],
-				verbose = opts["--verbose"])
 		else:
-			bs = get_build_stack(
-				profileids = opts["--profiles"],
-				username = opts["--user"],
-				verbose = opts["--verbose"])
-		# handle build stack use cases:
-		if opts["get"]:
-			bs.get(
-				packageid = opts["<packageid>"],
-				repositoryid = opts["--repository"])
-		else:
-			for target in opts["<target>"]:
-				if target == "clean":
-					bs.clean(all = opts["--all"])
-				elif target == "test":
-					bs.test()
-				elif target == "compile":
-					bs.compile()
-				elif target == "package":
-					bs.package(formatid = opts["--format"])
-				elif target == "publish":
-					bs.publish(repositoryid = opts["--repository"])
-				elif target == "develop":
-					bs.develop(uninstall = opts["--uninstall"])
-				elif target == "install":
-					bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"])
-				else:
-					raise BuildError("%s: unknown target" % target)
-			bs.build()
+			build(opts)
 	except (subprocess.CalledProcessError, BuildError) as exc:
-		raise SystemExit("\033[31m%s\033[0m" % exc)
+		raise SystemExit(red(exc))
 
 if __name__ == "__main__": main()
