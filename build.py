@@ -1,5 +1,7 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
+# POST-IT: if you update the docstring, please update the README too.
+
 """
 Detect and drive any source code build stack to reach well-known targets.
 

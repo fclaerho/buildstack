@@ -6,7 +6,7 @@
 	Detect and drive any source code build stack to reach well-known targets.
 	
 	Usage:
-	  build [options] configure <toolid> [<vars>]
+	  build [options] configure (<toolid>|help) [<vars>]
 	  build [options] get <packageid>
 	  build [options] <target>...
 	  build --version
@@ -24,6 +24,7 @@
 	  -X <path>, --pom <path>          force maven as build stack
 	  -f <id>, --format <id>           with 'package': set format, use '-f help' to list ids
 	  -U, --uninstall                  with 'develop' and 'install': undo
+	  -c, --no-colors                  disable ANSI color codes
 	  -v, --verbose                    output executed commands
 	  -V, --version                    show version
 	  -h, --help                       show help
