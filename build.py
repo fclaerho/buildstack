@@ -568,8 +568,8 @@ def main(*args):
 	try:
 		# disable ANSI color codes
 		if opts["--no-colors"]:
-			globals()["notice"] = lambda s: s
-			globals()["error"] = lambda s: s
+			globals()["blue"] = lambda s: s
+			globals()["red"] = lambda s: s
 		# change directory
 		if opts["--directory"]:
 			os.chdir(opts["--directory"])
