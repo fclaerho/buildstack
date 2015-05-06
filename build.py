@@ -535,7 +535,7 @@ def build(opts):
 			profileids = opts["--profiles"],
 			username = opts["--user"],
 			verbose = opts["--verbose"])
-	# process build targets
+	# reach targets
 	if opts["get"]:
 		bs.get(
 			packageid = opts["<packageid>"],
