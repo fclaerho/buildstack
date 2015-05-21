@@ -42,7 +42,7 @@ Examples:
     $ build get requirements.yml
 """
 
-import pkg_resources, subprocess, sys, os
+import pkg_resources, subprocess, textwrap, sys, os
 
 import buildstack, docopt # 3rd-party
 
