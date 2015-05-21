@@ -104,7 +104,7 @@ def on_publish(profileid, username, filename, targets, repositoryid):
 	yield "flush"
 	args = ["upload"] + glob.glob("dist/*")
 	if repositoryid:
-		argv += ["--repository", repositoryid]
+		args += ["--repository", repositoryid]
 	yield twine(
 		username = username,
 		args = args)
