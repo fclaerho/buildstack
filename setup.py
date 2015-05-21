@@ -5,13 +5,14 @@ import setuptools
 setuptools.setup(
 	name = "build",
 	author = "fclaerhout.fr",
-	version = "1.0.0",
+	version = "2.0.0",
 	license = "MIT",
+	packages = ["buildstack"],
 	test_suite = "test",
-	py_modules = ["build"],
+	py_modules = ["build2"],
 	description = "build stack helper",
 	author_email = "contact@fclaerhout.fr",
-	entry_points = {"console_scripts": ["build=build:main"]},
+	entry_points = {"console_scripts": ["build=build2:main"]},
 	tests_require = ["docopt"],
 	install_requires = ["docopt"],
 )

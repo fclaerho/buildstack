@@ -1,0 +1,4 @@
+
+manifest = {
+	"filenames": ["build.xml"],
+}
