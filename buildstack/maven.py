@@ -1,3 +1,4 @@
+# copyright (c) 2015 fclaerhout.fr, all rights reserved
 
 def mvn(filename, profileid, args):
 	args = ["mvn"] + list(args)

@@ -1,3 +1,4 @@
+# copyright (c) 2015 fclaerhout.fr, all rights reserved
 
 def make(filename, username, args):
 	args = ["make", "--file", filename] + list(args)

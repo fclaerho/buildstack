@@ -1,5 +1,6 @@
+# copyright (c) 2015 fclaerhout.fr, all rights reserved
 
-import glob, os
+import glob, os, re
 
 #########
 # tools #
