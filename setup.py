@@ -9,10 +9,10 @@ setuptools.setup(
 	license = "MIT",
 	packages = ["buildstack"],
 	test_suite = "test",
-	py_modules = ["build2"],
+	py_modules = ["build"],
 	description = "build stack helper",
 	author_email = "contact@fclaerhout.fr",
-	entry_points = {"console_scripts": ["build=build2:main"]},
+	entry_points = {"console_scripts": ["build=build:main"]},
 	tests_require = ["docopt"],
 	install_requires = ["docopt"],
 )
