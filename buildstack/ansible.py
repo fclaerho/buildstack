@@ -17,10 +17,10 @@ def galaxy(args):
 def play(profileid, username, filename, args):
 	args = list(args)
 	if username:
-		argv = ["--user", username] + args
+		args = ["--user", username] + args
 	if profileid:
-		argv += ["--tags", profileid]
-	return ["ansible-playbook", filename] + argv
+		args += ["--tags", profileid]
+	return ["ansible-playbook", filename] + args
 
 ############
 # handlers #
