@@ -48,7 +48,7 @@ def on_publish(profileid, username, filename, targets, repositoryid):
 		os.mkdir(DISTDIR)
 	for name in os.listdir("roles"):
 		srcpath = os.path.join("roles", name)
-		tgtpath = os.path.join(self.distdir, "%s.tgz" % name)
+		tgtpath = os.path.join(DISTDIR, "%s.tgz" % name)
 		if os.path.isdir(srcpath):
 			yield ("tar", "zcf", tgtpath, "-C", srcpath, ".")
 			if target.repositoryid:
