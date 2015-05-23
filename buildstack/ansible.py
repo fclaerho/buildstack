@@ -55,6 +55,7 @@ def on_publish(profileid, username, filename, targets, repositoryid):
 				yield ("curl", "-k", "-T", tgtpath, target.repositoryid) # HTTP upload
 
 def on_flush(profileid, username, filename, targets):
+	do_play = False
 	args = []
 	while targets:
 		target = targets.pop(0)
@@ -64,10 +65,10 @@ def on_flush(profileid, username, filename, targets):
 			if target.inventoryid:
 				args += ["--inventory-file", target.inventoryid]
 			else:
-				args.append("") # force at least one arg
+				do_play = True
 		else:
 			yield "%s: unexpected target" % target
-	if args:
+	if args or do_play:
 		yield play(
 			profileid = profileid,
 			username = username,
