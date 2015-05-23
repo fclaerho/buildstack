@@ -51,8 +51,8 @@ def on_publish(profileid, username, filename, targets, repositoryid):
 		tgtpath = os.path.join(DISTDIR, "%s.tgz" % name)
 		if os.path.isdir(srcpath):
 			yield ("tar", "zcf", tgtpath, "-C", srcpath, ".")
-			if target.repositoryid:
-				yield ("curl", "-k", "-T", tgtpath, target.repositoryid) # HTTP upload
+			if repositoryid:
+				yield ("curl", "-k", "-T", tgtpath, repositoryid) # HTTP upload
 
 def on_flush(profileid, username, filename, targets):
 	do_play = False
