@@ -7,6 +7,9 @@ def make(filename, username, args):
 	return args
 
 def on_flush(profileid, username, filename, targets):
+	if filename == "configure":
+		yield ("./configure",)
+		filename = "Makefile"
 	args = []
 	while targets:
 		target = targets.pop(0)
@@ -29,7 +32,7 @@ def on_flush(profileid, username, filename, targets):
 		yield make(filename = filename, username = username, args = args)
 
 manifest = {
-	"filenames": ["Makefile", "makefile", "GNUmakefile"],
+	"filenames": ["configure", "Makefile", "makefile", "GNUmakefile"],
 	"on_get": None,
 	"on_flush": on_flush,
 }
