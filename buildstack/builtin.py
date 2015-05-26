@@ -78,7 +78,7 @@ Development 101:
   A Target subclass must implement, at least, the build() method.
 """
 
-import ConfigParser, subprocess, tempfile, shutil, os
+import ConfigParser, subprocess, tempfile, shutil, abc, os
 
 #############
 # templates #
