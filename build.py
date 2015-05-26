@@ -46,13 +46,13 @@ import pkg_resources, subprocess, textwrap, sys, os
 
 import buildstack, docopt # 3rd-party
 
-TRACEFP = open(os.devnull, "w")
-
 def blue(string):
 	return "\033[34m%s\033[0m" % string
 
 def red(string):
 	return "\033[31m%s\033[0m" % string
+
+TRACEFP = open(os.devnull, "w")
 
 def trace(*strings):
 	TRACEFP.write(blue("+ %s\n") % " ".join(strings))

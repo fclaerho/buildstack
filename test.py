@@ -6,7 +6,7 @@ import build # 3rd-party
 
 class Test(unittest.TestCase):
 
-	def test(self):
+	def test_make(self):
 		# generate a Makefile, check it's detected and run
 		dirname = tempfile.mkdtemp()
 		with open(os.path.join(dirname, "Makefile"), "w") as f:
