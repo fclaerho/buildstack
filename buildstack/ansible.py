@@ -14,10 +14,8 @@ def galaxy(args):
 		args = ["--roles-path", "roles"] + args
 	return ["ansible-galaxy", "install"] + args
 
-def play(profileid, username, filename, args):
+def play(profileid, filename, args):
 	args = list(args)
-	if username:
-		args = ["--user", username] + args
 	if profileid:
 		args += ["--tags", profileid]
 	return ["ansible-playbook", filename] + args
@@ -26,7 +24,7 @@ def play(profileid, username, filename, args):
 # handlers #
 ############
 
-def on_get(profileid, username, filename, targets, packageid, repositoryid):
+def on_get(profileid, filename, targets, packageid, repositoryid):
 	if os.path.exists(packageid):
 		# requirements file
 		args = ["-r", packageid]
@@ -37,12 +35,12 @@ def on_get(profileid, username, filename, targets, packageid, repositoryid):
 		args = [packageid]
 	yield galaxy(args)
 
-def on_clean(profileid, username, filename, targets, all):
+def on_clean(profileid, filename, targets, all):
 	if all:
 		yield "flush"
 		yield ("rm", "-vrf", DISTDIR)
 
-def on_publish(profileid, username, filename, targets, repositoryid):
+def on_publish(profileid, filename, targets, repositoryid):
 	yield "flush"
 	if not os.path.exists(DISTDIR):
 		os.mkdir(DISTDIR)
@@ -54,7 +52,7 @@ def on_publish(profileid, username, filename, targets, repositoryid):
 			if repositoryid:
 				yield ("curl", "-k", "-T", tgtpath, repositoryid) # HTTP upload
 
-def on_flush(profileid, username, filename, targets):
+def on_flush(profileid, filename, targets):
 	do_play = False
 	args = []
 	while targets:
@@ -71,7 +69,6 @@ def on_flush(profileid, username, filename, targets):
 	if args or do_play:
 		yield play(
 			profileid = profileid,
-			username = username,
 			filename = filename,
 			args = args)
 

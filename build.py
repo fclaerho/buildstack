@@ -1,7 +1,7 @@
 # copyright (c) 2015 fclaerhout.fr, all rights reserved
 
 """
-Detect and drive your source code build stack to reach well-known targets.
+Detect and drive a source code build stack to reach well-known targets.
 
 Usage:
   build [options] configure (<toolid>|help) [<vars>]
@@ -14,10 +14,11 @@ Options:
   -C <path>, --directory <path>  set working directory
   -r <id>, --repository <id>     with 'get' and 'publish': select repository
   -i <id>, --inventory <id>      with 'install': select inventory
-  -u <name>, --user <name>       build on behalf of the specified user
-  -p <id>, --profile <id>        set a build profile
-  -f <id>, --format <id>         with 'package': set format, use '-f help' to list ids
-  -U, --uninstall                with 'develop' and 'install': uninstall
+  -e <args>, --extra <args>      arguments appended to build stack invocation
+  -f <path>, --file <path>       set build manifest path
+  -p <id>, --profile <id>        set build profile
+  -F <id>, --format <id>         with 'package': set format, use '-f help' to list ids
+  -u, --uninstall                with 'develop' and 'install': uninstall
   -c, --no-colors                disable ANSI color codes
   -v, --verbose                  output executed commands
   -V, --version                  show version
@@ -34,12 +35,48 @@ Options:
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
 Examples:
-  Run unit tests then cleanup everything:
-    $ build test clean -a
-  Install software as root:
-    $ build install -u root
-  Install dependencies from requirements:
-    $ build get requirements.yml
+  Any stack, run unit tests then cleanup everything:
+  $ build test clean -a
+  Ansible, deploy as root:
+  $ build install -e "--user root --ask-pass"
+  Python, fetch dependencies:
+  $ build get requirements.txt
+
+Plugin Development:
+  Fill-in the following template and move it to the buildstack directory.
+  For all handlers, except on_flush, the default behavior is to stack the
+  target in the 'targets' list. on_flush is called last to unstack those.
+  All handlers are generators and can yield either "flush" or a command
+  as many time as needed.
+  |
+  | def on_clean(profileid, filename, targets, all): pass
+  |
+  | def on_test(profileid, filename, targets): pass
+  |
+  | def on_compile(profileid, filename, targets): pass
+  |
+  | def on_package(profileid, filename, targets, formatid): pass
+  |
+  | def on_publish(profileid, filename, targets, repositoryid): pass
+  |
+  | def on_develop(profileid, filename, targets, uninstall): pass
+  |
+  | def on_install(profileid, filename, targets, uninstall): pass
+  |
+  | def on_flush(profileid, filename, targets): pass
+  |
+  | manifest = {
+  | 	#"name": # if unset, use the module name
+  | 	"filenames": [], # list of supported build manifest filenames
+  | 	#"on_clean": None | on_clean,
+  | 	#"on_test": None | on_test,
+  | 	#"on_compile": None | on_compile,
+  | 	#"on_package": None | on_package,
+  | 	#"on_publish": None | on_publish,
+  | 	#"on_develop": None | on_develop,
+  | 	#"on_install": None | on_install,
+  | 	#"on_flush": None | on_flush,
+  | }
 """
 
 import pkg_resources, subprocess, textwrap, sys, os
@@ -91,23 +128,31 @@ class BuildError(Exception):
 
 class BuildStack(object):
 
-	def __init__(self, profileid = None, username = None, dirname = None):
+	def __init__(self, profileid = None, extraargs = None, filename = None, dirname = None):
 		self.profileid = profileid
-		self.username = username
+		self.extraargs = extraargs or ()
+		self.filename = filename
 		if dirname:
 			trace("chdir", dirname)
 			os.chdir(dirname)
-		# detect the buildstack:
 		manifests = []
-		for manifest in buildstack.manifests:
-			for filename in manifest["filenames"]:
-				if os.path.exists(filename):
-					self.filename = filename
+		if self.filename:
+			# find all stacks able to handle this manifest:
+			for manifest in buildstack.manifests:
+				if filename in manifest["filenames"]:
 					manifests.append(manifest)
+		else:
+			# otherwise try all filenames declared by all stacks:
+			for manifest in buildstack.manifests:
+				for filename in manifest["filenames"]:
+					if os.path.exists(filename):
+						self.filename = filename
+						manifests.append(manifest)
+		# assess there's exactly one stack found, or fail:
 		if not manifests:
 			raise BuildError("no known build stack detected")
 		elif len(manifests) > 1:
-			raise BuildError("multiple build stacks detected")
+			raise BuildError("multiple build stacks detected") #FIXME: we might have plugins declaring the same filenames
 		else:
 			self.manifest, = manifests
 		for key in ("name", "filenames"):
@@ -116,6 +161,7 @@ class BuildStack(object):
 		self.targets = Targets()
 
 	def _check_call(self, args):
+		args += self.extraargs
 		trace(*args)
 		subprocess.check_call(args)
 
@@ -126,7 +172,6 @@ class BuildStack(object):
 				assert callable(self.manifest[key]), "%s: %s: not callable" % (self.manifest["name"], key)
 				for res in self.manifest[key](
 					profileid = self.profileid,
-					username = self.username,
 					filename = self.filename,
 					targets = self.targets,
 					**kwargs):
@@ -137,7 +182,7 @@ class BuildStack(object):
 						self._check_call(res)
 					else: # assume res is an error object
 						raise BuildError("%s: %s: %s" % (self.manifest["name"], name, res))
-			else: # manifest explicitly declare this target as unsupported
+			else: # the manifest explicitly declares this target as unsupported
 				raise BuildError("%s: %s: unsupported target" % (self.manifest["name"], name))
 		elif default == "stack":
 			self.targets.append(name, **kwargs)
@@ -174,7 +219,10 @@ class BuildStack(object):
 
 	def flush(self):
 		self._handle_target("flush", canflush = False, default = "stack")
-		assert not self.targets, "%s: unhandled target(s) left" % self.manifest["name"]
+		assert not self.targets, "%s: lingering unhandled target(s)" % self.manifest["name"]
+
+	def __del__(self):
+		self.flush()
 
 	def get(self, packageid, repositoryid = None):
 		self._handle_target("get", canflush = False, default = "fail")
@@ -210,11 +258,13 @@ def main(*args):
 		__doc__,
 		argv = args or None,
 		version = pkg_resources.require("build")[0].version)
+	print opts
 	try:
 		if opts["--no-colors"]:
 			globals()["blue"] = globals()["red"] = lambda s: s
 		if opts["--verbose"]:
-			globals()["TRACEFP"] = sys.stderr
+			global TRACEFP
+			TRACEFP = sys.stderr
 		if opts["configure"]:
 			configure(
 				toolid = opts["<toolid>"],
@@ -222,7 +272,8 @@ def main(*args):
 		else:
 			bs = BuildStack(
 				profileid = opts["--profile"],
-				username = opts["--user"],
+				extraargs = opts["--extra"].split(),
+				filename = opts["--file"],
 				dirname = opts["--directory"])
 			if opts["get"]:
 				bs.get(
@@ -246,7 +297,6 @@ def main(*args):
 						bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"])
 					else:
 						raise BuildError("%s: unknown target" % target)
-				bs.flush()
 	except (subprocess.CalledProcessError, BuildError) as exc:
 		raise SystemExit(red(exc))
 

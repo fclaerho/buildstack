@@ -6,25 +6,16 @@ import glob, os, re
 # tools #
 #########
 
-def pip(username, args):
-	args = ["pip"] + list(args)
-	if username:
-		args = ["sudo", "-u", username] + args
-	return args
+def pip(args):
+	return ["pip"] + list(args)
 
-def setup(filename, username, args):
-	args = ["python", filename] + list(args)
-	if username:
-		args = ["sudo", "-u", username] + argv
-	return args
+def setup(filename, args):
+	return ["python", filename] + list(args)
 
-def twine(username, args):
-	args = ["twine"] + list(args)
-	if username:
-		args = ["sudo", "-u", username] + args
-	return args
+def twine(args):
+	return ["twine"] + list(args)
 
-def get(self, username, packageid, repositoryid = None):
+def get(self, packageid, repositoryid = None):
 	args = ["install"]
 	if os.path.exists(packageid):
 		# requirements file
@@ -34,15 +25,13 @@ def get(self, username, packageid, repositoryid = None):
 		args += [packageid]
 	if repositoryid:
 		args += ["--extra-index-url", repositoryid]
-	return pip(
-		username = username,
-		args = args)
+	return pip(args)
 
 ############
 # handlers #
 ############
 
-def on_get(profileid, username, filename, targets, packageid, repositoryid):
+def on_get(profileid, filename, targets, packageid, repositoryid):
 	args = ["install"]
 	if os.path.exists(packageid):
 		# requirements file
@@ -52,11 +41,9 @@ def on_get(profileid, username, filename, targets, packageid, repositoryid):
 		args += [packageid]
 	if repositoryid:
 		args += ["--extra-index-url", repositoryid]
-	yield pip(
-		username = username,
-		args = args)
+	yield pip(args)
 
-def on_clean(profileid, username, filename, targets, all):
+def on_clean(profileid, filename, targets, all):
 	if all:
 		targets.append("clean", all = True)
 		yield "flush"
@@ -65,7 +52,7 @@ def on_clean(profileid, username, filename, targets, all):
 	else:
 		targets.append("clean")
 
-def on_test(profileid, username, filename, targets):
+def on_test(profileid, filename, targets):
 	# if nose2 configuration file exists, use nose2 as test framework
 	text = open(filename).read()
 	if os.path.exists("nose2.cfg") and "nose2.collector.collector" not in text:
@@ -81,13 +68,12 @@ def on_test(profileid, username, filename, targets):
 	# solution: flush targets after test
 	yield "flush"
 
-def on_package(profileid, username, filename, targets, formatid):
+def on_package(profileid, filename, targets, formatid):
 	if formatid == "pkg":
 		# *** EXPERIMENTAL ***
 		args += ["bdist", "--format=tar"]
 		yield setup(
 			filename = filename,
-			username = username,
 			args = args)
 		for path in glob.glob("dist/*.tar"):
 			yield ("mkdir", "-p", "dist/root")
@@ -100,23 +86,21 @@ def on_package(profileid, username, filename, targets, formatid):
 	else:
 		targets.append("package", formatid = formatid)
 
-def on_publish(profileid, username, filename, targets, repositoryid):
+def on_publish(profileid, filename, targets, repositoryid):
 	yield "flush"
 	args = ["upload"] + glob.glob("dist/*")
 	if repositoryid:
 		args += ["--repository", repositoryid]
-	yield twine(
-		username = username,
-		args = args)
+	yield twine(args)
 
-def on_install(filename, username, targets, inventoryid, uninstall):
+def on_install(filename, targets, inventoryid, uninstall):
 	if uninstall:
 		yield "flush"
-		yield pip("uninstall", os.path.basename(os.getcwd()))
+		yield pip(("uninstall", os.path.basename(os.getcwd())))
 	else:
 		targets.append("install")
 
-def on_flush(profileid, username, filename, targets):
+def on_flush(profileid, filename, targets):
 	args = []
 	while targets:
 		target = targets.pop(0)
@@ -165,7 +149,6 @@ def on_flush(profileid, username, filename, targets):
 	if args:
 		yield setup(
 			filename = filename,
-			username = username,
 			args = args)
 
 manifest = {

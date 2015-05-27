@@ -8,7 +8,7 @@ def mvn(filename, profileid, args):
 		args += ["--activate-profiles", profileids]
 	return args
 
-def on_get(profileid, username, filename, targets, packageid, repositoryid):
+def on_get(profileid, filename, targets, packageid, repositoryid):
 	args = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % packageid]
 	if repositoryid:
 		args += ["--define", "repoUrl=%s" % repositoryid]
@@ -17,7 +17,7 @@ def on_get(profileid, username, filename, targets, packageid, repositoryid):
 		profileid = profileid,
 		args = args)
 
-def on_flush(profileid, username, filename, targets):
+def on_flush(profileid, filename, targets):
 	args = []
 	while targets:
 		target = targets.pop(0)

@@ -705,7 +705,7 @@ def init(root):
 		with open("build.ini", "w+") as fp:
 			fp.write("[compile:hello]\npaths: main@source/hello.py\n")
 
-def on_get(profileid, username, filename, targets, packageid, repositoryid):
+def on_get(profileid, filename, targets, packageid, repositoryid):
 	if ".git" in packageid:
 		# e.g. git://foo.com/bar.git
 		if packageid.endswith(".git"):
@@ -752,7 +752,7 @@ def parse_targets(url, root):
 		except Exception as e:
 			raise type(e)("in section [%s]: %s" % (section, e))
 
-def on_flush(profileid, username, filename, targets):
+def on_flush(profileid, filename, targets):
 	try:
 		root = Dir("target")
 		Phase("clean", model = Clean)

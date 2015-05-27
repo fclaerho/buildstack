@@ -1,12 +1,9 @@
 # copyright (c) 2015 fclaerhout.fr, all rights reserved
 
-def make(filename, username, args):
-	args = ["make", "--file", filename] + list(args)
-	if username:
-		args = ["sudo", "-u", username] + args
-	return args
+def make(filename, args):
+	return ["make", "--file", filename] + list(args)
 
-def on_flush(profileid, username, filename, targets):
+def on_flush(profileid, filename, targets):
 	if filename == "configure":
 		yield ("./configure",)
 		filename = "Makefile"
@@ -29,7 +26,7 @@ def on_flush(profileid, username, filename, targets):
 		else:
 			yield "%s: unexpected target" % target
 	if args:
-		yield make(filename = filename, username = username, args = args)
+		yield make(filename = filename, args = args)
 
 manifest = {
 	"filenames": ["configure", "Makefile", "makefile", "GNUmakefile"],
