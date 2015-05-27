@@ -149,7 +149,7 @@ class BuildStack(object):
 				for pattern in manifest["filenames"]:
 					filenames = glob.glob(pattern)
 					if filenames:
-						self.filename, = filenames # pick first match
+						self.filename = filenames[0] # pick first match
 						manifests.append(manifest)
 						break
 		# assess there's exactly one stack found, or fail:
