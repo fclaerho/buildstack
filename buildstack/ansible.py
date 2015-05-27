@@ -27,7 +27,7 @@ def play(profileid, filename, args):
 def on_get(profileid, filename, targets, packageid, repositoryid):
 	if os.path.exists(packageid):
 		# requirements file
-		args = ["-r", packageid]
+		args = ["--role-file", packageid]
 	else:
 		# single module
 		if not re.match("\w\.\w(,\w)?", packageid):
