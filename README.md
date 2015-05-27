@@ -1,6 +1,14 @@
 **Build** is a build stack wrapper, its goal is to allow you to handle the build process
 of any source code repository: all build stacks follow the same patterns but all have
 specific invocation details, focus on the big picture and let **Build** handle the details.
+Well-known targets:
+  * clean
+  * test
+  * compile
+  * package
+  * publish
+  * develop
+  * install.
 
 Example:
 
