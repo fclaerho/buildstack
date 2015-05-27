@@ -142,12 +142,14 @@ class BuildStack(object):
 				for pattern in manifest["filenames"]:
 					if fnmatch.fnmatch(self.filename, pattern):
 						manifests.append(manifest)
+						break
 		else:
 			# otherwise try all filenames declared by all stacks:
 			for manifest in buildstack.manifests:
 				for pattern in manifest["filenames"]:
-					for filename in glob.glob(pattern):
-						self.filename = filename
+					filenames = glob.glob(pattern)
+					if filenames:
+						self.filename, = filenames # pick first match
 						manifests.append(manifest)
 						break
 		# assess there's exactly one stack found, or fail:
