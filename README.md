@@ -3,6 +3,7 @@ of any source code repository: all build stacks follow the same patterns but all
 specific invocation details, focus on the big picture and let **Build** handle the details.
 
 Example:
+
 	$ git pull $somerepo
 	$ cd $somerepo
 	$ build clean -a test compile package
