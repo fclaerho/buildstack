@@ -221,9 +221,6 @@ class BuildStack(object):
 		self._handle_target("flush", canflush = False, default = "stack")
 		assert not self.targets, "%s: lingering unhandled target(s)" % self.manifest["name"]
 
-	def __del__(self):
-		self.flush()
-
 	def get(self, packageid, repositoryid = None):
 		self._handle_target("get", canflush = False, default = "fail")
 
@@ -260,7 +257,8 @@ def main(*args):
 		version = pkg_resources.require("build")[0].version)
 	try:
 		if opts["--no-colors"]:
-			globals()["blue"] = globals()["red"] = lambda s: s
+			global blue, red
+			blue = red = lambda s: s
 		if opts["--verbose"]:
 			global TRACEFP
 			TRACEFP = sys.stderr
@@ -296,6 +294,7 @@ def main(*args):
 						bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"])
 					else:
 						raise BuildError("%s: unknown target" % target)
+				bs.flush()
 	except (subprocess.CalledProcessError, BuildError) as exc:
 		raise SystemExit(red(exc))
 
