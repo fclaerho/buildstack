@@ -4,8 +4,8 @@ specific invocation details, focus on the big picture and let **Build** handle t
 
 Example:
 
-	$ git pull $somerepo
-	$ cd $somerepo
+	$ git pull ${somewhere}/${somerepo}.git
+	$ cd ${somerepo}
 	$ build clean -a test compile package
 
 For usage and development details, please check out the inline help: `build -h`
