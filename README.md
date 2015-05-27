@@ -12,9 +12,9 @@ Well-known targets:
 
 Example:
 
-	$ git pull ${somewhere}/${somerepo}.git
-	$ cd ${somerepo}
-	$ build clean -a test compile package publish -r ${someotherrepo}
+	$ git pull ${somewhere}/${some_code_repo}.git
+	$ cd ${some_code_repo}
+	$ build clean -a test compile package publish -r ${some_pkg_repo}
 
 For usage and development details, please check out the inline help: `build -h`
 
