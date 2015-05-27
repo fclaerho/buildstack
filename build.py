@@ -258,7 +258,6 @@ def main(*args):
 		__doc__,
 		argv = args or None,
 		version = pkg_resources.require("build")[0].version)
-	print opts
 	try:
 		if opts["--no-colors"]:
 			globals()["blue"] = globals()["red"] = lambda s: s
@@ -272,7 +271,7 @@ def main(*args):
 		else:
 			bs = BuildStack(
 				profileid = opts["--profile"],
-				extraargs = opts["--extra"].split(),
+				extraargs = opts["--extra"] and opts["--extra"].split(),
 				filename = opts["--file"],
 				dirname = opts["--directory"])
 			if opts["get"]:
