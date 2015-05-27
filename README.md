@@ -14,7 +14,7 @@ Example:
 
 	$ git pull ${somewhere}/${somerepo}.git
 	$ cd ${somerepo}
-	$ build clean -a test compile package
+	$ build clean -a test compile package publish -r ${someotherrepo}
 
 For usage and development details, please check out the inline help: `build -h`
 
