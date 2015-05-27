@@ -79,7 +79,7 @@ Plugin Development:
   | }
 """
 
-import pkg_resources, subprocess, textwrap, sys, os
+import pkg_resources, subprocess, textwrap, fnmatch, glob, sys, os
 
 import buildstack, docopt # 3rd-party
 
@@ -139,15 +139,17 @@ class BuildStack(object):
 		if self.filename:
 			# find all stacks able to handle this manifest:
 			for manifest in buildstack.manifests:
-				if filename in manifest["filenames"]:
-					manifests.append(manifest)
+				for pattern in manifest["filenames"]:
+					if fnmatch.fnmatch(self.filename, pattern):
+						manifests.append(manifest)
 		else:
 			# otherwise try all filenames declared by all stacks:
 			for manifest in buildstack.manifests:
-				for filename in manifest["filenames"]:
-					if os.path.exists(filename):
+				for pattern in manifest["filenames"]:
+					for filename in glob.glob(pattern):
 						self.filename = filename
 						manifests.append(manifest)
+						break
 		# assess there's exactly one stack found, or fail:
 		if not manifests:
 			raise BuildError("no known build stack detected")

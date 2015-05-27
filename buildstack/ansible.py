@@ -73,7 +73,7 @@ def on_flush(profileid, filename, targets):
 			args = args)
 
 manifest = {
-	"filenames": ["playbook.yml"],
+	"filenames": ["playbook.yml", "*.yml"],
 	"on_get": on_get,
 	"on_clean": on_clean,
 	"on_publish": on_publish,
