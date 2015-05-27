@@ -203,26 +203,40 @@ class BuildStack(object):
 
 	def package(self, formatid = None):
 		"package target objects"
-		self._handle_target("package", formatid = formatid)
+		self._handle_target(
+			"package",
+			formatid = formatid)
 
 	def publish(self, repositoryid = None):
 		"publish package to the target repository"
-		self._handle_target("publish", repositoryid = repositoryid)
+		self._handle_target(
+			"publish",
+			repositoryid = repositoryid)
 
 	def develop(self, uninstall = False):
 		"deploy target objects in development mode"
-		self._handle_target("develop", uninstall = uninstall)
+		self._handle_target(
+			"develop",
+			uninstall = uninstall)
 
 	def install(self, inventoryid = None, uninstall = False):
 		"deploy target objects in production mode"
-		self._handle_target("install", inventoryid = inventoryid, uninstall = uninstall)
+		self._handle_target(
+			"install",
+			inventoryid = inventoryid,
+			uninstall = uninstall)
 
 	def flush(self):
 		self._handle_target("flush", canflush = False, default = "stack")
 		assert not self.targets, "%s: lingering unhandled target(s)" % self.manifest["name"]
 
 	def get(self, packageid, repositoryid = None):
-		self._handle_target("get", canflush = False, default = "fail")
+		self._handle_target(
+			"get",
+			canflush = False,
+			default = "fail",
+			packageid = packageid,
+			repositoryid = repositoryid)
 
 def configure(toolid, vars = None):
 	tool = {}
