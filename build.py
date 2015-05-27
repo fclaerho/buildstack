@@ -154,9 +154,9 @@ class BuildStack(object):
 						break
 		# assess there's exactly one stack found, or fail:
 		if not manifests:
-			raise BuildError("no known build stack detected")
+			raise BuildError("no supported build stack detected")
 		elif len(manifests) > 1:
-			raise BuildError("multiple build stacks detected") #FIXME: we might have plugins declaring the same filenames
+			raise BuildError("%s: multiple build stacks detected" % " ".join(manifests))
 		else:
 			self.manifest, = manifests
 		for key in ("name", "filenames"):
