@@ -2,7 +2,7 @@
 of any source code repository: all build stacks follow the same patterns but all have
 specific invocation details, focus on the big picture and let **Build** handle the details.
 
-**Build** can handle the following *well-known* targets:
+**Build** understands the following *well-known* targets:
   * clean
   * test
   * compile
