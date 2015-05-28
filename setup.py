@@ -10,7 +10,7 @@ setuptools.setup(
 	packages = ["buildstack"],
 	test_suite = "test",
 	py_modules = ["build"],
-	description = "build stack helper",
+	description = "build stack wrapper",
 	author_email = "contact@fclaerhout.fr",
 	entry_points = {"console_scripts": ["build=build:main"]},
 	tests_require = ["docopt"],
