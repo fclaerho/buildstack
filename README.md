@@ -59,4 +59,4 @@ To uninstall:
 
 	$ sudo python setup.py develop --uninstall
 
-Add your extensions into the buildstack/ directory, it will be loaded automatically.
+Add your extensions into the `buildstack/` directory, it will be loaded automatically.
