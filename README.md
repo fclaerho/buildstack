@@ -18,7 +18,7 @@ Example:
 	$ cd ${some_code_repo}
 	$ build clean -a test compile package publish -r ${some_pkg_repo}
 
-**Build** can also install modules with `build get …` and configuration tools with `build configure …`.
+**Build** can also install modules, `build get <id>`, and configure tools, `build configure <id>`.
 
 For usage and development details, please check out the inline help: `build -h`
 
