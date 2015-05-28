@@ -25,7 +25,7 @@ For usage and development details, please check out the inline help: `build -h`
 EXTRA FEATURES
 --------------
 
-  * Generate configuration files (`build configure …`):
+  * Generate configuration files:
     * ansible
     * nose2, enable xunit standard, useful with Jenkins reporting
     * pypi, to use a private repository
