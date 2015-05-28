@@ -1,4 +1,4 @@
-**Build** is a build stack wrapper, its goal is to abstract the build process
+**Build** is a build stack wrapper — its goal is to abstract the build process
 of any source code repository by high-level *well-known targets*.
 All build stacks follow the same patterns but all have specific invocation details;
 focus on the big picture and let **Build** handle the details…
