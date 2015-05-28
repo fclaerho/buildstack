@@ -4,13 +4,13 @@ All build stacks follow the same patterns but all have specific invocation detai
 focus on the big picture and let **Build** handle the details…
 
 **Build** understands the following *well-known* targets:
-  * clean
-  * test
-  * compile
-  * package
-  * publish
-  * develop
-  * install.
+  * `clean [--all]`
+  * `test`
+  * `compile`
+  * `package [--format <id>]`
+  * `publish [--repository <id>]`
+  * `develop [--uninstall]`
+  * `install [--uninstall] [--inventory <id>]`
 
 Example:
 
