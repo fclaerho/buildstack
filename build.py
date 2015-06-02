@@ -36,47 +36,11 @@ Options:
 
 Examples:
   Any stack, run unit tests then cleanup everything:
-  $ build test clean -a
+    $ build test clean -a
   Ansible, deploy as root:
-  $ build install -e "--user root --ask-pass"
+    $ build install -e "--user root --ask-pass"
   Python, fetch dependencies:
-  $ build get requirements.txt
-
-Plugin Development:
-  Fill-in the following template and move it to the buildstack directory.
-  For all handlers, except on_flush, the default behavior is to stack the
-  target in the 'targets' list. on_flush is called last to unstack those.
-  All handlers are generators and can yield either "flush" or a command
-  as many time as needed.
-  |
-  | def on_clean(profileid, filename, targets, all): pass
-  |
-  | def on_test(profileid, filename, targets): pass
-  |
-  | def on_compile(profileid, filename, targets): pass
-  |
-  | def on_package(profileid, filename, targets, formatid): pass
-  |
-  | def on_publish(profileid, filename, targets, repositoryid): pass
-  |
-  | def on_develop(profileid, filename, targets, uninstall): pass
-  |
-  | def on_install(profileid, filename, targets, uninstall): pass
-  |
-  | def on_flush(profileid, filename, targets): pass
-  |
-  | manifest = {
-  | 	#"name": # if unset, use the module name
-  | 	"filenames": [], # list of supported build manifest filenames
-  | 	#"on_clean": None | on_clean,
-  | 	#"on_test": None | on_test,
-  | 	#"on_compile": None | on_compile,
-  | 	#"on_package": None | on_package,
-  | 	#"on_publish": None | on_publish,
-  | 	#"on_develop": None | on_develop,
-  | 	#"on_install": None | on_install,
-  | 	#"on_flush": None | on_flush,
-  | }
+    $ build get requirements.txt
 """
 
 import pkg_resources, subprocess, textwrap, fnmatch, glob, sys, os

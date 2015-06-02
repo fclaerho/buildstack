@@ -6,6 +6,7 @@ An opinionated pocket build tool.
 Phases:
   clean                               wipe out build workspace
   test < compile < package < install  install lifecycle
+                           < publish  publish lifecycle
   test < compile < check              check lifecycle
   uninstall                           uninstall package(s) locally
 

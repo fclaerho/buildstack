@@ -22,7 +22,7 @@ Example:
 
 For usage and development details, please check out the inline help: `build -h`
 
-EXTRA FEATURES
+Extra Features
 --------------
 
   * Generate configuration files:
@@ -36,7 +36,7 @@ EXTRA FEATURES
     * publish your roles to a private http server (e.g. nginx + dav module).
     * Install the dependencies with galaxy from requirements.yml
 
-END-USER INSTALLATION
+End-user Installation
 ---------------------
 
 	$ sudo pip install --extra-index-url https://pypi.fclaerhout.fr/simple/ build
@@ -50,7 +50,7 @@ To uninstall:
 
 	$ sudo pip uninstall build
 
-DEVELOPER INSTALLATION
+Developer Installation
 ----------------------
 
 To install:
@@ -62,3 +62,42 @@ To uninstall:
 	$ sudo python setup.py develop --uninstall
 
 Add your extensions into the `buildstack/` directory, they will be loaded automatically.
+
+Plugin Development
+------------------
+
+Fill-in the following template and move it to the buildstack directory.
+
+	def on_clean(profileid, filename, targets, all): pass
+
+	def on_test(profileid, filename, targets): pass
+
+	def on_compile(profileid, filename, targets): pass
+
+	def on_package(profileid, filename, targets, formatid): pass
+
+	def on_publish(profileid, filename, targets, repositoryid): pass
+
+	def on_develop(profileid, filename, targets, uninstall): pass
+
+	def on_install(profileid, filename, targets, uninstall): pass
+
+	def on_flush(profileid, filename, targets): pass
+
+	manifest = {
+		#"name": # if unset, use the module name
+		"filenames": [], # list of supported build manifest filenames
+		#"on_clean": None | on_clean,
+		#"on_test": None | on_test,
+		#"on_compile": None | on_compile,
+		#"on_package": None | on_package,
+		#"on_publish": None | on_publish,
+		#"on_develop": None | on_develop,
+		#"on_install": None | on_install,
+		#"on_flush": None | on_flush,
+	}
+
+For all handlers, except on_flush, the default behavior is to stack the
+target in the 'targets' list. on_flush is called last to unstack those.
+
+All handlers are generators and can yield either "flush" or commands.
