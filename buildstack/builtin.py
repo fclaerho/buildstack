@@ -79,7 +79,7 @@ Development 101:
   A Target subclass must implement, at least, the build() method.
 """
 
-import ConfigParser, subprocess, tempfile, shutil, abc, os
+import ConfigParser, subprocess, tempfile, shutil, urllib, stat, abc, md5, os
 
 #############
 # templates #
@@ -173,13 +173,13 @@ service %(srvname)s restart
 
 DEVNULL = open(os.devnull, "w")
 
-def platform():
+def init_platform():
 	"""
 	Copypasted from https://github.com/fclaerho/copypasta
 	guess host platform and set global variables accordingly
 	"""
 	import subprocess, platform, os
-	global DARWIN, LINUX, DEBIAN, CENTOS, UBUNTU, UNIX
+	global WINDOWS, DARWIN, LINUX, DEBIAN, CENTOS, UBUNTU, UNIX
 	WINDOWS = platform.uname()[0] == "Windows"
 	DARWIN = platform.uname()[0] == "Darwin"
 	LINUX = platform.uname()[0] == "Linux"
@@ -204,7 +204,9 @@ def _exec(cmd, *args, **kwargs):
 			assert not subprocess.call(("which", cmd), stdout = DEVNULL), "%s: not installed" % cmd
 		else:
 			raise NotImplementedError("unsupported platform")
-	return subprocess.check_output(cmd if shell else (cmd,) + args, **kwargs)
+	args = cmd if shell else (cmd,) + args
+	#print "executing:", args
+	return subprocess.check_output(args, **kwargs)
 
 class Node(object):
 	"abstract filesystem node"
@@ -672,6 +674,7 @@ class Uninstall(Target):
 
 SOURCE_PATH = "source"
 VENDOR_PATH = "vendor"
+TARGET_PATH = "target"
 
 def init(root):
 	"generate dummy hello world workspace"
@@ -754,21 +757,22 @@ def parse_targets(url, root):
 			raise type(e)("in section [%s]: %s" % (section, e))
 
 def on_flush(profileid, filename, targets):
-	try:
-		root = Dir("target")
-		Phase("clean", model = Clean)
-		Phase("test", model = Test)
-		Phase("compile", model = Compile, previous = "test")
-		Phase("package", model = Package, previous = "compile")
-		Phase("install", model = Install, previous = "package")
-		Phase("check", model = Check, previous = "compile")
-		Phase("uninstall", model = Uninstall)
-		targets = list(parse_targets(filename, root = root))
-		for name in targets:
-			phase, _, name = name.partition(":")
-			Phase.get(phase).run(name, targets)
-	except (subprocess.CalledProcessError, NotImplementedError, AssertionError, IOError) as e:
-		raise SystemExit("** fatal error! %s\n" % e)
+	init_platform()
+	root = Dir(TARGET_PATH)
+	Phase("clean", model = Clean)
+	Phase("test", model = Test)
+	Phase("compile", model = Compile, previous = "test")
+	Phase("package", model = Package, previous = "compile")
+	Phase("install", model = Install, previous = "package")
+	Phase("check", model = Check, previous = "compile")
+	Phase("uninstall", model = Uninstall)
+	available_targets = list(parse_targets(filename, root = root))
+	while targets:
+		target = targets.pop(0)
+		phase, _, name = target.name.partition(":")
+		Phase.get(phase).run(name, available_targets)
+	raise StopIteration
+	yield # force this function to be a generator
 
 manifest = {
 	"filenames": ["build.ini"],

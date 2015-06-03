@@ -35,6 +35,8 @@ Options:
   * install [-U,-i]: [un]install locally or [un]provision inventory
 
 Examples:
+  Any stack, to compile the project:
+    $ build compile
   Any stack, run unit tests then cleanup everything:
     $ build test clean -a
   Ansible, deploy as root:
@@ -95,7 +97,7 @@ class BuildStack(object):
 	def __init__(self, profileid = None, extraargs = None, filename = None, dirname = None):
 		self.profileid = profileid
 		self.extraargs = extraargs or ()
-		self.filename = filename
+		self.filename = filename and os.path.basename(filename)
 		if dirname:
 			trace("chdir", dirname)
 			os.chdir(dirname)
@@ -127,6 +129,7 @@ class BuildStack(object):
 			if not key in self.manifest:
 				raise BuildError("%s: missing required manifest property" % key)
 		self.targets = Targets()
+		trace("%s build stack ready" % self.manifest["name"])
 
 	def _check_call(self, args):
 		args += self.extraargs
