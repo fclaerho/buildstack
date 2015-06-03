@@ -99,7 +99,7 @@ class TestBuiltinCCompilation(Model, unittest.TestCase):
 	basename = "hello.c"
 
 class TestBuiltinPythonCompilation(Model, unittest.TestCase):
-	tools = ("python2.7",)
+	tools = ("python2.7", "zip")
 	basename = "hello.py"
 
 class TestBuiltinGoCompilation(Model, unittest.TestCase):
