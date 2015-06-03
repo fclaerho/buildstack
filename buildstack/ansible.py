@@ -1,4 +1,4 @@
-# copyright (c) 2015 fclaerhout.fr, all rights reserved
+# copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
 import os
 
@@ -40,18 +40,6 @@ def on_clean(profileid, filename, targets, all):
 		yield "flush"
 		yield ("rm", "-vrf", DISTDIR)
 
-def on_publish(profileid, filename, targets, repositoryid):
-	yield "flush"
-	if not os.path.exists(DISTDIR):
-		os.mkdir(DISTDIR)
-	for name in os.listdir("roles"):
-		srcpath = os.path.join("roles", name)
-		tgtpath = os.path.join(DISTDIR, "%s.tgz" % name)
-		if os.path.isdir(srcpath):
-			yield ("tar", "zcf", tgtpath, "-C", srcpath, ".")
-			if repositoryid:
-				yield ("curl", "-k", "-T", tgtpath, repositoryid) # HTTP upload
-
 def on_flush(profileid, filename, targets):
 	do_play = False
 	args = []
@@ -76,7 +64,7 @@ manifest = {
 	"filenames": ["playbook.yml", "*.yml"],
 	"on_get": on_get,
 	"on_clean": on_clean,
-	"on_publish": on_publish,
+	"on_publish": None,
 	"on_flush": on_flush,
 	"tool": {
 		"ansible": {
@@ -89,6 +77,51 @@ manifest = {
 			},
 			"template": """
 				[defaults]
+				# ask_pass = True
+				# ask_sudo_pass = True
+				# bin_ansible_callbacks = False
+				# callback_plugins =
+				# command_warnings = False
+				# connection_plugins =
+				# deprecation_warnings = False
+				# display_skipped_hosts = False
+				# error_on_undefined_vars = False
+				# executable = /bin/bash
+				# filter_plugins =
+				# force_color = 1
+				# forks = 5
+				# hash_behaviour = merge
+				# hostfile = 
+				# host_key_checking=True
+				# jinja2_extensions =
+				# library =
+				# log_path =
+				# lookup_plugins =
+				# module_name =
+				# nocolor = 1
+				# nocows = 1
+				# hosts = *
+				# poll_interval = 15
+				# private_key_file = /path/to/file.pem
+				# remote_port = 22
+				# remote_tmp =
+				# remote_user =
+				# roles_path =
+				# sudo_exe =
+				# sudo_flags =
+				# sudo_user =
+				# system_warnings = no
+				# timeout = 10
+				# record_host_keys = no
+				# ssh_args = -o ControlMaster=auto -o ControlPersist=60s
+				# control_path=%(directory)s/ansible-ssh-%%h-%%p-%%r
+				# scp_if_ssh=False
+				# pipelining=False
+				# accelerate_port = 5099
+				# accelerate_timeout = 30
+				# accelerate_connect_timeout = 1.0
+				# accelerate_daemon_timeout = 30
+				# accelerate_multi_key = yes
 				host_key_checking = %(host_key_checking)s
 				ask_sudo_pass = %(ask_sudo_pass)s
 				remote_user = %(user)s
