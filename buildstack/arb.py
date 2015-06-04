@@ -6,7 +6,9 @@ def on_flush(profileid, filename, targets):
 		target = targets.pop(0)
 		if target == "clean":
 			if target.all:
-				args.append("clean")
+				args.append("distclean")
+			else:
+				yield "%s: unexpected target" % target
 		elif target == "compile":
 			args.append("compile")
 		elif target == "package":
