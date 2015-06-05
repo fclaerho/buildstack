@@ -39,33 +39,32 @@ Extra Features
 End-user Installation
 ---------------------
 
-	$ pip install --user --extra-index-url https://pypi.fclaerhout.fr/simple/ --pre build
-	$ export PATH="$PATH:~/.local/bin"
+	$ sudo pip install --extra-index-url https://pypi.fclaerhout.fr/simple/ build
 
 or, if that repository is not available:
 
 	$ git clone $this
-	$ sudo python setup.py install --user
+	$ sudo python setup.py install
 
 To uninstall:
 
-	$ pip uninstall build
+	$ sudo pip uninstall build
 
 Developer Installation
 ----------------------
 
 To install:
 
-	$ python setup.py develop --user
+	$ sudo python setup.py develop
 
 To uninstall:
 
-	$ python setup.py develop --user --uninstall
-
-Add your extensions into the `buildstack/` directory, they will be loaded automatically.
+	$ sudo python setup.py develop --uninstall
 
 Plugin Development
 ------------------
+
+Add your extensions into the `buildstack/` directory, they will be loaded automatically.
 
 Fill-in the following template and move it to the buildstack directory.
 
