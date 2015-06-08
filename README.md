@@ -20,7 +20,7 @@ Example:
 
 **Build** can also install modules, `build get <id>`, and configure tools, `build configure <id>`.
 
-For usage and development details, please check out the inline help: `build -h`
+For usage details, please check out the inline help: `build -h`
 
 Extra Features
 --------------
@@ -64,9 +64,7 @@ To uninstall:
 Plugin Development
 ------------------
 
-Add your extensions into the `buildstack/` directory, they will be loaded automatically.
-
-Fill-in the following template and move it to the buildstack directory.
+Fill-in the following template and move it to the buildstack directory, it will be loaded automatically.
 
 	def on_clean(profileid, filename, targets, all): pass
 
@@ -100,4 +98,6 @@ Fill-in the following template and move it to the buildstack directory.
 For all handlers, except on_flush, the default behavior is to stack the
 target in the 'targets' list. on_flush is called last to unstack those.
 
-All handlers are generators and can yield either "flush" or commands.
+All handlers are generators and can yield either "flush", commands or strings.
+A command must be a list or tuple of strings as specified by subprocess.call.
+A string will be used as an error message.
