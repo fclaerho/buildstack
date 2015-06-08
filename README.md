@@ -64,7 +64,7 @@ To uninstall:
 Plugin Development
 ------------------
 
-Fill-in the following template and move it to the buildstack directory, it will be loaded automatically.
+Fill-in the following template and move it to the `buildstack/` directory, it will be loaded automatically.
 
 	def on_clean(profileid, filename, targets, all): pass
 
