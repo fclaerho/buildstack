@@ -66,21 +66,21 @@ Plugin Development
 
 Fill-in the following template and move it to the `buildstack/` directory, it will be loaded automatically.
 
-	def on_clean(profileid, filename, targets, all): pass
+	def on_clean(profileid, filename, targets, all): yield "FIXME"
 
-	def on_test(profileid, filename, targets): pass
+	def on_test(profileid, filename, targets): yield "FIXME"
 
-	def on_compile(profileid, filename, targets): pass
+	def on_compile(profileid, filename, targets): yield "FIXME"
 
-	def on_package(profileid, filename, targets, formatid): pass
+	def on_package(profileid, filename, targets, formatid): yield "FIXME"
 
-	def on_publish(profileid, filename, targets, repositoryid): pass
+	def on_publish(profileid, filename, targets, repositoryid): yield "FIXME"
 
-	def on_develop(profileid, filename, targets, uninstall): pass
+	def on_develop(profileid, filename, targets, uninstall): yield "FIXME"
 
-	def on_install(profileid, filename, targets, uninstall): pass
+	def on_install(profileid, filename, targets, uninstall): yield "FIXME"
 
-	def on_flush(profileid, filename, targets): pass
+	def on_flush(profileid, filename, targets): yield "FIXME"
 
 	manifest = {
 		#"name": # if unset, use the module name
