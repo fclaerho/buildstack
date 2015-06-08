@@ -96,8 +96,8 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 	}
 
 For all handlers, except on_flush, the default behavior is to stack the
-target in the 'targets' list. on_flush is called last to unstack those.
-
+target in the `targets` list (see function signature);
+`on_flush` is called last to unstack those.
 All handlers are generators and can yield either "flush", commands or strings.
 A command must be a list or tuple of strings as specified by subprocess.call.
 A string will be used as an error message.
