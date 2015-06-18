@@ -23,10 +23,10 @@ def on_flush(profileid, filename, targets):
 		target = targets.pop(0)
 		if target == "clean":
 			args.append("clean")
-		elif target == "test":
-			args.append("test")
 		elif target == "compile":
 			args.append("compile")
+		elif target == "test":
+			args.append("test")
 		elif target == "package":
 			args.append("package")
 		elif target == "publish":

@@ -9,6 +9,8 @@ def on_flush(profileid, filename, targets):
 				args.append("distclean")
 			else:
 				yield "%s: unexpected target" % target
+		elif target == "test":
+			args.append("check")
 		elif target == "compile":
 			args.append("compile")
 		elif target == "package":
@@ -25,6 +27,5 @@ def on_flush(profileid, filename, targets):
 
 manifest = {
 	"filenames": ["meta/main.yml"],
-	"on_test": None,
 	"on_flush": on_flush,
 }

@@ -27,8 +27,8 @@ Options:
 
 <target> values:
   * clean [-a]: delete objects generated during the build
-  * test: run unit tests
   * compile: compile code, for non-interpreted languages
+  * test: run unit tests
   * package [-f]: package code
   * publish [-r]: publish package to a repository
   * develop [-U]: [un]install locally in development mode
@@ -164,13 +164,13 @@ class BuildStack(object):
 		"delete intermediary objects. If all is true, delete target objects as well"
 		self._handle_target("clean", all = all)
 
-	def test(self):
-		"run unit tests"
-		self._handle_target("test")
-
 	def compile(self):
 		"compile source code into target objects"
 		self._handle_target("compile")
+
+	def test(self):
+		"run unit tests"
+		self._handle_target("test")
 
 	def package(self, formatid = None):
 		"package target objects"
@@ -265,10 +265,10 @@ def main(*args):
 				for target in opts["<target>"]:
 					if target == "clean":
 						bs.clean(all = opts["--all"])
-					elif target == "test":
-						bs.test()
 					elif target == "compile":
 						bs.compile()
+					elif target == "test":
+						bs.test()
 					elif target == "package":
 						bs.package(formatid = opts["--format"])
 					elif target == "publish":

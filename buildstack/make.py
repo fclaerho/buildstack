@@ -15,10 +15,10 @@ def on_flush(profileid, filename, targets):
 				args.append("clean")
 			else:
 				args.append("distclean")
-		elif target == "test":
-			args.append("check")
 		elif target == "compile":
 			args.append("all")
+		elif target == "test":
+			args.append("check")
 		elif target == "package":
 			args.append("dist")
 		elif target == "install":

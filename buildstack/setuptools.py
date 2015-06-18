@@ -108,10 +108,10 @@ def on_flush(profileid, filename, targets):
 			args.append("clean")
 			if target.all:
 				args.append("--all")
-		elif target == "test":
-			args.append("test")
 		elif target == "compile":
 			args.append("build")
+		elif target == "test":
+			args.append("test")
 		elif target == "package":
 			func = {
 				"sdist": lambda: args.append("sdist"),
