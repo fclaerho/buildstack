@@ -15,6 +15,9 @@ def setup(filename, args):
 def twine(args):
 	return ["twine"] + list(args)
 
+def bumpversion(args):
+	return ["bumpversion"] + list(args)
+
 def get(self, packageid, repositoryid = None):
 	args = ["install"]
 	if os.path.exists(packageid):
@@ -31,14 +34,14 @@ def get(self, packageid, repositoryid = None):
 # handlers #
 ############
 
-def on_get(profileid, filename, targets, packageid, repositoryid):
+def on_get(profileid, filename, targets, repositoryid, requirementid):
 	args = ["install"]
-	if os.path.exists(packageid):
+	if os.path.exists(requirementid):
 		# requirements file
-		args += ["-r", packageid]
+		args += ["-r", requirementid]
 	else:
 		# single module
-		args += [packageid]
+		args += [requirementid]
 	if repositoryid:
 		args += ["--extra-index-url", repositoryid]
 	yield pip(args)
@@ -93,12 +96,19 @@ def on_publish(profileid, filename, targets, repositoryid):
 		args += ["--repository", repositoryid]
 	yield twine(args)
 
-def on_install(filename, targets, inventoryid, uninstall):
+def on_install(profileid, filename, targets, inventoryid, uninstall):
 	if uninstall:
 		yield "flush"
 		yield pip(("uninstall", os.path.basename(os.getcwd())))
 	else:
 		targets.append("install")
+
+def on_release(profileid, filename, targets, typeid, message):
+	yield "flush"
+	args = [typeid]
+	if message:
+		args = ["--message", message] + args
+	yield bumpversion(args)
 
 def on_flush(profileid, filename, targets):
 	args = []
@@ -159,8 +169,23 @@ manifest = {
 	"on_package": on_package,
 	"on_publish": on_publish,
 	"on_install": on_install,
+	"on_release": on_release,
 	"on_flush": on_flush,
 	"tool": {
+		"bumpversion": {
+			"required_vars": ["current_version", "file"],
+			"defaults": {},
+			"template": """
+				[bumpversion]
+				current_version = %(current_version)s
+				commit = True
+				
+				[bumpversion:file:setup.py]
+				
+				[bumpversion:file:%(file)]
+			""",
+			"path": ".bumpversion.cfg",
+		},
 		"nose2": {
 			"required_vars": [],
 			"defaults": {},

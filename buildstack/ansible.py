@@ -24,15 +24,15 @@ def play(profileid, filename, args):
 # handlers #
 ############
 
-def on_get(profileid, filename, targets, packageid, repositoryid):
-	if os.path.exists(packageid):
+def on_get(profileid, filename, targets, repositoryid, requirementid):
+	if os.path.exists(requirementid):
 		# requirements file
-		args = ["--role-file", packageid]
+		args = ["--role-file", requirementid]
 	else:
 		# single module
-		if not re.match("\w\.\w(,\w)?", packageid):
-			raise BuildError("%s: expected 'username.rolename[,version]' format")
-		args = [packageid]
+		if not re.match("\w\.\w(,\w)?", requirementid):
+			raise BuildError("%s: expected 'username.rolename[,version]' format" % requirementid)
+		args = [requirementid]
 	yield galaxy(args)
 
 def on_clean(profileid, filename, targets, all):

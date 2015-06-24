@@ -8,8 +8,8 @@ def mvn(filename, profileid, args):
 		args += ["--activate-profiles", profileids]
 	return args
 
-def on_get(profileid, filename, targets, packageid, repositoryid):
-	args = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % packageid]
+def on_get(profileid, filename, targets, repositoryid, requirementid):
+	args = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % requirementid]
 	if repositoryid:
 		args += ["--define", "repoUrl=%s" % repositoryid]
 	yield mvn(

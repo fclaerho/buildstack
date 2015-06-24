@@ -199,9 +199,11 @@ def _exec(cmd, *args, **kwargs):
 	shell = kwargs.get("shell", False)
 	if not shell:
 		if WINDOWS:
-			assert not subprocess.call(("where", cmd), stdout = DEVNULL), "%s: not installed" % cmd
+			if not subprocess.call(("where", cmd), stdout = DEVNULL):
+				raise IOError("%s: not installed" % cmd)
 		elif UNIX:
-			assert not subprocess.call(("which", cmd), stdout = DEVNULL), "%s: not installed" % cmd
+			if not subprocess.call(("which", cmd), stdout = DEVNULL):
+				raise IOError("%s: not installed" % cmd)
 		else:
 			raise NotImplementedError("unsupported platform")
 	args = cmd if shell else (cmd,) + args
@@ -709,26 +711,26 @@ def init(root):
 		with open("build.ini", "w+") as fp:
 			fp.write("[compile:hello]\npaths: main@source/hello.py\n")
 
-def on_get(profileid, filename, targets, packageid, repositoryid):
-	if ".git" in packageid:
+def on_get(profileid, filename, targets, repositoryid, requirementid):
+	if ".git" in requirementid:
 		# e.g. git://foo.com/bar.git
-		if packageid.endswith(".git"):
-			basename = os.path.basename(packageid)
+		if requirementid.endswith(".git"):
+			basename = os.path.basename(requirementid)
 			rootname, _ = os.path.splitext(basename)
-			_exec("git", "submodule", "add", packageid, "%s/%s" % (VENDOR_PATH, rootname))
+			_exec("git", "submodule", "add", requirementid, "%s/%s" % (VENDOR_PATH, rootname))
 		# e.g. git://foo.com/bar.git/source/main.c
 		else:
-			_, path = packageid.split(".git/")
-			remote = packageid.replace(path, "")
+			_, path = requirementid.split(".git/")
+			remote = requirementid.replace(path, "")
 			_exec("git archive --remote=%s HEAD %s | tar -x --strip-components %i -C %s" % (remote, path, path.count("/"), VENDOR_PATH), shell = True)
-	elif packageid.startswith("python:"):
-		_, package = packageid.split(":", 1)
+	elif requirementid.startswith("python:"):
+		_, package = requirementid.split(":", 1)
 		_exec(
 			"easy_install", "--install-dir", VENDOR_PATH, "--exclude-scripts", "--always-unzip", package,
 			env = {"PYTHONPATH": VENDOR_PATH})
 		_exec("rm", "-f", "%s/easy-install.pth" % VENDOR_PATH, "%s/site.py" % VENDOR_PATH, "%s/site.pyc" % VENDOR_PATH)
 	else:
-		raise NotImplementedError("%s: unsupported packageid" % packageid)
+		raise NotImplementedError("%s: unsupported requirementid" % requirementid)
 
 def parse_targets(url, root):
 	"parse manifest and return reified targets"

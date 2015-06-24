@@ -5,16 +5,17 @@ Detect and drive a source code build stack to reach well-known targets.
 
 Usage:
   build [options] configure (<toolid>|help) [<vars>]
-  build [options] get <packageid>
   build [options] <target>...
   build --version
   build --help
 
 Options:
   -C <path>, --directory <path>  set working directory
+  -R <id>, --requirement <id>    with 'get': select requirement to install
   -r <id>, --repository <id>     with 'get' and 'publish': select repository
   -i <id>, --inventory <id>      with 'install': select inventory
   -e <args>, --extra <args>      arguments appended to build stack invocation
+  -m <str>, --message <str>      with 'release': set commit message
   -f <path>, --file <path>       set build manifest path
   -p <id>, --profile <id>        set build profile
   -F <id>, --format <id>         with 'package': set format, use '-f help' to list ids
@@ -25,7 +26,8 @@ Options:
   -h, --help                     show help
   -a, --all                      with 'clean': remove build artifacts
 
-<target> values:
+Where <target> is one of:
+  * get [-R]: install requirement(s)
   * clean [-a]: delete objects generated during the build
   * compile: compile code, for non-interpreted languages
   * test: run unit tests
@@ -33,6 +35,7 @@ Options:
   * publish [-r]: publish package to a repository
   * develop [-U]: [un]install locally in development mode
   * install [-U,-i]: [un]install locally or [un]provision inventory
+  * release:<type> [-m]: increment project version, commit and tag
 
 Examples:
   Any stack, to compile the project:
@@ -41,11 +44,11 @@ Examples:
     $ build test clean -a
   Ansible, deploy as root:
     $ build install -e "--user root --ask-pass"
-  Python, fetch dependencies:
-    $ build get requirements.txt
+  Install requirements:
+    $ build get -R docopt
 """
 
-import subprocess, textwrap, fnmatch, glob, sys, os
+import subprocess, platform, textwrap, fnmatch, glob, sys, os
 
 import buildstack, docopt # 3rd-party
 
@@ -70,7 +73,8 @@ def _check_call(args, _cache = {}):
 	trace(*args)
 	image = args[0]
 	if not image in _cache:
-		_cache[image] = subprocess.call(("which", image), stdout = DEVNULL, stderr = DEVNULL)
+		which = "where" if platform.uname()[0] == "Windows" else "which"
+		_cache[image] = subprocess.call((which, image), stdout = DEVNULL, stderr = DEVNULL)
 	if _cache[image] != 0:
 		raise IOError("%s is unavailable, please install it" % image)
 	subprocess.check_call(args)
@@ -113,7 +117,8 @@ class BuildStack(object):
 		self.profileid = profileid
 		self.extraargs = extraargs or ()
 		self.filename = filename and os.path.basename(filename)
-		_chdir(dirname)
+		if dirname:
+			_chdir(dirname)
 		manifests = []
 		if self.filename:
 			# find all stacks able to handle this manifest:
@@ -159,7 +164,7 @@ class BuildStack(object):
 					targets = self.targets,
 					**kwargs):
 					if res == "flush":
-						assert canflush
+						assert canflush, "%s: cannot flush from this target" % key
 						self.flush()
 					elif isinstance(res, (list, tuple)):
 						self._check_call(res)
@@ -167,10 +172,17 @@ class BuildStack(object):
 						raise BuildError("%s: %s: %s" % (self.manifest["name"], name, res))
 			else: # the manifest explicitly declares this target as unsupported
 				raise BuildError("%s: %s: unsupported target" % (self.manifest["name"], name))
-		elif default == "stack":
+		elif default == "stack": # stack target and let the on_flush handler deal with it
 			self.targets.append(name, **kwargs)
 		elif default == "fail":
 			raise BuildError("%s: %s: unhandled target" % (self.manifest["name"], name))
+
+	def get(self, requirementid, repositoryid = None):
+		self._handle_target(
+			"get",
+			default = "fail",
+			repositoryid = repositoryid,
+			requirementid = requirementid)
 
 	def clean(self, all = False):
 		"delete intermediary objects. If all is true, delete target objects as well"
@@ -209,17 +221,16 @@ class BuildStack(object):
 			inventoryid = inventoryid,
 			uninstall = uninstall)
 
-	def flush(self):
-		self._handle_target("flush", canflush = False, default = "stack")
-		assert not self.targets, "%s: lingering unhandled target(s)" % self.manifest["name"]
-
-	def get(self, packageid, repositoryid = None):
+	def release(self, typeid, message):
+		"increment project version and commit"
 		self._handle_target(
-			"get",
-			canflush = False,
-			default = "fail",
-			packageid = packageid,
-			repositoryid = repositoryid)
+			"release",
+			typeid = typeid,
+			message = message)
+
+	def flush(self):
+		self._handle_target("flush", canflush = False, default = "fail")
+		assert not self.targets, "%s: lingering unhandled target(s)" % self.manifest["name"]
 
 def configure(toolid, vars = None):
 	tool = {}
@@ -251,7 +262,7 @@ def main(*args):
 	opts = docopt.docopt(
 		__doc__,
 		argv = args or None,
-		version = "1.2.0")
+		version = "1.3.0")
 	try:
 		if opts["--no-colors"]:
 			global blue, red
@@ -269,28 +280,29 @@ def main(*args):
 				extraargs = opts["--extra"] and opts["--extra"].split(),
 				filename = opts["--file"],
 				dirname = opts["--directory"])
-			if opts["get"]:
-				bs.get(
-					packageid = opts["<packageid>"],
-					repositoryid = opts["--repository"])
-			else:
-				for target in opts["<target>"]:
-					if target == "clean":
-						bs.clean(all = opts["--all"])
-					elif target == "compile":
-						bs.compile()
-					elif target == "test":
-						bs.test()
-					elif target == "package":
-						bs.package(formatid = opts["--format"])
-					elif target == "publish":
-						bs.publish(repositoryid = opts["--repository"])
-					elif target == "develop":
-						bs.develop(uninstall = opts["--uninstall"])
-					elif target == "install":
-						bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"])
-					else:
-						raise BuildError("%s: unknown target" % target)
+			for target in opts["<target>"]:
+				if target == "get":
+					bs.get(
+						repositoryid = opts["--repository"],
+						requirementid = opts["--requirement"])
+				elif target == "clean":
+					bs.clean(all = opts["--all"])
+				elif target == "compile":
+					bs.compile()
+				elif target == "test":
+					bs.test()
+				elif target == "package":
+					bs.package(formatid = opts["--format"])
+				elif target == "publish":
+					bs.publish(repositoryid = opts["--repository"])
+				elif target == "develop":
+					bs.develop(uninstall = opts["--uninstall"])
+				elif target == "install":
+					bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"])
+				elif target.startswith("release:"):
+					bs.release(typeid = target.split(":")[1], message = opts["--message"])
+				else:
+					raise BuildError("%s: unknown target" % target)
 				bs.flush()
 	except (subprocess.CalledProcessError, BuildError) as exc:
 		raise SystemExit(red(exc))
