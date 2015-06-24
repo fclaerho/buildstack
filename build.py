@@ -45,7 +45,7 @@ Examples:
     $ build get requirements.txt
 """
 
-import pkg_resources, subprocess, textwrap, fnmatch, glob, sys, os
+import subprocess, textwrap, fnmatch, glob, sys, os
 
 import buildstack, docopt # 3rd-party
 
@@ -251,7 +251,7 @@ def main(*args):
 	opts = docopt.docopt(
 		__doc__,
 		argv = args or None,
-		version = pkg_resources.require("build")[0].version)
+		version = "1.1.1")
 	try:
 		if opts["--no-colors"]:
 			global blue, red
