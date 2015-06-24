@@ -55,10 +55,25 @@ def blue(string):
 def red(string):
 	return "\033[31m%s\033[0m" % string
 
-TRACEFP = open(os.devnull, "w")
+DEVNULL = open(os.devnull, "w")
+
+TRACEFP = DEVNULL
 
 def trace(*strings):
 	TRACEFP.write(blue("+ %s\n") % " ".join(strings))
+
+def _chdir(path):
+	trace("chdir", path)
+	os.chdir(os.path.expanduser(path))
+
+def _check_call(args, _cache = {}):
+	trace(*args)
+	image = args[0]
+	if not image in _cache:
+		_cache[image] = subprocess.call(("which", image), stdout = DEVNULL, stderr = DEVNULL)
+	if _cache[image] != 0:
+		raise IOError("%s is unavailable, please install it" % image)
+	subprocess.check_call(args)
 
 class Target(object):
 
@@ -98,9 +113,7 @@ class BuildStack(object):
 		self.profileid = profileid
 		self.extraargs = extraargs or ()
 		self.filename = filename and os.path.basename(filename)
-		if dirname:
-			trace("chdir", dirname)
-			os.chdir(dirname)
+		_chdir(dirname)
 		manifests = []
 		if self.filename:
 			# find all stacks able to handle this manifest:
@@ -122,7 +135,7 @@ class BuildStack(object):
 		if not manifests:
 			raise BuildError("no supported build stack detected")
 		elif len(manifests) > 1:
-			raise BuildError("%s: multiple build stacks detected" % " ".join(map(lambda m: m["name"], manifests)))
+			raise BuildError("%s: multiple build stacks detected" % ",".join(map(lambda m: m["name"], manifests)))
 		else:
 			self.manifest, = manifests
 		for key in ("name", "filenames"):
@@ -133,8 +146,7 @@ class BuildStack(object):
 
 	def _check_call(self, args):
 		args += self.extraargs
-		trace(*args)
-		subprocess.check_call(args)
+		_check_call(args)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
 		key = "on_%s" % name
@@ -284,3 +296,4 @@ def main(*args):
 		raise SystemExit(red(exc))
 
 if __name__ == "__main__": main()
+
