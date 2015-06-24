@@ -3,14 +3,14 @@ its goal is to abstract the build process of any source code repository through 
 Focus on the big picture and let *Build* handle the invocation details.
 
 *Build* understands the following well-known targets:
-  * get:<id>             install requirement
+  * get:\<id>             install requirement
   * clean[:all]          delete compilation objects [and build artifacts]
   * compile              compile code
   * test                 run unit tests
-  * package[:<id>]       package code [in the specified format]
-  * publish[:<id>]       publish package [to the specified repository]
-  * [un]install[:<id>]   [un]install locally [or [un]provision inventory]
-  * release[:<id>] [-m]  increment project version, commit and tag
+  * package[:\<id>]       package code [in the specified format]
+  * publish[:\<id>]       publish package [to the specified repository]
+  * [un]install[:\<id>]   [un]install locally [or [un]provision inventory]
+  * release[:\<id>] [-m]  increment project version, commit and tag
 
 Quick start:
 
@@ -19,8 +19,8 @@ Quick start:
 	$ build clean:all test compile package publish:${some_pkg_repo}
 
 *Build* can also:
-  * install requirements via `build get:<id>`
-  * and configure tools via `build configure <id>`.
+  * install requirements via `build get:\<id>`
+  * and configure tools via `build configure \<id>`.
 
 For usage details, please check out the inline help: `build -h`
 
