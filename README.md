@@ -3,14 +3,14 @@ its goal is to abstract the build process of any source code repository through 
 Focus on the big picture and let *Build* handle the invocation details.
 
 *Build* understands the following well-known targets:
-  * get:\<id>             install requirement
-  * clean[:all]          delete compilation objects [and build artifacts]
-  * compile              compile code
-  * test                 run unit tests
-  * package[:\<id>]       package code [in the specified format]
-  * publish[:\<id>]       publish package [to the specified repository]
-  * [un]install[:\<id>]   [un]install locally [or [un]provision inventory]
-  * release[:\<id>] [-m]  increment project version, commit and tag
+  * `get:<id>`             install requirement
+  * `clean[:all]`          delete compilation objects [and build artifacts]
+  * `compile`              compile code
+  * `test`                 run unit tests
+  * `package[:<id>]`       package code [in the specified format]
+  * `publish[:<id>]`       publish package [to the specified repository]
+  * `[un]install[:<id>]`   [un]install locally [or [un]provision inventory]
+  * `release[:<id>] [-m]`  increment project version, commit and tag
 
 Quick start:
 
@@ -19,8 +19,8 @@ Quick start:
 	$ build clean:all test compile package publish:${some_pkg_repo}
 
 *Build* can also:
-  * install requirements via `build get:\<id>`
-  * and configure tools via `build configure \<id>`.
+  * install requirements via `build get:<id>`
+  * and configure tools via `build configure <id>`.
 
 For usage details, please check out the inline help: `build -h`
 
@@ -66,7 +66,7 @@ Plugin Development
 
 Fill-in the following template and move it to the `buildstack/` directory, it will be loaded automatically.
 
-  def on_get(profileid, filename, targets, requirementid): raise NotImplementedError()
+	def on_get(profileid, filename, targets, requirementid): raise NotImplementedError()
 	def on_clean(profileid, filename, targets, all): raise NotImplementedError()
 	def on_test(profileid, filename, targets): raise NotImplementedError()
 	def on_compile(profileid, filename, targets): raise NotImplementedError()
@@ -77,7 +77,7 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 	manifest = {
 		#"name": # if unset, use the module name
 		"filenames": [], # list of supported build manifest filenames
-    #"on_get": None | on_get,
+		#"on_get": None | on_get,
 		#"on_clean": None | on_clean,
 		#"on_test": None | on_test,
 		#"on_compile": None | on_compile,
