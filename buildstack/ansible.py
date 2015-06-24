@@ -24,7 +24,7 @@ def play(profileid, filename, args):
 # handlers #
 ############
 
-def on_get(profileid, filename, targets, repositoryid, requirementid):
+def on_get(profileid, filename, targets, requirementid):
 	if os.path.exists(requirementid):
 		# requirements file
 		args = ["--role-file", requirementid]

@@ -11,9 +11,6 @@ Usage:
 
 Options:
   -C <path>, --directory <path>  set working directory
-  -r <id>, --repository <id>     with 'get': select repository
-  -i <id>, --inventory <id>      with 'install': select inventory
-  -e <args>, --extra <args>      arguments appended to build stack invocation
   -m <str>, --message <str>      with 'release': set commit message
   -f <path>, --file <path>       set build manifest path
   -p <id>, --profile <id>        set build profile
@@ -24,7 +21,7 @@ Options:
   -h, --help                     show help
 
 Where <target> is one of:
-  * get:<id> [-r]        install requirement [from repository]
+  * get:<id>             install requirement
   * clean[:all]          delete compilation objects [and build artifacts]
   * compile              compile code
   * test                 run unit tests
@@ -38,13 +35,13 @@ Examples:
     $ build compile
   Any stack, run unit tests then cleanup everything:
     $ build test clean:all
-  Ansible, deploy as root:
-    $ build install -e "--user root --ask-pass"
+  Install using the root profile:
+    $ build install -p root
   Install requirements:
     $ build get:docopt
 """
 
-import subprocess, platform, textwrap, fnmatch, glob, sys, os
+import subprocess, platform, textwrap, fnmatch, glob, json, sys, os
 
 import buildstack, docopt # 3rd-party
 
@@ -109,9 +106,9 @@ class BuildError(Exception):
 
 class BuildStack(object):
 
-	def __init__(self, profileid = None, extraargs = None, filename = None, dirname = None):
+	def __init__(self, customization = None, profileid = None, filename = None, dirname = None):
+		self.customization = customization or {}
 		self.profileid = profileid
-		self.extraargs = extraargs or ()
 		self.filename = filename and os.path.basename(filename)
 		if dirname:
 			_chdir(dirname)
@@ -146,8 +143,13 @@ class BuildStack(object):
 		trace("using '%s' build stack" % self.manifest["name"])
 
 	def _check_call(self, args):
-		args += self.extraargs
+		_dict = self.customization.get(self.profileid or "all", {}).get(args[0], {})
+		for _args in _dict.get("before", []):
+			_check_call(_args)
+		args = list(args) + _dict.get("append", [])
 		_check_call(args)
+		for _args in _dict.get("after", []):
+			_check_call(_args)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
 		key = "on_%s" % name
@@ -173,11 +175,10 @@ class BuildStack(object):
 		elif default == "fail":
 			raise BuildError("%s: %s: unhandled target" % (self.manifest["name"], name))
 
-	def get(self, requirementid, repositoryid = None):
+	def get(self, requirementid):
 		self._handle_target(
 			"get",
 			default = "fail",
-			repositoryid = repositoryid,
 			requirementid = requirementid)
 
 	def clean(self, all = False):
@@ -265,16 +266,20 @@ def main(*args):
 				toolid = opts["<toolid>"],
 				vars = opts["<vars>"])
 		else:
+			path = os.path.expanduser("~/build.json")
+			if os.path.exists(path):
+				with open(path, "r") as fp:
+					customization = json.load(fp)
+			else:
+				customization = None
 			bs = BuildStack(
+				customization = customization,
 				profileid = opts["--profile"],
-				extraargs = opts["--extra"] and opts["--extra"].split(),
 				filename = opts["--file"],
 				dirname = opts["--directory"])
 			for target in opts["<target>"]:
 				if target.startswith("get:"):
-					bs.get(
-						repositoryid = opts["--repository"],
-						requirementid = target.split(":")[1])
+					bs.get(requirementid = target.split(":")[1])
 				elif target == "clean":
 					bs.clean(all = False)
 				elif target == "clean:all":

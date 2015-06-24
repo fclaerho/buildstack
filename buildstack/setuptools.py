@@ -18,23 +18,11 @@ def twine(args):
 def bumpversion(args):
 	return ["bumpversion"] + list(args)
 
-def get(self, packageid, repositoryid = None):
-	args = ["install"]
-	if os.path.exists(packageid):
-		# requirements file
-		args += ["-r", packageid]
-	else:
-		# single module
-		args += [packageid]
-	if repositoryid:
-		args += ["--extra-index-url", repositoryid]
-	return pip(args)
-
 ############
 # handlers #
 ############
 
-def on_get(profileid, filename, targets, repositoryid, requirementid):
+def on_get(profileid, filename, targets, requirementid):
 	args = ["install"]
 	if os.path.exists(requirementid):
 		# requirements file
@@ -42,8 +30,6 @@ def on_get(profileid, filename, targets, repositoryid, requirementid):
 	else:
 		# single module
 		args += [requirementid]
-	if repositoryid:
-		args += ["--extra-index-url", repositoryid]
 	yield pip(args)
 
 def on_clean(profileid, filename, targets, all):
