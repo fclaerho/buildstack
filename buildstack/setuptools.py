@@ -16,7 +16,7 @@ def twine(args):
 	return ["twine"] + list(args)
 
 def bumpversion(args):
-	return ["bumpversion", "--allow-dirty"] + list(args)
+	return ["bumpversion"] + list(args)
 
 def get(self, packageid, repositoryid = None):
 	args = ["install"]
@@ -148,12 +148,10 @@ def on_flush(profileid, filename, targets):
 			elif formatid == "help":
 				raise SystemExit("\n".join(func.keys()))
 			func[target.formatid]()
-		elif target == "develop":
-			args.append("develop")
-			if target.uninstall:
-				args.append("--uninstall")
 		elif target == "install":
 			args.append("install")
+			if target.uninstall:
+				args.append("--uninstall")
 		else:
 			yield "%s: unexpected target" % target
 	if args:

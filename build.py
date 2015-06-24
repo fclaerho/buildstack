@@ -11,41 +11,37 @@ Usage:
 
 Options:
   -C <path>, --directory <path>  set working directory
-  -R <id>, --requirement <id>    with 'get': select requirement to install
-  -r <id>, --repository <id>     with 'get' and 'publish': select repository
+  -r <id>, --repository <id>     with 'get': select repository
   -i <id>, --inventory <id>      with 'install': select inventory
   -e <args>, --extra <args>      arguments appended to build stack invocation
   -m <str>, --message <str>      with 'release': set commit message
   -f <path>, --file <path>       set build manifest path
   -p <id>, --profile <id>        set build profile
-  -F <id>, --format <id>         with 'package': set format, use '-f help' to list ids
   -u, --uninstall                with 'develop' and 'install': uninstall
   -c, --no-colors                disable ANSI color codes
-  -v, --verbose                  output executed commands
+  -v, --verbose                  trace execution
   -V, --version                  show version
   -h, --help                     show help
-  -a, --all                      with 'clean': remove build artifacts
 
 Where <target> is one of:
-  * get [-R]: install requirement(s)
-  * clean [-a]: delete objects generated during the build
-  * compile: compile code, for non-interpreted languages
-  * test: run unit tests
-  * package [-f]: package code
-  * publish [-r]: publish package to a repository
-  * develop [-U]: [un]install locally in development mode
-  * install [-U,-i]: [un]install locally or [un]provision inventory
-  * release:<type> [-m]: increment project version, commit and tag
+  * get:<id> [-r]        install requirement [from repository]
+  * clean[:all]          delete compilation objects [and build artifacts]
+  * compile              compile code
+  * test                 run unit tests
+  * package[:<id>]       package code [in the specified format]
+  * publish[:<id>]       publish package [to the specified repository]
+  * [un]install[:<id>]   [un]install locally [or [un]provision inventory]
+  * release[:<id>] [-m]  increment project version, commit and tag
 
 Examples:
   Any stack, to compile the project:
     $ build compile
   Any stack, run unit tests then cleanup everything:
-    $ build test clean -a
+    $ build test clean:all
   Ansible, deploy as root:
     $ build install -e "--user root --ask-pass"
   Install requirements:
-    $ build get -R docopt
+    $ build get:docopt
 """
 
 import subprocess, platform, textwrap, fnmatch, glob, sys, os
@@ -53,10 +49,10 @@ import subprocess, platform, textwrap, fnmatch, glob, sys, os
 import buildstack, docopt # 3rd-party
 
 def blue(string):
-	return "\033[34m%s\033[0m" % string
+	return "\033[1;34m%s\033[0m" % string
 
 def red(string):
-	return "\033[31m%s\033[0m" % string
+	return "\033[1;31m%s\033[0m" % string
 
 DEVNULL = open(os.devnull, "w")
 
@@ -147,7 +143,7 @@ class BuildStack(object):
 			if not key in self.manifest:
 				raise BuildError("%s: missing required manifest property" % key)
 		self.targets = Targets()
-		trace("%s build stack ready" % self.manifest["name"])
+		trace("using '%s' build stack" % self.manifest["name"])
 
 	def _check_call(self, args):
 		args += self.extraargs
@@ -207,12 +203,6 @@ class BuildStack(object):
 		self._handle_target(
 			"publish",
 			repositoryid = repositoryid)
-
-	def develop(self, uninstall = False):
-		"deploy target objects in development mode"
-		self._handle_target(
-			"develop",
-			uninstall = uninstall)
 
 	def install(self, inventoryid = None, uninstall = False):
 		"deploy target objects in production mode"
@@ -281,26 +271,28 @@ def main(*args):
 				filename = opts["--file"],
 				dirname = opts["--directory"])
 			for target in opts["<target>"]:
-				if target == "get":
+				if target.startswith("get:"):
 					bs.get(
 						repositoryid = opts["--repository"],
-						requirementid = opts["--requirement"])
+						requirementid = target.split(":")[1])
 				elif target == "clean":
-					bs.clean(all = opts["--all"])
+					bs.clean(all = False)
+				elif target == "clean:all":
+					bs.clean(all = True)
 				elif target == "compile":
 					bs.compile()
 				elif target == "test":
 					bs.test()
-				elif target == "package":
-					bs.package(formatid = opts["--format"])
-				elif target == "publish":
-					bs.publish(repositoryid = opts["--repository"])
-				elif target == "develop":
-					bs.develop(uninstall = opts["--uninstall"])
-				elif target == "install":
-					bs.install(inventoryid = opts["--inventory"], uninstall = opts["--uninstall"])
-				elif target.startswith("release:"):
-					bs.release(typeid = target.split(":")[1], message = opts["--message"])
+				elif target.startswith("package"):
+					bs.package(formatid = target.partition(":")[2])
+				elif target.startswith("publish"):
+					bs.publish(repositoryid = target.partition(":")[2])
+				elif target.startswith("install") or target.startswith("uninstall"):
+					bs.install(
+						inventoryid = target.partition(":")[2],
+						uninstall = target == "uninstall")
+				elif target.startswith("release"):
+					bs.release(typeid = target.partition(":")[2], message = opts["--message"])
 				else:
 					raise BuildError("%s: unknown target" % target)
 				bs.flush()
