@@ -16,7 +16,7 @@ def twine(args):
 	return ["twine"] + list(args)
 
 def bumpversion(args):
-	return ["bumpversion"] + list(args)
+	return ["bumpversion", "--allow-dirty"] + list(args)
 
 def get(self, packageid, repositoryid = None):
 	args = ["install"]

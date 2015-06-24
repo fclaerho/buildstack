@@ -262,7 +262,7 @@ def main(*args):
 	opts = docopt.docopt(
 		__doc__,
 		argv = args or None,
-		version = "1.3.0")
+		version = "1.3.1")
 	try:
 		if opts["--no-colors"]:
 			global blue, red
