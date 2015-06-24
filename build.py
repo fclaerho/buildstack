@@ -14,7 +14,6 @@ Options:
   -m <str>, --message <str>      with 'release': set commit message
   -f <path>, --file <path>       set build manifest path
   -p <id>, --profile <id>        set build profile
-  -u, --uninstall                with 'develop' and 'install': uninstall
   -c, --no-colors                disable ANSI color codes
   -v, --verbose                  trace execution
   -V, --version                  show version
@@ -28,7 +27,7 @@ Where <target> is one of:
   * package[:<id>]       package code [in the specified format]
   * publish[:<id>]       publish package [to the specified repository]
   * [un]install[:<id>]   [un]install locally [or [un]provision inventory]
-  * release[:<id>] [-m]  increment project version, commit and tag
+  * release[:<id>] [-m]  bump project version, commit and tag
 
 Examples:
   Any stack, to compile the project:
@@ -40,13 +39,13 @@ Examples:
   Install requirements:
     $ build get:docopt
 
-Use '~/build.json' to customize commands with pre/post actions and extra arguments.
+Use '~/build.json' to customize commands:
   {
-    "<profileid>": {
+    "<profileid>|all": {
       "<command>": {
-        "before": [[argv...]...],
-        "append": [argv...],
-        "after": [[argv...]...]
+        "before": [[argv...]...], # list of commands to run before
+        "append": [argv...],      # extra arguments to append
+        "after": [[argv...]...]   # list of commands to run after
       }
     }
     ...
@@ -265,7 +264,7 @@ def main(*args):
 	opts = docopt.docopt(
 		__doc__,
 		argv = args or None,
-		version = "2.1.1")
+		version = "2.1.2")
 	try:
 		if opts["--no-colors"]:
 			global blue, red

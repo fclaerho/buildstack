@@ -10,17 +10,13 @@ Focus on the big picture and let *Build* handle the invocation details.
   * `package[:<id>]`       package code [in the specified format]
   * `publish[:<id>]`       publish package [to the specified repository]
   * `[un]install[:<id>]`   [un]install locally [or [un]provision inventory]
-  * `release[:<id>] [-m]`  increment project version, commit and tag
+  * `release[:<id>] [-m]`  bump project version, commit and tag
 
 Quick start:
 
 	$ git pull ${somewhere}/${some_code_repo}.git
 	$ cd ${some_code_repo}
 	$ build clean:all test compile package publish:${some_pkg_repo}
-
-*Build* can also:
-  * install requirements via `build get:<id>`
-  * and configure tools via `build configure <id>`.
 
 For usage details, please check out the inline help: `build -h`
 
@@ -31,6 +27,8 @@ Extra Features
     * ansible
     * nose2, enable xunit standard, useful with Jenkins reporting
     * pypi, to use a private repository
+    * bumpversion
+    * ...
   * Python:
     * use `build package:pkg` to build native OS/X packages.
     * on testing,
