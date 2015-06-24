@@ -39,6 +39,18 @@ Examples:
     $ build install -p root
   Install requirements:
     $ build get:docopt
+
+Use '~/build.json' to customize commands with pre/post actions and extra arguments.
+  {
+    "<profileid>": {
+      "<command>": {
+        "before": [[argv...]...],
+        "append": [argv...],
+        "after": [[argv...]...]
+      }
+    }
+    ...
+  }
 """
 
 import subprocess, platform, textwrap, fnmatch, glob, json, sys, os
