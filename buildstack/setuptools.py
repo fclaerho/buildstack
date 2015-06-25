@@ -1,4 +1,5 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
+# coding: utf-8
 
 import glob, os, re
 
@@ -156,17 +157,62 @@ manifest = {
 	"on_release": on_release,
 	"on_flush": on_flush,
 	"tool": {
-		"bumpversion": {
-			"required_vars": ["current_version", "file"],
+		"setuptools": {
+			"required_vars": [],
 			"defaults": {},
 			"template": """
+				# Reference: https://packaging.python.org
+				
+				import setuptools
+				
+				setuptools.setup(
+					"name": "", # https://www.python.org/dev/peps/pep-0426/#name
+					"version": "", # https://www.python.org/dev/peps/pep-0440/
+					"packages": setuptools.find_packages(),
+					#"description": "",
+					#"long_description": "",
+					#"url": "",
+					#"author": "",
+					#"author_email": "",
+					#"license": "%(license)s",
+					#"classifiers": [], # https://pypi.python.org/pypi?%3Aaction=list_classifiers
+					#"keyword": [],
+					#"modules": [],
+					#"install_requires": [],
+					#"package_data": {},
+					#"data_files": {},
+					#"entry_points": {}, # http://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins
+				)
+			""",
+			"path": "setup.py",
+		},
+		"bumpversion": {
+			"required_vars": ["current_version"],
+			"defaults": {},
+			"template": """
+				# Reference: https://github.com/peritus/bumpversion
+
 				[bumpversion]
 				current_version = %(current_version)s
+				#new_version=
 				commit = True
+				tag = True
+				#tag_name = v{new_version}
+				#message = Bump version: {current_version} → {new_version}
+				#parse = (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)
+				#serialize = {major}.{minor}.{patch}
+
+				#[bumpversion:part:<name>]
+				#values =
+				#	witty-warthog
+				#	ridiculous-rat
+				#	marvelous-mantis
+				#optional_values =
+				#first_value =
 				
 				[bumpversion:file:setup.py]
-				
-				[bumpversion:file:%(file)]
+				#search = {current_version}
+				#replace = {new_version}
 			""",
 			"path": ".bumpversion.cfg",
 		},

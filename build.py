@@ -30,14 +30,12 @@ Where <target> is one of:
   * release[:<id>] [-m]  bump project version, commit and tag
 
 Examples:
-  Any stack, to compile the project:
+  To compile the project:
     $ build compile
-  Any stack, run unit tests then cleanup everything:
+  To run unit tests then cleanup everything:
     $ build test clean:all
-  Install using the root profile:
-    $ build install -p root
-  Install requirements:
-    $ build get:docopt
+  Clean, compile, package and install:
+    $ build clean:all compile package install
 
 Use '~/build.json' to customize commands:
   {
@@ -52,7 +50,9 @@ Use '~/build.json' to customize commands:
   }
 """
 
-import subprocess, platform, textwrap, fnmatch, glob, json, sys, os
+__version__ = "2.1.3"
+
+import textwrap, fnmatch, glob, json, sys, os
 
 import buildstack, docopt # 3rd-party
 
@@ -69,11 +69,13 @@ TRACEFP = DEVNULL
 def trace(*strings):
 	TRACEFP.write(blue("+ %s\n") % " ".join(strings))
 
-def _chdir(path):
-	trace("chdir", path)
-	os.chdir(os.path.expanduser(path))
-
-def _check_call(args, _cache = {}):
+def check_call(args, trace = lambda *args: None, _cache = {}):
+	"""
+	Copypasted from https://github.com/fclaerho/copypasta
+	Trace and execute command or raise IOError if it is not available or fails.
+	v20150625A
+	"""
+	import subprocess, platform
 	trace(*args)
 	image = args[0]
 	if not image in _cache:
@@ -81,7 +83,52 @@ def _check_call(args, _cache = {}):
 		_cache[image] = subprocess.call((which, image), stdout = DEVNULL, stderr = DEVNULL)
 	if _cache[image] != 0:
 		raise IOError("%s is unavailable, please install it" % image)
-	subprocess.check_call(args)
+	try:
+		subprocess.check_call(args)
+	except subprocess.CalledProcessError as exc:
+		raise IOError(*exc.args)
+
+def parse_file(path, extname = None, trace = lambda *args: None, warn_only = False):
+	"""
+	Copypasted from https://github.com/fclaerho/copypasta
+	Return parsed (if possible) file content.
+	Raise IOError on any issue, or None if warn_only is set.
+	Support json, ini and text files.
+	v20150625B
+	"""
+	import ConfigParser, json, os
+	path = os.path.expanduser(path)
+	rootname, _extname = os.path.splitext(path)
+	try:
+		with open(path, "r") as fp:
+			if extname == ".ini" or _extname == ".ini":
+				parser = ConfigParser.ConfigParser()
+				if not parser.readfp(fp):
+					raise IOError("%s: unreadable file" % path)
+				_dict = {}
+				for section in parser.sections():
+					_dict[section] = {key: value for key, value in parser.items(section)}
+				return _dict
+			elif extname == ".json" or _extname == ".json":
+				return json.load(fp)
+			else:
+				return fp.read()
+	except IOError:
+		if warn_only:
+			trace("%s: cannot parse file" % path)
+			return None
+		else:
+			raise
+
+def chdir(path, trace = lambda *args: None):
+	"""
+	Copypasted from https://github.com/fclaerho/copypasta
+	Trace and change of current working directory.
+	v20150625A
+	"""
+	import os
+	trace("chdir", path)
+	os.chdir(os.path.expanduser(path))
 
 class Target(object):
 
@@ -122,7 +169,8 @@ class BuildStack(object):
 		self.profileid = profileid
 		self.filename = filename and os.path.basename(filename)
 		if dirname:
-			_chdir(dirname)
+			chdir(dirname)
+		# resolve manifest:
 		manifests = []
 		if self.filename:
 			# find all stacks able to handle this manifest:
@@ -140,7 +188,6 @@ class BuildStack(object):
 						self.filename = filenames[0] # pick first match
 						manifests.append(manifest)
 						break
-		# assess there's exactly one stack found, or fail:
 		if not manifests:
 			raise BuildError("no supported build stack detected")
 		elif len(manifests) > 1:
@@ -156,11 +203,11 @@ class BuildStack(object):
 	def _check_call(self, args):
 		_dict = self.customization.get(self.profileid or "all", {}).get(args[0], {})
 		for _args in _dict.get("before", []):
-			_check_call(_args)
+			check_call(_args, trace = trace)
 		args = list(args) + _dict.get("append", [])
-		_check_call(args)
+		check_call(args, trace = trace)
 		for _args in _dict.get("after", []):
-			_check_call(_args)
+			check_call(_args, trace = trace)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
 		key = "on_%s" % name
@@ -264,7 +311,7 @@ def main(*args):
 	opts = docopt.docopt(
 		__doc__,
 		argv = args or None,
-		version = "2.1.2")
+		version = __version__)
 	try:
 		if opts["--no-colors"]:
 			global blue, red
@@ -277,14 +324,8 @@ def main(*args):
 				toolid = opts["<toolid>"],
 				vars = opts["<vars>"])
 		else:
-			path = os.path.expanduser("~/build.json")
-			if os.path.exists(path):
-				with open(path, "r") as fp:
-					customization = json.load(fp)
-			else:
-				customization = None
 			bs = BuildStack(
-				customization = customization,
+				customization = parse_file("~/build.json", trace = trace, warn_only = True),
 				profileid = opts["--profile"],
 				filename = opts["--file"],
 				dirname = opts["--directory"])
@@ -312,8 +353,10 @@ def main(*args):
 				else:
 					raise BuildError("%s: unknown target" % target)
 				bs.flush()
-	except (subprocess.CalledProcessError, BuildError) as exc:
+	except (NotImplementedError, BuildError, IOError) as exc:
+		# Possible runtime errors are caught and nicely formatted for the user (no stacktrace!)
+		# SystemExit(str) is builtin and returns a status code of 1, this is good enough.
+		# Anything else has to be debugged and the stacktrace is therefore kept for you.
 		raise SystemExit(red(exc))
 
 if __name__ == "__main__": main()
-
