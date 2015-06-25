@@ -73,7 +73,7 @@ For, instance, to push after bumpversion (called for a python project on release
 	{
 		"all": {
 			"bumpversion": {
-				"after": [["git", "push", "origin", "master"]]
+				"after": [["git", "push", "origin", "master", "--tags"]]
 			}
 		}
 	}
