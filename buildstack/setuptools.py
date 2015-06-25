@@ -177,7 +177,7 @@ manifest = {
 					#license = "",
 					#classifiers = [], # https://pypi.python.org/pypi?%%3Aaction=list_classifiers
 					#keyword = [],
-					#modules = [],
+					#py_modules = [],
 					#install_requires = [],
 					#package_data = {},
 					#data_files = {},
