@@ -1,9 +1,9 @@
 
-*Build* is a build stack wrapper:
+**Build** is a build stack wrapper:
 its goal is to abstract the build process of any source code repository through high-level well-known targets.
-Focus on the big picture and let *Build* handle the invocation details.
+Focus on the big picture and let **Build** handle the invocation details.
 
-*Build* understands the following well-known targets:
+**Build** understands the following well-known targets:
   * `get:<id>`             install requirement
   * `clean[:all]`          delete compilation objects [and build artifacts]
   * `compile`              compile code
@@ -66,7 +66,7 @@ To uninstall:
 Advanced Configuration
 ----------------------
 
-You can create the ~/build.json to customize the commands executed by `build`.
+You can create the `~/build.json` to customize the commands executed by `build`.
 
 For, instance, to push after bumpversion (called for a python project on release):
 
