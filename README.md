@@ -24,7 +24,7 @@ Here's the killer use case: check out any repository and build it. No question a
 	$ cd ${some_code_repo}
 	$ build clean:all compile package install # or publish
 
-If you're a developer, being able to test and release your code in one step is neat:
+If you're a developer, being able to test and release your code in one step is neat too:
 
 	$ build test clean:all release:patch -m "fix bug foobar"
 
@@ -68,7 +68,7 @@ Advanced Configuration
 
 You can create the `~/build.json` to customize the commands executed by `build`.
 
-For, instance, to push after bumpversion (called for a python project on release):
+For instance, to push after bumpversion (called for a python project on release):
 
 	{
 		"all": {
