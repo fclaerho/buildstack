@@ -78,6 +78,20 @@ For instance, to push after bumpversion (called for a python project on release)
 		}
 	}
 
+`all` means "for all profile".
+
+Or to provision an Ansible inventory as root with a password (on install):
+
+	{
+		"ansible-root": {
+			"ansible-playbook": {
+				"append": ["--user", "root", "--ask-pass"]
+			}
+		}
+	}
+
+Specifying a profile means you have to call `build -p ansible-root ...` to use the customization.
+
 Plugin Development
 ------------------
 
