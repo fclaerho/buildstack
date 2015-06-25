@@ -1,3 +1,4 @@
+
 *Build* is a build stack wrapper:
 its goal is to abstract the build process of any source code repository through high-level well-known targets.
 Focus on the big picture and let *Build* handle the invocation details.
@@ -12,23 +13,26 @@ Focus on the big picture and let *Build* handle the invocation details.
   * `[un]install[:<id>]`   [un]install locally [or [un]provision inventory]
   * `release[:<id>] [-m]`  bump project version, commit and tag
 
-Quick start:
+Why the heck should you use this junk?
+--------------------------------------
+
+The target audience is SQA engineers and developers.
+
+Here's the killer use case: check out any repository and build it. No question asked.
 
 	$ git pull ${somewhere}/${some_code_repo}.git
 	$ cd ${some_code_repo}
-	$ build clean:all test compile package publish:${some_pkg_repo}
+	$ build clean:all compile package install # or publish
 
-For usage details, please check out the inline help: `build -h`
+If you're a developer, being able to test and release your code in one step is neat:
+
+	$ build test clean:all release:patch -m "fix bug foobar"
 
 Extra Features
 --------------
 
-  * Generate configuration files:
-    * ansible
-    * nose2, enable xunit standard, useful with Jenkins reporting
-    * pypi, to use a private repository
-    * bumpversion
-    * ...
+  * Instantiate configuration file templates: ansible, nose2, pypi, etc.
+    Use `build configure help` for details.
   * Python:
     * use `build package:pkg` to build native OS/X packages.
     * on testing,
@@ -59,6 +63,21 @@ To uninstall:
 
 	$ sudo python setup.py develop --uninstall
 
+Advanced Configuration
+----------------------
+
+You can create the ~/build.json to customize the commands executed by `build`.
+
+For, instance, to push after bumpversion (called for a python project on release):
+
+	{
+		"all": {
+			"bumpversion": {
+				"after": [["git", "push", "origin", "master"]]
+			}
+		}
+	}
+
 Plugin Development
 ------------------
 
@@ -85,8 +104,8 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 		#"on_flush": None | on_flush,
 	}
 
-For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list; `on_flush` is called last to unstack those.
+For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list.
+The handler `on_flush` is called last to unstack targets.
 All handlers are generators and can yield either the string `"flush"`, commands or strings.
 A command must be a sequence of strings as specified by `subprocess.call()`.
 A string is considered to be an error message and raise a BuildError.
-
