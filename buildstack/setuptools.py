@@ -158,7 +158,7 @@ manifest = {
 	"on_flush": on_flush,
 	"tool": {
 		"setuptools": {
-			"required_vars": [],
+			"required_vars": ["name", "version"],
 			"defaults": {},
 			"template": """
 				# Reference: https://packaging.python.org
@@ -166,16 +166,16 @@ manifest = {
 				import setuptools
 				
 				setuptools.setup(
-					"name": "", # https://www.python.org/dev/peps/pep-0426/#name
-					"version": "", # https://www.python.org/dev/peps/pep-0440/
+					"name": "%(name)s", # https://www.python.org/dev/peps/pep-0426/#name
+					"version": "%(version)s", # https://www.python.org/dev/peps/pep-0440/
 					"packages": setuptools.find_packages(),
 					#"description": "",
 					#"long_description": "",
 					#"url": "",
 					#"author": "",
 					#"author_email": "",
-					#"license": "%(license)s",
-					#"classifiers": [], # https://pypi.python.org/pypi?%3Aaction=list_classifiers
+					#"license": "",
+					#"classifiers": [], # https://pypi.python.org/pypi?%%3Aaction=list_classifiers
 					#"keyword": [],
 					#"modules": [],
 					#"install_requires": [],
