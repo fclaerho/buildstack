@@ -50,7 +50,7 @@ Use '~/build.json' to customize commands:
   }
 """
 
-__version__ = "2.1.6"
+__version__ = "2.1.7"
 
 import textwrap, fnmatch, glob, json, sys, os
 

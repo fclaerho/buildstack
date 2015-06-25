@@ -166,24 +166,24 @@ manifest = {
 				import setuptools
 				
 				setuptools.setup(
-					"name" = "%(name)s", # https://www.python.org/dev/peps/pep-0426/#name
-					"version" = "%(version)s", # https://www.python.org/dev/peps/pep-0440/
-					"packages" = setuptools.find_packages(),
-					#"description" = "",
-					#"long_description" = "",
-					#"url" = "",
-					#"author" = "",
-					#"author_email" = "",
-					#"license" = "",
-					#"classifiers" = [], # https://pypi.python.org/pypi?%%3Aaction=list_classifiers
-					#"keyword" = [],
-					#"modules" = [],
-					#"install_requires" = [],
-					#"package_data" = {},
-					#"data_files" = {},
-					#"entry_points" = {}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
-					#"test_suite" = "",
-					#"tests_require" = [],
+					name = "%(name)s", # https://www.python.org/dev/peps/pep-0426/#name
+					version = "%(version)s", # https://www.python.org/dev/peps/pep-0440/
+					packages = setuptools.find_packages(),
+					#description = "",
+					#long_description = "",
+					#url = "",
+					#author = "",
+					#author_email = "",
+					#license = "",
+					#classifiers = [], # https://pypi.python.org/pypi?%%3Aaction=list_classifiers
+					#keyword = [],
+					#modules = [],
+					#install_requires = [],
+					#package_data = {},
+					#data_files = {},
+					#entry_points = {}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
+					#test_suite = "",
+					#tests_require = [],
 				)
 			""",
 			"path": "setup.py",
