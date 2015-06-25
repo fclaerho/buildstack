@@ -181,7 +181,9 @@ manifest = {
 					#"install_requires": [],
 					#"package_data": {},
 					#"data_files": {},
-					#"entry_points": {}, # http://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins
+					#"entry_points": {}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
+					#"test_suite": "",
+					#"tests_require": [],
 				)
 			""",
 			"path": "setup.py",
