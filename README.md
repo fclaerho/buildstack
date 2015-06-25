@@ -50,6 +50,7 @@ or, if that repository is not available:
 	$ sudo python setup.py install
 
 To uninstall:
+
 	$ sudo pip uninstall build
 
 Developer Installation
