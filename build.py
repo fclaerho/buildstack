@@ -6,7 +6,6 @@ Detect and drive a source code build stack to reach well-known targets.
 Usage:
   build [options] configure (<toolid>|help) [<vars>]
   build [options] <target>...
-  build --version
   build --help
 
 Options:
@@ -16,7 +15,6 @@ Options:
   -p <id>, --profile <id>        set build profile
   -c, --no-colors                disable ANSI color codes
   -v, --verbose                  trace execution
-  -V, --version                  show version
   -h, --help                     show help
 
 Where <target> is one of:
@@ -49,8 +47,6 @@ Use '~/build.json' to customize commands:
     ...
   }
 """
-
-__version__ = "2.1.8"
 
 import textwrap, fnmatch, glob, json, sys, os
 
@@ -308,10 +304,7 @@ def configure(toolid, vars = None):
 			raise BuildError("%s: file already exists" % path)
 
 def main(*args):
-	opts = docopt.docopt(
-		__doc__,
-		argv = args or None,
-		version = __version__)
+	opts = docopt.docopt(__doc__, argv = args or None)
 	try:
 		if opts["--no-colors"]:
 			global blue, red
