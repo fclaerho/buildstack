@@ -2,8 +2,6 @@
 
 import os
 
-DISTDIR = "dist"
-
 #########
 # tools #
 #########
@@ -35,11 +33,6 @@ def on_get(profileid, filename, targets, requirementid):
 		args = [requirementid]
 	yield galaxy(args)
 
-def on_clean(profileid, filename, targets, all):
-	if all:
-		yield "flush"
-		yield ("rm", "-vrf", DISTDIR)
-
 def on_flush(profileid, filename, targets):
 	do_play = False
 	args = []
@@ -63,8 +56,6 @@ def on_flush(profileid, filename, targets):
 manifest = {
 	"filenames": ["playbook.yml", "*.yml"],
 	"on_get": on_get,
-	"on_clean": on_clean,
-	"on_publish": None,
 	"on_flush": on_flush,
 	"tool": {
 		"ansible": {

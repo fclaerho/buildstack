@@ -10,7 +10,7 @@ Usage:
 
 Options:
   -C <path>, --directory <path>  set working directory
-  -m <str>, --message <str>      with 'release': set commit message
+  -m <str>, --message <str>      set commit message on release
   -f <path>, --file <path>       set build manifest path
   -p <id>, --profile <id>        set build profile
   -c, --no-colors                disable ANSI color codes
@@ -19,7 +19,7 @@ Options:
 
 Where <target> is one of:
   * get:<id>             install requirement
-  * clean[:all]          delete compilation objects [and build artifacts]
+  * clean[:<id>]         delete files out of the identified scope
   * compile              compile code
   * test                 run unit tests
   * package[:<id>]       package code [in the specified format]
@@ -30,19 +30,21 @@ Where <target> is one of:
 Examples:
   To compile the project:
     $ build compile
-  To run unit tests then cleanup everything:
-    $ build test clean:all
-  Clean, compile, package and install:
-    $ build clean:all compile package install
+  To run unit tests then clean-up:
+    $ build test clean
+  Clean-up, compile, package and install:
+    $ build clean compile package install
 
 Use '~/build.json' to customize commands:
   {
+    ...
     "<profileid>|all": {
       "<command>": {
         "before": [[argv...]...], # list of commands to run before
         "append": [argv...],      # extra arguments to append
         "after": [[argv...]...]   # list of commands to run after
       }
+      ...
     }
     ...
   }
@@ -187,7 +189,7 @@ class BuildStack(object):
 		if not manifests:
 			raise BuildError("no supported build stack detected")
 		elif len(manifests) > 1:
-			raise BuildError("%s: multiple build stacks detected" % ",".join(map(lambda m: m["name"], manifests)))
+			raise BuildError("%s: multiple build stacks detected" % ", ".join(map(lambda m: m["name"], manifests)))
 		else:
 			self.manifest, = manifests
 		for key in ("name", "filenames"):
@@ -235,9 +237,19 @@ class BuildStack(object):
 			default = "fail",
 			requirementid = requirementid)
 
-	def clean(self, all = False):
-		"delete intermediary objects. If all is true, delete target objects as well"
-		self._handle_target("clean", all = all)
+	def clean(self, scopeid = None):
+		"delete generated files"
+		if scopeid == "source":
+			print "removing untracked files"
+			self.flush()
+			if os.path.exists(".git"):
+				self._check_call(("git", "clean", "--force", "-d", "-x"))
+			elif os.path.exists(".hg"):
+				self._check_call(("hg", "purge", "--config", "extensions.purge="))
+			else:
+				raise BuildError("unknown VCS, cannot remove untracked files") # NOTE: add svn-cleanup
+		else:
+			self._handle_target("clean", scopeid = scopeid)
 
 	def compile(self):
 		"compile source code into target objects"
@@ -282,11 +294,16 @@ def configure(toolid, vars = None):
 	for manifest in buildstack.manifests:
 		tool.update(manifest.get("tool", {}))
 	if toolid == "help":
+		name_width = max(map(len, tool.keys()))
+		path_width = max(map(lambda key: len(tool[key]["path"]), tool.keys()))
 		def print_help(key):
 			vars = tool[key]["defaults"]
 			for name in tool[key]["required_vars"]:
 				vars[name] = "REQUIRED"
-			print blue(key) + " %s" % ",".join("%s=%s" % (key, vars[key]) for key in vars)
+			print\
+				blue(key.rjust(name_width)),\
+				tool[key]["path"].center(path_width),\
+				"%s" % ",".join("%s=%s" % (key, vars[key]) for key in vars)
 		map(print_help, tool.keys())
 	else:
 		if not toolid in tool:
@@ -325,10 +342,8 @@ def main(*args):
 			for target in opts["<target>"]:
 				if target.startswith("get:"):
 					bs.get(requirementid = target.split(":")[1])
-				elif target == "clean":
-					bs.clean(all = False)
-				elif target == "clean:all":
-					bs.clean(all = True)
+				elif target.startswith("clean"):
+					bs.clean(scopeid = target.partition(":")[2])
 				elif target == "compile":
 					bs.compile()
 				elif target == "test":

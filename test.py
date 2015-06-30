@@ -1,114 +1,80 @@
 # copyright (c) 2014 fclaerhout.fr, released under the MIT license.
 
-import subprocess, tempfile, unittest, textwrap, shutil, sys, os
+import tempfile, unittest, shutil, sys, os
 
 import build # 3rd-party
 
+FOOBUILD = """
+for i
+do
+	touch foo.$i
+done
+"""
+
+def _foo_on_flush(profileid, filename, targets):
+	args = map(lambda target: target.name, targets)
+	del targets[:]
+	yield ["bash", filename] + args
+
+# register manifest for a pretend stack "foo"
+build.buildstack.manifests.append({
+	"name": "foo",
+	"filenames": ["Foobuild"],
+	"on_flush": _foo_on_flush,
+})
+
 class Test(unittest.TestCase):
 
-	def test_make(self):
-		# generate a Makefile, check it's detected and run
-		dirname = tempfile.mkdtemp()
-		with open(os.path.join(dirname, "Makefile"), "w") as f:
-			f.write("all: ; touch %s/success" % dirname)
-		build.main("-C", dirname, "compile")
-		self.assertTrue(os.path.exists(os.path.join(dirname, "success")))
-		shutil.rmtree(dirname)
-
-DEVNULL = open(os.devnull, "w")
-
-FILE = {
-	"Hello.java": """
-		class Hello {
-			public static void main(String[] argv) {
-				System.out.println("hello world!");
-			}
-		}
-	""",
-	"hello.c": """
-		#include <stdio.h>
-		int main(void) {
-			printf("hello world!\\n");
-			return 0;
-		}
-	""",
-	"hello.go": """
-		package main
-		import "fmt"
-		func main() {
-			fmt.Println("hello world!")
-		}
-	""",
-	"hello.py": "print 'hello world!'",
-	"hello.hs": """
-		main = putStrLn "hello world!"
-	""",
-}
-
-# to implement this base class, define two attributes:
-#   * tools, the list of tools needed
-#   * basename, the source filename
-class Model(object):
-
-	tools = ()
-
-	basename = None
-
 	def setUp(self):
-		# create a work directory:
-		self.dir = tempfile.mkdtemp()
-		# generate source file:
-		srcpath = os.path.join(self.dir, self.basename)
-		with open(srcpath, "w+") as fp:
-			fp.write(textwrap.dedent(FILE[self.basename]))
-		self.rootname, extname = os.path.splitext(self.basename)
-		# generate build manifest:
-		self.inipath = os.path.join(self.dir, "build.ini")
-		with open(self.inipath, "w+") as fp:
-			fp.write("[compile:%s]\npaths: main@%s\n" % (self.rootname, srcpath))
+		# generate build manifest
+		self.dirname = tempfile.mkdtemp()
+		with open(os.path.join(self.dirname, "Foobuild"), "w") as fp:
+			fp.write(FOOBUILD)
+
+	def assert_is_compiled(self):
+		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.compile")))
+
+	def assert_is_tested(self):
+		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.test")))
+
+	def assert_is_installed(self):
+		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.install")))
+
+	def assert_is_packaged(self):
+		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.package")))
+
+	def assert_is_published(self):
+		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.publish")))
+
+	def test_compile(self):
+		build.main("-C", self.dirname, "compile")
+		self.assert_is_compiled()
+
+	def test_test(self):
+		build.main("-C", self.dirname, "test")
+		self.assert_is_tested()
+
+	def test_package(self):
+		build.main("-C", self.dirname, "package")
+		self.assert_is_packaged()
+
+	def test_install(self):
+		build.main("-C", self.dirname, "install")
+		self.assert_is_installed()
+
+	def test_publish(self):
+		build.main("-C", self.dirname, "publish")
+		self.assert_is_published()
+
+	def test_build(self):
+		build.main("-C", self.dirname, "clean", "compile", "test", "package", "install", "publish")
+		self.assert_is_compiled()
+		self.assert_is_tested()
+		self.assert_is_packaged()
+		self.assert_is_installed()
+		self.assert_is_published()
 
 	def tearDown(self):
-		# delete work directory:
-		shutil.rmtree(self.dir)
-
-	def test(self):
-		# build project:
-		try:
-			build.main("-v", "-C", self.dir, "-f", self.inipath, "compile")
-		except IOError:
-			return
-		# assert the target has been built:
-		tgtpath = os.path.join(self.dir, "target", self.rootname)
-		self.assertTrue(
-			os.path.exists(tgtpath),
-			"%s: target not built" % tgtpath)
-		# run the target and check the output is correct:
-		output = subprocess.check_output(
-			(tgtpath,),
-			stderr = sys.stderr)
-		self.assertEqual(output, "hello world!\n")
-
-if False:
-	# "builtin" is currently broken, tests are disabled
-
-	class TestBuiltinJavaCompilation(Model, unittest.TestCase):
-		tools = ("javac",)
-		basename = "Hello.java"
-
-	class TestBuiltinCCompilation(Model, unittest.TestCase):
-		tools = ("cc",)
-		basename = "hello.c"
-
-	class TestBuiltinPythonCompilation(Model, unittest.TestCase):
-		tools = ("python2.7", "zip")
-		basename = "hello.py"
-
-	class TestBuiltinGoCompilation(Model, unittest.TestCase):
-		tools = ("go",)
-		basename = "hello.go"
-
-	class TestBuiltinHaskellCompilation(Model, unittest.TestCase):
-		tools = ("ghc",)
-		basename = "hello.hs"
+		shutil.rmtree(self.dirname)
 
 if __name__ == "__main__": unittest.main(verbosity = 2)

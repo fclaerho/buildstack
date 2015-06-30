@@ -99,7 +99,7 @@ Plugin Development
 Fill-in the following template and move it to the `buildstack/` directory, it will be loaded automatically.
 
 	def on_get(profileid, filename, targets, requirementid): raise NotImplementedError()
-	def on_clean(profileid, filename, targets, all): raise NotImplementedError()
+	def on_clean(profileid, filename, targets, scopeid): raise NotImplementedError()
 	def on_test(profileid, filename, targets): raise NotImplementedError()
 	def on_compile(profileid, filename, targets): raise NotImplementedError()
 	def on_package(profileid, filename, targets, formatid): raise NotImplementedError()

@@ -5,10 +5,12 @@ def on_flush(profileid, filename, targets):
 	while targets:
 		target = targets.pop(0)
 		if target == "clean":
-			if target.all:
-				args.append("distclean")
+			if not target.scopeid:
+				args.append("clean")
+			elif target.scopid == "all":
+				args += ["clean", "--all"]
 			else:
-				yield "%s: unexpected target" % target
+				yield "%s: unknown scope, expected none or 'all'" % target.scopeid
 		elif target == "test":
 			args.append("check")
 		elif target == "compile":

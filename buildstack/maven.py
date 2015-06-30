@@ -22,7 +22,10 @@ def on_flush(profileid, filename, targets):
 	while targets:
 		target = targets.pop(0)
 		if target == "clean":
-			args.append("clean")
+			if not target.scopeid:
+				args.append("clean")
+			else:
+				yield "%s: unknown scope, expected none" % target.scopeid
 		elif target == "compile":
 			args.append("compile")
 		elif target == "test":

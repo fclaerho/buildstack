@@ -1,7 +1,7 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 # coding: utf-8
 
-import glob, os, re
+import shutil, glob, os, re
 
 #########
 # tools #
@@ -33,14 +33,14 @@ def on_get(profileid, filename, targets, requirementid):
 		args += [requirementid]
 	yield pip(args)
 
-def on_clean(profileid, filename, targets, all):
-	if all:
-		targets.append("clean", all = True)
-		yield "flush"
-		yield ["rm", "-vrf", ".virtualenv", "dist", ".eggs", "nose2-junit.xml"] + glob.glob("*.egg-info")
-		yield ("find", ".", "-name", "*.pyc", "-delete")
-	else:
-		targets.append("clean")
+def on_clean(profileid, filename, targets, scopeid):
+	yield "flush"
+	yield ("pyclean", ".") # remove *.pyc and *.pyo, comes from python-minimal
+	if scopeid == "all":
+		for name in glob.glob("dist") + glob.glob("*.egg-info"):
+			print "removing lingering '%s'" % name
+			shutil.rmtree(name)
+	targets.append("clean", scopeid = scopeid)
 
 def on_test(profileid, filename, targets):
 	# if nose2 configuration file exists, use nose2 as test framework
@@ -102,9 +102,12 @@ def on_flush(profileid, filename, targets):
 	while targets:
 		target = targets.pop(0)
 		if target == "clean":
-			args.append("clean")
-			if target.all:
-				args.append("--all")
+			if not target.scopeid:
+				args.append("clean")
+			elif target.scopeid == "all":
+				args += ["clean", "--all"]
+			else:
+				yield "%s: unknown clean scope, expected none or 'all'" % target.scopeid
 		elif target == "compile":
 			args.append("build")
 		elif target == "test":
@@ -132,7 +135,7 @@ def on_flush(profileid, filename, targets):
 			}
 			if not target.formatid:
 				target.formatid = "sdist"
-			elif formatid == "help":
+			elif target.formatid == "help":
 				raise SystemExit("\n".join(func.keys()))
 			func[target.formatid]()
 		elif target == "install":
