@@ -5,7 +5,7 @@ import setuptools
 setuptools.setup(
 	name = "build",
 	author = "fclaerhout.fr",
-	version = "2.3.0",
+	version = "2.4.0",
 	license = "MIT",
 	packages = ["buildstack"],
 	test_suite = "test",

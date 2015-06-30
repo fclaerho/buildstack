@@ -37,16 +37,14 @@ Examples:
 
 Use '~/build.json' to customize commands:
   {
-    ...
     "<profileid>|all": {
       "<command>": {
         "before": [[argv...]...], # list of commands to run before
         "append": [argv...],      # extra arguments to append
-        "after": [[argv...]...]   # list of commands to run after
-      }
-      ...
-    }
-    ...
+        "after": [[argv...]...],  # list of commands to run after
+        "path": "<path>"         # custom image path
+      }...
+    }...
   }
 """
 
@@ -86,18 +84,17 @@ def check_call(args, trace = lambda *args: None, _cache = {}):
 	except subprocess.CalledProcessError as exc:
 		raise IOError(*exc.args)
 
-def parse_file(path, extname = None, trace = lambda *args: None, warn_only = False):
+def parse_file(path, extname = None, default = None):
 	"""
 	Copypasted from https://github.com/fclaerho/copypasta
-	Return parsed (if possible) file content.
-	Raise IOError on any issue, or None if warn_only is set.
+	Return parsed file content or $default if it does not exist, raise IOError otherwise.
 	Support json, ini and text files.
-	v20150625B
+	v20150630A
 	"""
 	import ConfigParser, json, os
 	path = os.path.expanduser(path)
-	rootname, _extname = os.path.splitext(path)
-	try:
+	if os.path.exists(path):
+		rootname, _extname = os.path.splitext(path)
 		with open(path, "r") as fp:
 			if extname == ".ini" or _extname == ".ini":
 				parser = ConfigParser.ConfigParser()
@@ -108,15 +105,14 @@ def parse_file(path, extname = None, trace = lambda *args: None, warn_only = Fal
 					_dict[section] = {key: value for key, value in parser.items(section)}
 				return _dict
 			elif extname == ".json" or _extname == ".json":
-				return json.load(fp)
+				try:
+					return json.load(fp)
+				except ValueError as exc:
+					raise IOError("%s: json parse error (%s)" % (path, exc))
 			else:
 				return fp.read()
-	except IOError:
-		if warn_only:
-			trace("%s: cannot parse file" % path)
-			return None
-		else:
-			raise
+	else:
+		return default
 
 def chdir(path, trace = lambda *args: None):
 	"""
@@ -200,12 +196,10 @@ class BuildStack(object):
 
 	def _check_call(self, args):
 		_dict = self.customization.get(self.profileid or "all", {}).get(args[0], {})
-		for _args in _dict.get("before", []):
-			check_call(_args, trace = trace)
-		args = list(args) + _dict.get("append", [])
-		check_call(args, trace = trace)
-		for _args in _dict.get("after", []):
-			check_call(_args, trace = trace)
+		args = [_dict.get("path", args[0])] + list(args[1:]) + _dict.get("append", [])
+		argslist =_dict.get("before", []) + [args] + _dict.get("after", [])
+		for args in argslist:
+			check_call(args, trace = trace)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
 		key = "on_%s" % name
@@ -335,7 +329,7 @@ def main(*args):
 				vars = opts["<vars>"])
 		else:
 			bs = BuildStack(
-				customization = parse_file("~/build.json", trace = trace, warn_only = True),
+				customization = parse_file("~/build.json", default = None),
 				profileid = opts["--profile"],
 				filename = opts["--file"],
 				dirname = opts["--directory"])
