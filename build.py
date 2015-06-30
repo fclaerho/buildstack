@@ -196,8 +196,12 @@ class BuildStack(object):
 
 	def _check_call(self, args):
 		_dict = self.customization.get(self.profileid or "all", {}).get(args[0], {})
-		args = [_dict.get("path", args[0])] + list(args[1:]) + _dict.get("append", [])
-		argslist =_dict.get("before", []) + [args] + _dict.get("after", [])
+		args = list(args)
+		args[0] = _dict.get("path", args[0])
+		argslist =\
+			_dict.get("before", [])\
+			+ [args + _dict.get("append", [])]\
+			+ _dict.get("after", [])
 		for args in argslist:
 			check_call(args, trace = trace)
 

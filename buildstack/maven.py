@@ -24,12 +24,16 @@ def on_flush(profileid, filename, targets):
 		if target == "clean":
 			if not target.scopeid:
 				args.append("clean")
+			elif target.scopeid == "update":
+				args += ["clean", "--update-snapshots"]
 			else:
-				yield "%s: unknown clean scope, expected none" % target.scopeid
+				yield "%s: unknown clean scope, expected none or 'update'" % target.scopeid
 		elif target == "compile":
 			args.append("compile")
 		elif target == "test":
 			args.append("test")
+		elif target == "release":
+			args.append("release:prepare")
 		elif target == "package":
 			args.append("package")
 		elif target == "publish":
@@ -53,110 +57,109 @@ manifest = {
 			"required_vars": ["name", "version"],
 			"defaults": {},
 			"template": """
-				<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
-				  <localRepository/>
-				  <interactiveMode/>
-				  <usePluginRegistry/>
-				  <offline/>
-				  <proxies>
-				    <proxy>
-				      <active/>
-				      <protocol/>
-				      <username/>
-				      <password/>
-				      <port/>
-				      <host/>
-				      <nonProxyHosts/>
-				      <id/>
-				    </proxy>
-				  </proxies>
-				  <servers>
-				    <server>
-				      <username/>
-				      <password/>
-				      <privateKey/>
-				      <passphrase/>
-				      <filePermissions/>
-				      <directoryPermissions/>
-				      <configuration/>
-				      <id/>
-				    </server>
-				  </servers>
-				  <mirrors>
-				    <mirror>
-				      <mirrorOf/>
-				      <name/>
-				      <url/>
-				      <layout/>
-				      <mirrorOfLayouts/>
-				      <id/>
-				    </mirror>
-				  </mirrors>
-				  <profiles>
-				    <profile>
-				      <activation>
-				        <activeByDefault/>
-				        <jdk/>
-				        <os>
-				          <name/>
-				          <family/>
-				          <arch/>
-				          <version/>
-				        </os>
-				        <property>
-				          <name/>
-				          <value/>
-				        </property>
-				        <file>
-				          <missing/>
-				          <exists/>
-				        </file>
-				      </activation>
-				      <properties>
-				        <key>value</key>
-				      </properties>
-				      <repositories>
-				        <repository>
-				          <releases>
-				            <enabled/>
-				            <updatePolicy/>
-				            <checksumPolicy/>
-				          </releases>
-				          <snapshots>
-				            <enabled/>
-				            <updatePolicy/>
-				            <checksumPolicy/>
-				          </snapshots>
-				          <id/>
-				          <name/>
-				          <url/>
-				          <layout/>
-				        </repository>
-				      </repositories>
-				      <pluginRepositories>
-				        <pluginRepository>
-				          <releases>
-				            <enabled/>
-				            <updatePolicy/>
-				            <checksumPolicy/>
-				          </releases>
-				          <snapshots>
-				            <enabled/>
-				            <updatePolicy/>
-				            <checksumPolicy/>
-				          </snapshots>
-				          <id/>
-				          <name/>
-				          <url/>
-				          <layout/>
-				        </pluginRepository>
-				      </pluginRepositories>
-				      <id/>
-				    </profile>
-				  </profiles>
-				  <activeProfiles/>
-				  <pluginGroups/>
+				<settings>
+					<localRepository/>
+					<interactiveMode/>
+					<usePluginRegistry/>
+					<offline/>
+					<proxies>
+						<proxy>
+							<active/>
+							<protocol/>
+							<username/>
+							<password/>
+							<port/>
+							<host/>
+							<nonProxyHosts/>
+							<id/>
+						</proxy>
+					</proxies>
+					<servers>
+						<server>
+							<username/>
+							<password/>
+							<privateKey/>
+							<passphrase/>
+							<filePermissions/>
+							<directoryPermissions/>
+							<configuration/>
+							<id/>
+						</server>
+					</servers>
+					<mirrors>
+						<mirror>
+							<mirrorOf/>
+							<name/>
+							<url/>
+							<layout/>
+							<mirrorOfLayouts/>
+							<id/>
+						</mirror>
+					</mirrors>
+					<profiles>
+						<profile>
+							<activation>
+								<activeByDefault/>
+								<jdk/>
+								<os>
+									<name/>
+									<family/>
+									<arch/>
+									<version/>
+								</os>
+								<property>
+									<name/>
+									<value/>
+								</property>
+								<file>
+									<missing/>
+									<exists/>
+								</file>
+							</activation>
+							<properties>
+								<key>value</key>
+							</properties>
+							<repositories>
+								<repository>
+									<releases>
+										<enabled/>
+										<updatePolicy/>
+										<checksumPolicy/>
+									</releases>
+									<snapshots>
+										<enabled/>
+										<updatePolicy/>
+										<checksumPolicy/>
+									</snapshots>
+									<id/>
+									<name/>
+									<url/>
+									<layout/>
+								</repository>
+							</repositories>
+							<pluginRepositories>
+								<pluginRepository>
+									<releases>
+										<enabled/>
+										<updatePolicy/>
+										<checksumPolicy/>
+									</releases>
+									<snapshots>
+										<enabled/>
+										<updatePolicy/>
+										<checksumPolicy/>
+									</snapshots>
+									<id/>
+									<name/>
+									<url/>
+									<layout/>
+								</pluginRepository>
+							</pluginRepositories>
+							<id/>
+						</profile>
+					</profiles>
+					<activeProfiles/>
+					<pluginGroups/>
 				</settings>
 			""",
 			"path": "~/.m2/settings.xml",
