@@ -67,7 +67,12 @@ To uninstall:
 Advanced Configuration
 ----------------------
 
-You can create the `~/build.json` to customize the commands executed by `build`.
+You can create the `~/build.json` to customize the commands executed by `build`:
+
+  * before: run commands before
+  * after: run commands after
+  * append: append extra arguments to the command
+  * path: set command path (e.g. on user-wide installation)
 
 For instance, to push after bumpversion (called for a python project on release):
 

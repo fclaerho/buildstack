@@ -22,8 +22,8 @@ Where <target> is one of:
   * clean[:<id>]         delete files out of the identified scope
   * compile              compile code
   * test                 run unit tests
-  * package[:<id>]       package code [in the specified format]
-  * publish[:<id>]       publish package [to the specified repository]
+  * package[:<id>]       package code [in the identified format]
+  * publish[:<id>]       publish package [to the identified repository]
   * [un]install[:<id>]   [un]install locally [or [un]provision inventory]
   * release[:<id>] [-m]  bump project version, commit and tag
 
