@@ -42,7 +42,7 @@ Use '~/build.json' to customize commands:
         "before": [[argv...]...], # list of commands to run before
         "append": [argv...],      # extra arguments to append
         "after": [[argv...]...],  # list of commands to run after
-        "path": "<path>"         # custom image path
+        "path": "<path>"          # custom image path
       }...
     }...
   }
