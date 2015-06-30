@@ -239,7 +239,7 @@ class BuildStack(object):
 
 	def clean(self, scopeid = None):
 		"delete generated files"
-		if scopeid == "source":
+		if scopeid == "tracked":
 			print "removing untracked files"
 			self.flush()
 			if os.path.exists(".git"):
