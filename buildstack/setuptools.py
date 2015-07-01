@@ -37,12 +37,13 @@ def on_clean(profileid, filename, targets, scopeid):
 	yield "flush"
 	yield ("pyclean", ".") # remove *.pyc and *.pyo (pyclean is packaged in python-minimal)
 	if scopeid == "all":
-		# dist: local build
-		# *.egg-info: local build byproduct
-		# *.egg: downloaded requirements
-		for name in glob.glob("dist") + glob.glob("*.egg*"):
-			print "removing lingering '%s'" % name
+		for name in glob.glob("dist") + glob.glob("*.egg-info"):
+			print "removing lingering '%s' (build byproduct)" % name
 			shutil.rmtree(name)
+		# cleanup requirements
+		for name in glob.glob("*.egg*"):
+			print "removing lingering '%s' (requirement)" % name
+			os.remove(name)
 	targets.append("clean", scopeid = scopeid)
 
 def on_test(profileid, filename, targets):
