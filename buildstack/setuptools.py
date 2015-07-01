@@ -190,6 +190,7 @@ manifest = {
 					#entry_points = {}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 					#test_suite = "",
 					#tests_require = [],
+					#dependency_links = [], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
 				)
 			""",
 			"path": "setup.py",
