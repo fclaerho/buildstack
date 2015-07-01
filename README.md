@@ -39,8 +39,8 @@ Extra Features
 		  if `nose2.cfg` is present and setup.py does not use it,
 			the original setup.py will be backed up and a new one will be generated to call nose2.
 
-End-User Installation
----------------------
+Installation
+------------
 
 	$ sudo pip install --extra-index-url https://pypi.fclaerhout.fr/simple/ build
 
@@ -52,17 +52,6 @@ or, if that repository is not available:
 To uninstall:
 
 	$ sudo pip uninstall build
-
-Developer Installation
-----------------------
-
-To install:
-
-	$ sudo python setup.py develop
-
-To uninstall:
-
-	$ sudo python setup.py develop --uninstall
 
 Advanced Configuration
 ----------------------
