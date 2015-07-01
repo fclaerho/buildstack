@@ -35,9 +35,12 @@ def on_get(profileid, filename, targets, requirementid):
 
 def on_clean(profileid, filename, targets, scopeid):
 	yield "flush"
-	yield ("pyclean", ".") # remove *.pyc and *.pyo, comes from python-minimal
+	yield ("pyclean", ".") # remove *.pyc and *.pyo (pyclean is packaged in python-minimal)
 	if scopeid == "all":
-		for name in glob.glob("dist") + glob.glob("*.egg-info"):
+		# dist: local build
+		# *.egg-info: local build byproduct
+		# *.egg: downloaded requirements
+		for name in glob.glob("dist") + glob.glob("*.egg*"):
 			print "removing lingering '%s'" % name
 			shutil.rmtree(name)
 	targets.append("clean", scopeid = scopeid)
