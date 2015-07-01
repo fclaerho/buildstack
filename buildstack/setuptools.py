@@ -27,7 +27,7 @@ def on_get(profileid, filename, targets, requirementid):
 	args = ["install"]
 	if os.path.exists(requirementid):
 		# requirements file
-		args += ["-r", requirementid]
+		args += ["--requirement", requirementid]
 	else:
 		# single module
 		args += [requirementid]
@@ -54,7 +54,7 @@ def on_test(profileid, filename, targets):
 	print "Setuptools can resolve dependencies from a single repository only."
 	print "It defaults to pypi.python.org; you can also set a private mirror."
 	print "If the test requirements depends on multiple repositories, you must"
-	print "resolve them beforehand with pip (e.g. with a requirements file.)"
+	print "resolve them beforehand with pip (e.g. with a requirements.txt file.)"
 	print "----------------------------------------------------------------------"
 	# if nose2 configuration file exists, use nose2 as test framework
 	text = open(filename).read()

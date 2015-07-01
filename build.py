@@ -18,7 +18,7 @@ Options:
   -h, --help                     show help
 
 Where <target> is one of:
-  * get:<id>             install requirement
+  * get:<id>             install requirement(s)
   * clean[:<id>]         delete files out of the identified scope
   * compile              compile code
   * test                 run unit tests
