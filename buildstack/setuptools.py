@@ -35,7 +35,7 @@ def on_get(profileid, filename, targets, requirementid):
 
 def on_clean(profileid, filename, targets, scopeid):
 	yield "flush"
-	yield ("pyclean", ".") # remove *.pyc and *.pyo (pyclean is packaged in python-minimal)
+	yield ("pyclean", ".") # remove *.pyc and *.pyo -- packaged in python-minimal
 	if scopeid == "all":
 		for name in glob.glob("dist") + glob.glob("*.egg-info"):
 			print "removing lingering '%s' (build byproduct)" % name
@@ -43,10 +43,19 @@ def on_clean(profileid, filename, targets, scopeid):
 		# cleanup requirements
 		for name in glob.glob("*.egg*"):
 			print "removing lingering '%s' (requirement)" % name
-			os.remove(name)
+			if os.path.isdir(name):
+				shutil.rmtree(name)
+			else:
+				os.remove(name)
 	targets.append("clean", scopeid = scopeid)
 
 def on_test(profileid, filename, targets):
+	print "------------------------------ WARNING -------------------------------"
+	print "Setuptools can resolve dependencies from a single repository only."
+	print "It defaults to pypi.python.org; you can also set a private mirror."
+	print "If the test requirements depends on multiple repositories, you must"
+	print "resolve them beforehand with pip (e.g. with a requirements file.)"
+	print "----------------------------------------------------------------------"
 	# if nose2 configuration file exists, use nose2 as test framework
 	text = open(filename).read()
 	if os.path.exists("nose2.cfg") and "nose2.collector.collector" not in text:
@@ -175,7 +184,7 @@ manifest = {
 				setuptools.setup(
 					name = "%(name)s", # https://www.python.org/dev/peps/pep-0426/#name
 					version = "%(version)s", # https://www.python.org/dev/peps/pep-0440/
-					packages = setuptools.find_packages(),
+					packages = setuptools.find_packages(), # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 					#description = "",
 					#long_description = "",
 					#url = "",
@@ -185,12 +194,14 @@ manifest = {
 					#classifiers = [], # https://pypi.python.org/pypi?%%3Aaction=list_classifiers
 					#keyword = [],
 					#py_modules = [],
-					#install_requires = [],
+					#install_requires = [], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
 					#package_data = {},
 					#data_files = {},
 					#entry_points = {}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 					#test_suite = "",
 					#tests_require = [],
+					#extra_require = {},
+					#setup_requires = [],
 					#dependency_links = [], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
 				)
 			""",
@@ -200,7 +211,7 @@ manifest = {
 			"required_vars": ["current_version"],
 			"defaults": {},
 			"template": """
-				# Reference: https://github.com/peritus/bumpversion
+				# REF: https://github.com/peritus/bumpversion
 
 				[bumpversion]
 				current_version = %(current_version)s
@@ -230,10 +241,19 @@ manifest = {
 			"required_vars": [],
 			"defaults": {},
 			"template": """
+				# REF: http://nose2.readthedocs.org/en/latest/configuration.html
+
 				[unittest]
+				#start-dir =
+				#code-directories =
+				#test-file-pattern =
+				#test-method-prefix
 				plugins = nose2.plugins.junitxml
+				#exclude-plugins =
+
 				[junit-xml]
 				always-on = True
+
 				[load_tests]
 				always-on = True
 			""",
@@ -243,14 +263,42 @@ manifest = {
 			"required_vars": ["name", "url", "user", "pass"],
 			"defaults": {},
 			"template": """
+				# REF: https://docs.python.org/2/distutils/packageindex.html#the-pypirc-file
+
 				[distutils]
 				index-servers = %(name)s
+
 				[%(name)s]
 				repository = %(url)s
 				username = %(user)s
 				password = %(pass)s
 			""",
 			"path": "~/.pypirc",
+		},
+		"pip": {
+			"required_vars": [],
+			"defaults": {},
+			"template": """
+				# REF: https://pip.pypa.io/en/latest/user_guide.html#configuration
+				
+				[global]
+				#timeout =
+				#index-url =
+				#extra-index-url =
+			""",
+			"path": "~/.pip/pip.conf",
+		},
+		"easy_install": {
+			"required_vars": [],
+			"defaults": {},
+			"template": """
+				# REF: https://pythonhosted.org/setuptools/easy_install.html#configuration-files
+				[easy_install]
+				#install_dir =
+				#index_url =
+				#find_links =
+			""",
+			"path": "~/.pydistutils.cfg",
 		},
 	},
 }

@@ -315,6 +315,7 @@ def configure(toolid, vars = None):
 				raise BuildError("%s: missing required variable" % exc)
 			with open(path, "w") as f:
 				f.write(text)
+			print "%s: template instantiated" % path
 		else:
 			raise BuildError("%s: file already exists" % path)
 
