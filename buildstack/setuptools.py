@@ -226,9 +226,6 @@ manifest = {
 				
 				#[bumpversion:part:<name>]
 				#values =
-				#	witty-warthog
-				#	ridiculous-rat
-				#	marvelous-mantis
 				#optional_values =
 				#first_value =
 				
@@ -277,14 +274,14 @@ manifest = {
 			"path": "~/.pypirc",
 		},
 		"pip": {
-			"required_vars": [],
+			"required_vars": ["extra_index_url"],
 			"defaults": {},
 			"template": """
 				# REF: https://pip.pypa.io/en/latest/user_guide.html#configuration
 				[global]
-				#timeout =
+				#proxy =
 				#index-url =
-				#extra-index-url =
+				extra-index-url = %(extra_index_url)s
 			""",
 			"path": "~/.pip/pip.conf",
 		},
