@@ -13,9 +13,9 @@ Options:
   -m <str>, --message <str>      set commit message on release
   -f <path>, --file <path>       set build manifest path
   -p <id>, --profile <id>        set build profile
-  -c, --no-colors                disable ANSI color codes
   -v, --verbose                  trace execution
-  -h, --help                     show help
+  -h, --help                     display full help text
+  --no-color                     disable colored output
 
 Where <target> is one of:
   * get:<id>             install requirement(s)
@@ -48,81 +48,9 @@ Use '~/build.json' to customize commands:
   }
 """
 
-import textwrap, fnmatch, glob, json, sys, os
+import textwrap, fnmatch, strfmt, utils, glob, json, sys, os
 
 import buildstack, docopt # 3rd-party
-
-def blue(string):
-	return "\033[1;34m%s\033[0m" % string
-
-def red(string):
-	return "\033[1;31m%s\033[0m" % string
-
-DEVNULL = open(os.devnull, "w")
-
-TRACEFP = DEVNULL
-
-def trace(*strings):
-	TRACEFP.write(blue("+ %s\n") % " ".join(strings))
-
-def check_call(args, trace = lambda *args: None, _cache = {}):
-	"""
-	Copypasted from https://github.com/fclaerho/copypasta
-	Trace and execute command or raise IOError if it is not available or fails.
-	v20150625A
-	"""
-	import subprocess, platform
-	trace(*args)
-	image = args[0]
-	if not image in _cache:
-		which = "where" if platform.uname()[0] == "Windows" else "which"
-		_cache[image] = subprocess.call((which, image), stdout = DEVNULL, stderr = DEVNULL)
-	if _cache[image] != 0:
-		raise IOError("%s is unavailable, please install it" % image)
-	try:
-		subprocess.check_call(args)
-	except subprocess.CalledProcessError as exc:
-		raise IOError(*exc.args)
-
-def parse_file(path, extname = None, default = None):
-	"""
-	Copypasted from https://github.com/fclaerho/copypasta
-	Return parsed file content or $default if it does not exist, raise IOError otherwise.
-	Support json, ini and text files.
-	v20150630A
-	"""
-	import ConfigParser, json, os
-	path = os.path.expanduser(path)
-	if os.path.exists(path):
-		rootname, _extname = os.path.splitext(path)
-		with open(path, "r") as fp:
-			if extname == ".ini" or _extname == ".ini":
-				parser = ConfigParser.ConfigParser()
-				if not parser.readfp(fp):
-					raise IOError("%s: unreadable file" % path)
-				_dict = {}
-				for section in parser.sections():
-					_dict[section] = {key: value for key, value in parser.items(section)}
-				return _dict
-			elif extname == ".json" or _extname == ".json":
-				try:
-					return json.load(fp)
-				except ValueError as exc:
-					raise IOError("%s: json parse error (%s)" % (path, exc))
-			else:
-				return fp.read()
-	else:
-		return default
-
-def chdir(path, trace = lambda *args: None):
-	"""
-	Copypasted from https://github.com/fclaerho/copypasta
-	Trace and change of current working directory.
-	v20150625A
-	"""
-	import os
-	trace("chdir", path)
-	os.chdir(os.path.expanduser(path))
 
 class Target(object):
 
@@ -163,7 +91,7 @@ class BuildStack(object):
 		self.profileid = profileid
 		self.filename = filename and os.path.basename(filename)
 		if dirname:
-			chdir(dirname)
+			utils.chdir(dirname, trace = trace)
 		# resolve manifest:
 		manifests = []
 		if self.filename:
@@ -203,7 +131,7 @@ class BuildStack(object):
 			+ [args + _dict.get("append", [])]\
 			+ _dict.get("after", [])
 		for args in argslist:
-			check_call(args, trace = trace)
+			utils.check_call(args, trace = trace)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
 		key = "on_%s" % name
@@ -322,19 +250,19 @@ def configure(toolid, vars = None):
 def main(*args):
 	opts = docopt.docopt(__doc__, argv = args or None)
 	try:
-		if opts["--no-colors"]:
-			global blue, red
-			blue = red = lambda s: s
-		if opts["--verbose"]:
-			global TRACEFP
-			TRACEFP = sys.stderr
+		global trace
+		trace = utils.Trace(
+			color = strfmt.blue,
+			quiet = not opts["--verbose"])
+		if opts["--no-color"]:
+			strfmt.disable_colors()
 		if opts["configure"]:
 			configure(
 				toolid = opts["<toolid>"],
 				vars = opts["<vars>"])
 		else:
 			bs = BuildStack(
-				customization = parse_file("~/build.json", default = None),
+				customization = utils.parse_file("~/build.json", default = None),
 				profileid = opts["--profile"],
 				filename = opts["--file"],
 				dirname = opts["--directory"])
@@ -364,6 +292,6 @@ def main(*args):
 		# Possible runtime errors are caught and nicely formatted for the user (no stacktrace!)
 		# SystemExit(str) is builtin and returns a status code of 1, this is good enough.
 		# Anything else has to be debugged and the stacktrace is therefore kept for you.
-		raise SystemExit(red(exc))
+		raise SystemExit(strfmt.red(exc))
 
 if __name__ == "__main__": main()

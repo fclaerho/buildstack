@@ -35,7 +35,14 @@ def on_get(profileid, filename, targets, requirementid):
 
 def on_clean(profileid, filename, targets, scopeid):
 	yield "flush"
-	yield ("pyclean", ".") # remove *.pyc and *.pyo -- packaged in python-minimal
+	# remove *.pyc and *.pyo files
+	for dirname, _, basenames in os.walk("."):
+		for basename in basenames:
+			_, extname = os.path.splitext(basename)
+			if extname in (".pyc", ".pyo"):
+				print "removing lingering '%s'" % basename
+				path = os.path.join(dirname, basename)
+				os.remove(path)
 	if scopeid == "all":
 		for name in glob.glob("dist") + glob.glob("*.egg-info"):
 			print "removing lingering '%s' (build byproduct)" % name
@@ -50,11 +57,13 @@ def on_clean(profileid, filename, targets, scopeid):
 	targets.append("clean", scopeid = scopeid)
 
 def on_test(profileid, filename, targets):
-	print "------------------------------ WARNING -------------------------------"
-	print "Setuptools can resolve dependencies from a single repository only."
-	print "It defaults to pypi.python.org; you can also set a private mirror."
+	print "------------------------------- NOTICE -------------------------------"
+	print "Setuptools can resolve dependencies from a *single* repository only."
+	print "It defaults to pypi.python.org but you can also set a private mirror."
 	print "If the test requirements depends on multiple repositories, you must"
-	print "resolve them beforehand with pip (e.g. with a requirements.txt file.)"
+	print "resolve them beforehand with pip individually or with requirements."
+	print "  * To set a private mirror, run 'build configure easy_install'"
+	print "  * To write a requirements file, see the pip documentation"
 	print "----------------------------------------------------------------------"
 	# if nose2 configuration file exists, use nose2 as test framework
 	text = open(filename).read()
@@ -212,7 +221,7 @@ manifest = {
 			"defaults": {},
 			"template": """
 				# REF: https://github.com/peritus/bumpversion
-
+				
 				[bumpversion]
 				current_version = %(current_version)s
 				#new_version=
@@ -222,7 +231,7 @@ manifest = {
 				#message = Bump version: {current_version} → {new_version}
 				#parse = (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)
 				#serialize = {major}.{minor}.{patch}
-
+				
 				#[bumpversion:part:<name>]
 				#values =
 				#	witty-warthog
@@ -242,7 +251,7 @@ manifest = {
 			"defaults": {},
 			"template": """
 				# REF: http://nose2.readthedocs.org/en/latest/configuration.html
-
+				
 				[unittest]
 				#start-dir =
 				#code-directories =
@@ -250,10 +259,10 @@ manifest = {
 				#test-method-prefix
 				plugins = nose2.plugins.junitxml
 				#exclude-plugins =
-
+				
 				[junit-xml]
 				always-on = True
-
+				
 				[load_tests]
 				always-on = True
 			""",
@@ -264,10 +273,10 @@ manifest = {
 			"defaults": {},
 			"template": """
 				# REF: https://docs.python.org/2/distutils/packageindex.html#the-pypirc-file
-
+				
 				[distutils]
 				index-servers = %(name)s
-
+				
 				[%(name)s]
 				repository = %(url)s
 				username = %(user)s
@@ -289,14 +298,13 @@ manifest = {
 			"path": "~/.pip/pip.conf",
 		},
 		"easy_install": {
-			"required_vars": [],
+			"required_vars": ["index_url"],
 			"defaults": {},
 			"template": """
 				# REF: https://pythonhosted.org/setuptools/easy_install.html#configuration-files
 				[easy_install]
 				#install_dir =
-				#index_url =
-				#find_links =
+				index_url = %(index_url)s
 			""",
 			"path": "~/.pydistutils.cfg",
 		},
