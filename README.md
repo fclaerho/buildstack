@@ -30,8 +30,8 @@ If you're a developer, being able to test and release your code in one step is n
 Extra Features
 --------------
 
-  * Instantiate configuration file templates: ansible, nose2, pypi, etc.
-    Use `build configure help` for details.
+  * Instantiate configuration file templates,
+    run `build configure help` for details.
   * Python:
     * use `build package:pkg` to build native OS/X packages.
     * on testing,
