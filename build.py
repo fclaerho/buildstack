@@ -28,12 +28,12 @@ Where <target> is one of:
   * release[:<id>] [-m]  bump project version, commit and tag
 
 Examples:
-  To compile the project:
-    $ build compile
-  To run unit tests then clean-up:
-    $ build test clean
+  To compile the project in subdir foo:
+    $ build -C foo/ compile
+  To run unit tests, clean-up and release:
+    $ build test clean:all release:patch
   Clean-up, compile, package and install:
-    $ build clean compile package install
+    $ build clean:all compile package install
 
 Use '~/build.json' to customize commands:
   {
@@ -231,15 +231,16 @@ def configure(toolid, vars = None):
 				required,\
 				("[%s]" % optional) if optional else ""
 	else:
+		suffix = ", run 'build configure help' for details"
 		if not toolid in tools:
-			raise Error(toolid, "unknown tool, run 'build configure help' for the list of supported tools")
+			raise Error(toolid, "unknown tool" + suffix)
 		path = os.path.expanduser(tools[toolid]["path"])
 		vars = dict(tools[toolid]["defaults"], **(dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}))
 		if not os.path.exists(path) or vars.get("overwrite", "no") == "yes":
 			try:
 				text = textwrap.dedent(tools[toolid]["template"]).lstrip() % vars
 			except KeyError as exc:
-				raise Error(exc, "missing required variable")
+				raise Error(" ".join(exc.args), "missing required variable" + suffix)
 			with open(path, "w") as fp:
 				fp.write(text)
 			trace("%s: template instantiated" % path)
