@@ -188,7 +188,7 @@ manifest = {
 					#packages = [], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 					#description = "",
 					#long_description = "",
-					#url = "",
+					#url = "", # https://docs.python.org/2/distutils/setupscript.html#additional-meta-data
 					#author = "",
 					#author_email = "",
 					#license = "",
@@ -196,14 +196,15 @@ manifest = {
 					#keyword = [],
 					#py_modules = [],
 					#install_requires = [], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
-					#package_data = {},
-					#data_files = {},
+					#package_data = {}, # https://docs.python.org/2/distutils/setupscript.html#installing-package-data
+					#data_files = {}, # https://docs.python.org/2/distutils/setupscript.html#installing-additional-files
 					#entry_points = {}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 					#test_suite = "",
 					#tests_require = [],
 					#extra_require = {},
 					#setup_requires = [],
 					#dependency_links = [], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
+					#scripts = [], # https://docs.python.org/2/distutils/setupscript.html#installing-scripts
 				)
 			""",
 			"path": "setup.py",

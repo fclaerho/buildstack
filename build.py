@@ -52,7 +52,10 @@ import textwrap, fnmatch, glob, os
 
 import buildstack, docopt, strfmt, utils # 3rd-party
 
-class Error(Exception): pass
+class Error(Exception):
+
+	def __str__(self):
+		return "build error: %s" % ": ".join(self.args)
 
 class Target(object):
 
@@ -110,12 +113,12 @@ class BuildStack(object):
 		if not manifests:
 			raise Error("no supported build stack detected")
 		elif len(manifests) > 1:
-			raise Error("%s: multiple build stacks detected" % ", ".join(map(lambda m: m["name"], manifests)))
+			raise Error(" ".join(map(lambda m: m["name"], manifests)), "multiple build stacks detected")
 		else:
 			self.manifest, = manifests
 		for key in ("name", "filenames"):
 			if not key in self.manifest:
-				raise Error("%s: missing required manifest property" % key)
+				raise Error(key, "missing required manifest property")
 		self.targets = Targets()
 		trace("using '%s' build stack" % self.manifest["name"])
 
@@ -146,13 +149,13 @@ class BuildStack(object):
 					elif isinstance(res, (list, tuple)):
 						self._check_call(res)
 					else: # assume res is an error object
-						raise Error("%s: %s: %s" % (self.manifest["name"], name, res))
+						raise Error(self.manifest["name"], name, res)
 			else: # the manifest explicitly declares this target as unsupported
-				raise Error("%s: %s: unsupported target" % (self.manifest["name"], name))
+				raise Error(self.manifest["name"], name, "unsupported target")
 		elif default == "stack": # stack target and let the on_flush handler deal with it
 			self.targets.append(name, **kwargs)
 		elif default == "fail":
-			raise Error("%s: %s: unhandled target" % (self.manifest["name"], name))
+			raise Error(self.manifest["name"], name, "unhandled target")
 
 	def get(self, requirementid):
 		self._handle_target(
@@ -229,19 +232,19 @@ def configure(toolid, vars = None):
 				("[%s]" % optional) if optional else ""
 	else:
 		if not toolid in tools:
-			raise Error("%s: unknown tool" % toolid)
+			raise Error(toolid, "unknown tool, run 'build configure help' for the list of supported tools")
 		path = os.path.expanduser(tools[toolid]["path"])
 		vars = dict(tools[toolid]["defaults"], **(dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}))
 		if not os.path.exists(path) or vars.get("overwrite", "no") == "yes":
 			try:
 				text = textwrap.dedent(tools[toolid]["template"]).lstrip() % vars
 			except KeyError as exc:
-				raise Error("%s: missing required variable" % exc)
+				raise Error(exc, "missing required variable")
 			with open(path, "w") as fp:
 				fp.write(text)
 			trace("%s: template instantiated" % path)
 		else:
-			raise Error("%s: file already exists, use overwrite=yes to overwrite it" % path)
+			raise Error(path, "file already exists, use overwrite=yes to overwrite it")
 
 def main(*args):
 	opts = docopt.docopt(__doc__, argv = args or None)
@@ -282,7 +285,7 @@ def main(*args):
 				elif target.startswith("release"):
 					bs.release(typeid = target.partition(":")[2], message = opts["--message"])
 				else:
-					raise Error("%s: unknown target" % target)
+					raise Error(target, "unknown target")
 				bs.flush()
 	except (utils.Error, Error) as exc:
 		raise SystemExit(strfmt.red(exc))
