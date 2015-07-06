@@ -48,9 +48,11 @@ Use '~/build.json' to customize commands:
   }
 """
 
-import textwrap, fnmatch, strfmt, utils, glob, json, sys, os
+import textwrap, fnmatch, glob, os
 
-import buildstack, docopt # 3rd-party
+import buildstack, docopt, strfmt, utils # 3rd-party
+
+class Error(Exception): pass
 
 class Target(object):
 
@@ -79,11 +81,6 @@ class Targets(list):
 	def append(self, name, **kwargs):
 		super(Targets, self).append(Target(name, **kwargs))
 
-class BuildError(Exception):
-
-	def __str__(self):
-		return "build error: %s" % " ".join(self.args)
-
 class BuildStack(object):
 
 	def __init__(self, customization = None, profileid = None, filename = None, dirname = None):
@@ -111,14 +108,14 @@ class BuildStack(object):
 						manifests.append(manifest)
 						break
 		if not manifests:
-			raise BuildError("no supported build stack detected")
+			raise Error("no supported build stack detected")
 		elif len(manifests) > 1:
-			raise BuildError("%s: multiple build stacks detected" % ", ".join(map(lambda m: m["name"], manifests)))
+			raise Error("%s: multiple build stacks detected" % ", ".join(map(lambda m: m["name"], manifests)))
 		else:
 			self.manifest, = manifests
 		for key in ("name", "filenames"):
 			if not key in self.manifest:
-				raise BuildError("%s: missing required manifest property" % key)
+				raise Error("%s: missing required manifest property" % key)
 		self.targets = Targets()
 		trace("using '%s' build stack" % self.manifest["name"])
 
@@ -149,13 +146,13 @@ class BuildStack(object):
 					elif isinstance(res, (list, tuple)):
 						self._check_call(res)
 					else: # assume res is an error object
-						raise BuildError("%s: %s: %s" % (self.manifest["name"], name, res))
+						raise Error("%s: %s: %s" % (self.manifest["name"], name, res))
 			else: # the manifest explicitly declares this target as unsupported
-				raise BuildError("%s: %s: unsupported target" % (self.manifest["name"], name))
+				raise Error("%s: %s: unsupported target" % (self.manifest["name"], name))
 		elif default == "stack": # stack target and let the on_flush handler deal with it
 			self.targets.append(name, **kwargs)
 		elif default == "fail":
-			raise BuildError("%s: %s: unhandled target" % (self.manifest["name"], name))
+			raise Error("%s: %s: unhandled target" % (self.manifest["name"], name))
 
 	def get(self, requirementid):
 		self._handle_target(
@@ -173,7 +170,7 @@ class BuildStack(object):
 			elif os.path.exists(".hg"):
 				self._check_call(("hg", "purge", "--config", "extensions.purge="))
 			else:
-				raise BuildError("unknown VCS, cannot remove untracked files") # NOTE: add svn-cleanup
+				raise Error("unknown VCS, cannot remove untracked files") # NOTE: add svn-cleanup
 		else:
 			self._handle_target("clean", scopeid = scopeid)
 
@@ -216,36 +213,35 @@ class BuildStack(object):
 		assert not self.targets, "%s: lingering unhandled target(s)" % self.manifest["name"]
 
 def configure(toolid, vars = None):
-	tool = {}
+	tools = {}
 	for manifest in buildstack.manifests:
-		tool.update(manifest.get("tool", {}))
+		tools.update(manifest.get("tools", {}))
 	if toolid == "help":
-		name_width = max(map(len, tool.keys()))
-		path_width = max(map(lambda key: len(tool[key]["path"]), tool.keys()))
-		def print_help(key):
-			vars = tool[key]["defaults"]
-			for name in tool[key]["required_vars"]:
-				vars[name] = "REQUIRED"
+		name_width = max(map(len, tools))
+		path_width = max(map(lambda key: len(tools[key]["path"]), tools))
+		for key in tools:
+			required = ", ".join(tools[key]["required_vars"])
+			optional = ", ".join("%s=%s" % (k, v) for k,v in tools[key]["defaults"].items())
 			print\
-				blue(key.rjust(name_width)),\
-				tool[key]["path"].center(path_width),\
-				"%s" % ",".join("%s=%s" % (key, vars[key]) for key in vars)
-		map(print_help, tool.keys())
+				strfmt.blue(key.rjust(name_width)),\
+				tools[key]["path"].center(path_width),\
+				required,\
+				("[%s]" % optional) if optional else ""
 	else:
-		if not toolid in tool:
-			raise BuildError("%s: unknown tool" % toolid)
-		path = os.path.expanduser(tool[toolid]["path"])
-		vars = dict(tool[toolid]["defaults"], **(dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}))
+		if not toolid in tools:
+			raise Error("%s: unknown tool" % toolid)
+		path = os.path.expanduser(tools[toolid]["path"])
+		vars = dict(tools[toolid]["defaults"], **(dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}))
 		if not os.path.exists(path) or vars.get("overwrite", "no") == "yes":
 			try:
-				text = textwrap.dedent(tool[toolid]["template"]).lstrip() % vars
+				text = textwrap.dedent(tools[toolid]["template"]).lstrip() % vars
 			except KeyError as exc:
-				raise BuildError("%s: missing required variable" % exc)
-			with open(path, "w") as f:
-				f.write(text)
-			print "%s: template instantiated" % path
+				raise Error("%s: missing required variable" % exc)
+			with open(path, "w") as fp:
+				fp.write(text)
+			trace("%s: template instantiated" % path)
 		else:
-			raise BuildError("%s: file already exists" % path)
+			raise Error("%s: file already exists, use overwrite=yes to overwrite it" % path)
 
 def main(*args):
 	opts = docopt.docopt(__doc__, argv = args or None)
@@ -286,12 +282,9 @@ def main(*args):
 				elif target.startswith("release"):
 					bs.release(typeid = target.partition(":")[2], message = opts["--message"])
 				else:
-					raise BuildError("%s: unknown target" % target)
+					raise Error("%s: unknown target" % target)
 				bs.flush()
-	except (NotImplementedError, BuildError, IOError) as exc:
-		# Possible runtime errors are caught and nicely formatted for the user (no stacktrace!)
-		# SystemExit(str) is builtin and returns a status code of 1, this is good enough.
-		# Anything else has to be debugged and the stacktrace is therefore kept for you.
+	except (utils.Error, Error) as exc:
 		raise SystemExit(strfmt.red(exc))
 
 if __name__ == "__main__": main()

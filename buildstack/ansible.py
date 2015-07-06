@@ -57,7 +57,7 @@ manifest = {
 	"filenames": ["playbook.yml", "*.yml"],
 	"on_get": on_get,
 	"on_flush": on_flush,
-	"tool": {
+	"tools": {
 		"ansible": {
 			"required_vars": ["user", "inventory"],
 			"defaults": {

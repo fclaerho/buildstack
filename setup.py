@@ -5,7 +5,7 @@ import setuptools
 setuptools.setup(
 	name = "build",
 	author = "fclaerhout.fr",
-	version = "2.7.1",
+	version = "2.7.2",
 	license = "MIT",
 	packages = ["buildstack"],
 	test_suite = "test",
@@ -15,4 +15,5 @@ setuptools.setup(
 	entry_points = {"console_scripts": ["build=build:main"]},
 	tests_require = ["pyutils", "docopt"],
 	install_requires = ["pyutils", "docopt"],
+	dependency_links = ["https://pypi.fclaerhout.fr/simple/pyutils"],
 )

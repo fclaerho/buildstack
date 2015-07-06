@@ -181,19 +181,19 @@ manifest = {
 	"on_install": on_install,
 	"on_release": on_release,
 	"on_flush": on_flush,
-	"tool": {
+	"tools": {
 		"setuptools": {
 			"required_vars": ["name", "version"],
 			"defaults": {},
 			"template": """
-				# Reference: https://packaging.python.org
+				# REF: https://packaging.python.org
 				
 				import setuptools
 				
 				setuptools.setup(
 					name = "%(name)s", # https://www.python.org/dev/peps/pep-0426/#name
 					version = "%(version)s", # https://www.python.org/dev/peps/pep-0440/
-					packages = setuptools.find_packages(), # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
+					#packages = [], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 					#description = "",
 					#long_description = "",
 					#url = "",
@@ -289,7 +289,6 @@ manifest = {
 			"defaults": {},
 			"template": """
 				# REF: https://pip.pypa.io/en/latest/user_guide.html#configuration
-				
 				[global]
 				#timeout =
 				#index-url =

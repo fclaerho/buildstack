@@ -1,7 +1,6 @@
 
 **Build** is a build stack wrapper:
-its goal is to abstract the build process of any source code repository through high-level well-known targets.
-Focus on the big picture and let **Build** handle the invocation details.
+its goal is to abstract the build process of any source code repository through high-level well-known targets. Focus on the big picture and let **Build** handle the invocation details.
 
 **Build** understands the following well-known targets:
   * `get:<id>`             install requirement

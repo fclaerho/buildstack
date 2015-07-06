@@ -52,7 +52,7 @@ manifest = {
 	"filenames": ["pom.xml"],
 	"on_get": on_get,
 	"on_flush": on_flush,
-	"tool": {
+	"tools": {
 		"maven": {
 			"required_vars": ["name", "version"],
 			"defaults": {},
