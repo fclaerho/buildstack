@@ -57,14 +57,6 @@ def on_clean(profileid, filename, targets, scopeid):
 	targets.append("clean", scopeid = scopeid)
 
 def on_test(profileid, filename, targets):
-	print "------------------------------- NOTICE -------------------------------"
-	print "Setuptools can resolve dependencies from a *single* repository only."
-	print "It defaults to pypi.python.org but you can also set a private mirror."
-	print "If the test requirements depends on multiple repositories, you must"
-	print "resolve them beforehand with pip individually or with requirements."
-	print "  * To set a private mirror, run 'build configure easy_install'"
-	print "  * To write a requirements file, see the pip documentation"
-	print "----------------------------------------------------------------------"
 	# if nose2 configuration file exists, use nose2 as test framework
 	text = open(filename).read()
 	if os.path.exists("nose2.cfg") and "nose2.collector.collector" not in text:
