@@ -55,7 +55,7 @@ import buildstack, docopt, utils # 3rd-party
 class Error(Exception):
 
 	def __str__(self):
-		return "%s error: %s" % (__name__, ": ".join(self.args))
+		return "build error: %s" % ": ".join(self.args)
 
 class Target(object):
 

@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
 	name = "build", # https://www.python.org/dev/peps/pep-0426/#name
-	version = "2.8.5", # https://www.python.org/dev/peps/pep-0440/
+	version = "2.8.6", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 	#description = "",
 	#long_description = "",
