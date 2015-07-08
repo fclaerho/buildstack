@@ -50,7 +50,7 @@ Use '~/build.json' to customize commands:
 
 import textwrap, fnmatch, glob, os
 
-import buildstack, docopt, strfmt, utils # 3rd-party
+import buildstack, docopt, utils # 3rd-party
 
 class Error(Exception):
 
