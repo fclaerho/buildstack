@@ -24,10 +24,10 @@ setuptools.setup(
 		],
 	}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 	test_suite = "test",
-	tests_require = ["pyutils", "docopt"],
+	tests_require = ["pyutils>=2.0.0", "docopt"],
 	#extra_require = {},
 	#setup_requires = [],
 	dependency_links = [
-		"git+https://github.com/fclaerho/pyutils/tarball/master@v2.0.3#egg=pyutils-2.0.3",
+		"https://pypi.fclaerhout.fr/simple",
 	], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
 )
