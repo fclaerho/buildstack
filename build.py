@@ -55,7 +55,7 @@ import buildstack, docopt, strfmt, utils # 3rd-party
 class Error(Exception):
 
 	def __str__(self):
-		return "build error: %s" % ": ".join(self.args)
+		return "%s error: %s" % (__name__, ": ".join(self.args))
 
 class Target(object):
 
@@ -91,7 +91,7 @@ class BuildStack(object):
 		self.profileid = profileid
 		self.filename = filename and os.path.basename(filename)
 		if dirname:
-			utils.chdir(dirname, trace = trace)
+			utils.chdir(dirname)
 		# resolve manifest:
 		manifests = []
 		if self.filename:
@@ -120,7 +120,7 @@ class BuildStack(object):
 			if not key in self.manifest:
 				raise Error(key, "missing required manifest property")
 		self.targets = Targets()
-		trace("using '%s' build stack" % self.manifest["name"])
+		utils.trace("using '%s' build stack" % self.manifest["name"])
 
 	def _check_call(self, args):
 		_dict = self.customization.get(self.profileid or "all", {}).get(args[0], {})
@@ -131,7 +131,7 @@ class BuildStack(object):
 			+ [args + _dict.get("append", [])]\
 			+ _dict.get("after", [])
 		for args in argslist:
-			utils.check_call(args, trace = trace)
+			utils.check_call(*args)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
 		key = "on_%s" % name
@@ -243,19 +243,17 @@ def configure(toolid, vars = None):
 				raise Error(" ".join(exc.args), "missing required variable" + suffix)
 			with open(path, "w") as fp:
 				fp.write(text)
-			trace("%s: template instantiated" % path)
+			utils.trace("%s: template instantiated" % path)
 		else:
 			raise Error(path, "file already exists, use overwrite=yes to overwrite it")
 
 def main(*args):
 	opts = docopt.docopt(__doc__, argv = args or None)
 	try:
-		global trace
-		trace = utils.Trace(
-			color = strfmt.blue,
-			quiet = not opts["--verbose"])
 		if opts["--no-color"]:
-			strfmt.disable_colors()
+			utils.disable_colors()
+		if opts["--verbose"]:
+			utils.enable_tracing()
 		if opts["configure"]:
 			configure(
 				toolid = opts["<toolid>"],
@@ -289,6 +287,6 @@ def main(*args):
 					raise Error(target, "unknown target")
 				bs.flush()
 	except (utils.Error, Error) as exc:
-		raise SystemExit(strfmt.red(exc))
+		raise SystemExit(utils.red(exc))
 
 if __name__ == "__main__": main()

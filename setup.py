@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
 	name = "build", # https://www.python.org/dev/peps/pep-0426/#name
-	version = "2.8.2", # https://www.python.org/dev/peps/pep-0440/
+	version = "2.8.3", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 	#description = "",
 	#long_description = "",
@@ -28,7 +28,6 @@ setuptools.setup(
 	#extra_require = {},
 	#setup_requires = [],
 	dependency_links = [
-		"https://pypi.fclaerhout.fr/simple/pyutils",
-		"git+https://github.com/fclaerho/pyutils/tarball/master@v1.2.2#egg=pyutils-1.2.2",
+		"git+https://github.com/fclaerho/pyutils/tarball/master@v2.0.3#egg=pyutils-2.0.3",
 	], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
 )
