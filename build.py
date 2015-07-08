@@ -248,7 +248,9 @@ def configure(toolid, vars = None):
 			raise Error(path, "file already exists, use overwrite=yes to overwrite it")
 
 def main(*args):
-	opts = docopt.docopt(__doc__, argv = args or None)
+	opts = docopt.docopt(
+		doc = __doc__,
+		argv = args or None)
 	try:
 		if opts["--no-color"]:
 			utils.disable_colors()
