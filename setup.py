@@ -28,6 +28,6 @@ setuptools.setup(
 	#extra_require = {},
 	#setup_requires = [],
 	dependency_links = [
-		"https://pypi.fclaerhout.fr/simple",
+		"https://pypi.fclaerhout.fr/simple/pyutils",
 	], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
 )
