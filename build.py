@@ -226,7 +226,7 @@ def configure(toolid, vars = None):
 			required = ", ".join(tools[key]["required_vars"])
 			optional = ", ".join("%s=%s" % (k, v) for k,v in tools[key]["defaults"].items())
 			print\
-				strfmt.blue(key.rjust(name_width)),\
+				utils.blue(key.rjust(name_width)),\
 				tools[key]["path"].center(path_width),\
 				required,\
 				("[%s]" % optional) if optional else ""
