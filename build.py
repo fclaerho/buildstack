@@ -20,6 +20,7 @@ Options:
 Where <target> is one of:
   * get:<id>             install requirement(s)
   * clean[:<id>]         delete files out of the identified scope
+                         use clean:tracked to delete untracked files.
   * compile              compile code
   * test                 run unit tests
   * package[:<id>]       package code [in the identified format]
@@ -52,10 +53,7 @@ import textwrap, fnmatch, glob, os
 
 import buildstack, docopt, utils # 3rd-party
 
-class Error(Exception):
-
-	def __str__(self):
-		return "build error: %s" % ": ".join(self.args)
+class Error(utils.Error): pass
 
 class Target(object):
 
@@ -213,7 +211,8 @@ class BuildStack(object):
 
 	def flush(self):
 		self._handle_target("flush", canflush = False, default = "fail")
-		assert not self.targets, "%s: lingering unhandled target(s)" % self.manifest["name"]
+		if self.targets:
+			raise Error(self.manifest["name"], "lingering unhandled target(s) -- please report this bug")
 
 def configure(toolid, vars = None):
 	tools = {}
@@ -288,7 +287,7 @@ def main(*args):
 				else:
 					raise Error(target, "unknown target")
 				bs.flush()
-	except (utils.Error, Error) as exc:
+	except utils.Error as exc:
 		raise SystemExit(utils.red(exc))
 
 if __name__ == "__main__": main()
