@@ -118,4 +118,4 @@ For all handlers, except `on_flush`, the default behavior is to stack the target
 The handler `on_flush` is called last to unstack targets.
 All handlers are generators and can yield either the string `"flush"`, commands or strings.
 A command must be a sequence of strings as specified by `subprocess.call()`.
-A string is considered to be an error message and raise a BuildError.
+A string is considered to be an error message and raise a `BuildError()`.
