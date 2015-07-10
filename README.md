@@ -79,14 +79,14 @@ For instance, to push after bumpversion (called for a python project on release)
 Or to provision an Ansible inventory as root with a password (on install):
 
 	{
-		"ansible-root": {
+		"asroot": {
 			"ansible-playbook": {
 				"append": ["--user", "root", "--ask-pass"]
 			}
 		}
 	}
 
-Specifying a profile means you have to call `build -p ansible-root ...` to use the customization.
+Specifying a profile means you have to call `build -p asroot ...` to use the customization.
 
 Plugin Development
 ------------------
