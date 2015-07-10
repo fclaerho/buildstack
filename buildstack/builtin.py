@@ -777,7 +777,7 @@ def on_flush(profileid, filename, targets):
 	yield # force this function to be a generator
 
 manifest = {
-	"filenames": ["build.ini"],
+	"filenames": ("build.ini",),
 	"on_get": on_get,
 	"on_flush": on_flush,
 }

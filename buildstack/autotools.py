@@ -61,7 +61,7 @@ def on_flush(profileid, filename, targets):
 		yield ["make"] + args
 
 manifest = {
-	"filenames": ["configure.ac", "configure.in"],
+	"filenames": ("configure.ac", "configure.in", "Makefile"),
 	"on_get": None,
 	"on_clean": on_clean,
 	"on_flush": on_flush,

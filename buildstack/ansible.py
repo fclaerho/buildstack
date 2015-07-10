@@ -1,37 +1,64 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
-import os
+import ConfigParser, yaml, os
+
+###########
+# helpers #
+###########
+
+cat = lambda *args: args
+
+def get_roles_path():
+	parser = ConfigParser.ConfigParser()
+	parser.read("ansible.cfg")
+	if parser.has_option("defaults", "roles_path"):
+		return parser.get("defaults", "roles_path")
 
 #########
 # tools #
 #########
 
-def galaxy(args):
-	args = list(args)
-	if not os.path.exists("ansible.cfg"):
-		args = ["--roles-path", "roles"] + args
-	return ["ansible-galaxy", "install"] + args
+def galaxy(*args):
+	return cat("ansible-galaxy", *args)
 
-def play(profileid, filename, args):
-	args = list(args)
+def play(profileid, filename, *args):
 	if profileid:
-		args += ["--tags", profileid]
-	return ["ansible-playbook", filename] + args
+		args += ("--tags", profileid)
+	return cat("ansible-playbook", filename, *args)
 
 ############
 # handlers #
 ############
 
 def on_get(profileid, filename, targets, requirementid):
+	yield "flush"
+	# create roles_path if it does not exist:
+	roles_path = get_roles_path()
+	if not os.path.exists(roles_path):
+		os.mkdir(roles_path)
 	if os.path.exists(requirementid):
-		# requirements file
-		args = ["--role-file", requirementid]
+		# meet requirements file:
+		args = ("--role-file", requirementid)
 	else:
-		# single module
+		# get single module:
 		if not re.match("\w\.\w(,\w)?", requirementid):
-			raise BuildError("%s: expected 'username.rolename[,version]' format" % requirementid)
-		args = [requirementid]
-	yield galaxy(args)
+			yield "%s: expected id format 'username.rolename[,version]' format" % requirementid
+		args = (requirementid,)
+	yield galaxy("install", "--force", *args)
+
+def on_clean(profileid, filename, targets, scopeid):
+	yield "flush"
+	# given a requirements file, remove each requirement:
+	if os.path.isfile(scopeid):
+		with open(scopeid, "r") as fp:
+			requirements = yaml.load(fp)
+		for req in requirements:
+			yield galaxy("remove", req["name"])
+		roles_path = get_roles_path()
+		if roles_path and os.path.exists(roles_path) and os.listdir(roles_path) == []:
+			os.rmdir(roles_path)
+	else:
+		yield "%s: unknown clean scope, expected requirements file" % scopeid
 
 def on_flush(profileid, filename, targets):
 	do_play = False
@@ -51,15 +78,16 @@ def on_flush(profileid, filename, targets):
 		yield play(
 			profileid = profileid,
 			filename = filename,
-			args = args)
+			*args)
 
 manifest = {
-	"filenames": ["playbook.yml", "*.yml"],
+	"filenames": ("playbook.yml", "*.yml"),
 	"on_get": on_get,
+	"on_clean": on_clean,
 	"on_flush": on_flush,
 	"tools": {
 		"ansible": {
-			"required_vars": ["user", "inventory"],
+			"required_vars": ("user", "inventory"),
 			"defaults": {
 				"host_key_checking": "yes",
 				"ask_sudo_pass": "no",
@@ -67,6 +95,7 @@ manifest = {
 				"sudo": "no",
 			},
 			"template": """
+			  # http://docs.ansible.com/intro_configuration.html
 				[defaults]
 				# ask_pass = True
 				# ask_sudo_pass = True

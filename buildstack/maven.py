@@ -1,17 +1,29 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
-def mvn(filename, profileid, args):
-	args = ["mvn"] + list(args)
+###########
+# helpers #
+###########
+
+cat = lambda *args: args
+
+#########
+# tools #
+#########
+
+def mvn(profileid, filename, *args):
 	if filename:
-		args += ["--file", filename]
+		args += ("--file", filename)
 	if profileid:
-		args += ["--activate-profiles", profileids]
-	return args
+		args += ("--activate-profiles", profileids)
+	return cat("mvn", *args)
+
+############
+# handlers #
+############
 
 def on_get(profileid, filename, targets, repositoryid, requirementid):
-	args = ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % requirementid]
-	if repositoryid:
-		args += ["--define", "repoUrl=%s" % repositoryid]
+	# POST-IT: not tested yet.
+
 	yield mvn(
 		filename = filename,
 		profileid = profileid,
@@ -21,7 +33,11 @@ def on_flush(profileid, filename, targets):
 	args = []
 	while targets:
 		target = targets.pop(0)
-		if target == "clean":
+		if target == "get":
+			args += ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % requirementid]
+			if repositoryid:
+				args += ["--define", "repoUrl=%s" % repositoryid]
+		elif target == "clean":
 			if not target.scopeid:
 				args.append("clean")
 			elif target.scopeid == "update":
@@ -49,12 +65,12 @@ def on_flush(profileid, filename, targets):
 			args = args)
 
 manifest = {
-	"filenames": ["pom.xml"],
+	"filenames": ("pom.xml",),
 	"on_get": on_get,
 	"on_flush": on_flush,
 	"tools": {
 		"maven": {
-			"required_vars": ["name", "version"],
+			"required_vars": ("url",),
 			"defaults": {},
 			"template": """
 				<settings>
@@ -99,7 +115,7 @@ manifest = {
 					<profiles>
 						<profile>
 							<activation>
-								<activeByDefault/>
+								<activeByDefault>true</activeByDefault>
 								<jdk/>
 								<os>
 									<name/>
@@ -131,9 +147,9 @@ manifest = {
 										<updatePolicy/>
 										<checksumPolicy/>
 									</snapshots>
-									<id/>
-									<name/>
-									<url/>
+									<id>private</id>
+									<name>Private Repository</name>
+									<url>%(url)s</url>
 									<layout/>
 								</repository>
 							</repositories>
@@ -155,7 +171,7 @@ manifest = {
 									<layout/>
 								</pluginRepository>
 							</pluginRepositories>
-							<id/>
+							<id>default</id>
 						</profile>
 					</profiles>
 					<activeProfiles/>

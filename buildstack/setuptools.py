@@ -164,7 +164,7 @@ def on_flush(profileid, filename, targets):
 			args = args)
 
 manifest = {
-	"filenames": ["setup.py"],
+	"filenames": ("setup.py",),
 	"on_get": on_get,
 	"on_clean": on_clean,
 	"on_test": on_test,
@@ -175,7 +175,7 @@ manifest = {
 	"on_flush": on_flush,
 	"tools": {
 		"setuptools": {
-			"required_vars": ["name", "version"],
+			"required_vars": ("name", "version",),
 			"defaults": {},
 			"template": """
 				# REF: https://packaging.python.org
@@ -185,7 +185,7 @@ manifest = {
 				setuptools.setup(
 					name = "%(name)s", # https://www.python.org/dev/peps/pep-0426/#name
 					version = "%(version)s", # https://www.python.org/dev/peps/pep-0440/
-					#packages = [], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
+					#packages = []|setuptools.find_packages(), # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 					#description = "",
 					#long_description = "",
 					#url = "", # https://docs.python.org/2/distutils/setupscript.html#additional-meta-data
