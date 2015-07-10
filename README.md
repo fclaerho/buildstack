@@ -115,7 +115,7 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 	}
 
 For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list.
-The handler `on_flush` is called last to unstack targets.
+The handler `on_flush` is called last to unstack targets and build will fail if not all targets have been processed.
 All handlers are generators and can yield either the string `"flush"`, commands or strings.
 A command must be a sequence of strings as specified by `subprocess.call()`.
 A string is considered to be an error message and raise a `BuildError()`.
