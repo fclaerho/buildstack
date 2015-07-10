@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
 	name = "build", # https://www.python.org/dev/peps/pep-0426/#name
-	version = "2.8.8", # https://www.python.org/dev/peps/pep-0440/
+	version = "2.8.9", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 	#description = "",
 	#long_description = "",
@@ -15,7 +15,11 @@ setuptools.setup(
 	#classifiers = [], # https://pypi.python.org/pypi?%3Aaction=list_classifiers
 	#keyword = [],
 	py_modules = ["build"],
-	install_requires = ["pyutils", "docopt"], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
+	install_requires = [
+		"pyutils>=2.0.0",
+		"docopt",
+		"PyYAML",
+	], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
 	#package_data = {},
 	#data_files = {},
 	entry_points = {
@@ -24,7 +28,11 @@ setuptools.setup(
 		],
 	}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 	test_suite = "test",
-	tests_require = ["pyutils>=2.0.0", "docopt"],
+	tests_require = [
+		"pyutils>=2.0.0",
+		"docopt",
+		"PyYAML",
+	],
 	#extra_require = {},
 	#setup_requires = [],
 	dependency_links = [
