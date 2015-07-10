@@ -14,8 +14,8 @@ its goal is to abstract the build process of any source code repository through 
   * `[un]install[:<id>]`   [un]install locally [or [un]provision inventory]
   * `release[:<id>] [-m]`  bump project version, commit and tag
 
-Why the heck should you use this junk?
---------------------------------------
+Why, oh why?
+------------
 
 The target audience is SQA engineers and developers.
 
