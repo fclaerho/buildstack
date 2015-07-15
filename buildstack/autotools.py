@@ -55,7 +55,10 @@ def on_flush(profileid, filename, targets):
 			yield ("libtoolize",) # => ltmain.sh (to do before aclocal and automake)
 			yield ("aclocal",) # configure.ac => aclocal.m4
 			yield ("autoconf",) # configure.ac => configure
-			yield ("autoheader",) # configure.ac => config.h.in
+			with open(filename, "r") as fp:
+				text = fp.read()
+				if "AC_CONFIG_HEADERS" in text:
+					yield ("autoheader",) # configure.ac => config.h.in
 			yield ("automake", "--add-missing") # Makefile.am => Makefile.in + missing files
 			yield ("./configure",) # system state + Makefile.in => Makefile
 		yield ["make"] + args

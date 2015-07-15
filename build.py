@@ -111,7 +111,7 @@ class BuildStack(object):
 		if not manifests:
 			raise Error("no supported build stack detected")
 		elif len(manifests) > 1:
-			raise Error(" ".join(map(lambda m: m["name"], manifests)), "multiple build stacks detected")
+			raise Error("/".join(map(lambda m: m["name"], manifests)), "multiple build stacks detected")
 		else:
 			self.manifest, = manifests
 		for key in ("name", "filenames"):

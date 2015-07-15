@@ -40,6 +40,12 @@ Extra Features
 		  if `nose2.cfg` is present and setup.py does not use it,
 			the original setup.py will be backed up and a new one will be generated to call nose2.
 
+Pre-requisites
+--------------
+
+**Build** is not bundled with any build stack.
+Make sure to install your compiler and other tools beforehand.
+
 Installation
 ------------
 
