@@ -35,7 +35,7 @@ Extra Features
   * Can instantiate configuration file templates,
     run `build configure help` for the list of supported tools.
   * Python:
-    * use `build package:pkg` to build native OS/X packages.
+    * use `build package:pkg` to build native OS/X packages (on an OS/X platform.)
     * use `build package:deb` to build debian packages (on a debian platform.)
       Install the following tools beforehands:
 
