@@ -39,10 +39,10 @@ Extra Features
     * use `build package:deb` to build debian packages (on a debian platform.)
       Install the following tools beforehands:
 
-		$ sudo pip install make-deb
-		$ sudo add-apt-repository ppa:dh-virtualenv/daily
-		$ sudo apt-get update
-		$ sudo apt-get install debhelper dh-virtualenv
+			$ sudo pip install make-deb
+			$ sudo add-apt-repository ppa:dh-virtualenv/daily
+			$ sudo apt-get update
+			$ sudo apt-get install debhelper dh-virtualenv
 
     * on testing,
       if `nose2.cfg` is present and setup.py does not use it,
