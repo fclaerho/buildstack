@@ -1,5 +1,5 @@
 NOTICE!
-This tool is stable for the use cases it covers but it does not cover all major use cases yet.
+This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build autotools, setuptools, maven and ansible projects.
 
 **Build** is a build stack wrapper:
 its goal is to abstract the build process of any source code repository through high-level well-known targets. Focus on the big picture and let **Build** handle the invocation details.
@@ -21,9 +21,9 @@ The target audience is SQA engineers and developers.
 
 Here's the killer use case: check out any repository and build it. No question asked.
 
-	$ git pull ${somewhere}/${some_code_repo}.git
-	$ cd ${some_code_repo}
-	$ build clean:all compile package install # or publish
+	$ git pull $GITSERVER/$MYREPO.git
+	$ cd $MYREPO
+	$ build clean compile package install
 
 If you're a developer, being able to test and release your code in one step is neat too:
 
