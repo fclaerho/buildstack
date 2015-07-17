@@ -1,4 +1,4 @@
-NOTICE!
+*NOTICE!*
 This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build autotools, setuptools, maven and ansible projects.
 
 **Build** is a build stack wrapper:
