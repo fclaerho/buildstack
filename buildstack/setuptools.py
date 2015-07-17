@@ -72,9 +72,10 @@ def on_test(profileid, filename, targets):
 	# solution: flush targets after test
 	yield "flush"
 
+# *** EXPERIMENTAL ***
 def on_package(profileid, filename, targets, formatid):
+	# build OS/X package:
 	if formatid == "pkg":
-		# *** EXPERIMENTAL ***
 		args += ["bdist", "--format=tar"]
 		yield setup(
 			filename = filename,
@@ -84,9 +85,15 @@ def on_package(profileid, filename, targets, formatid):
 			yield ("tar", "-C", "dist/root", "-xf", path)
 			basename, extname = os.path.splitext(path)
 			name, tail = basename.split("-", 1)
-			version, _ = tail.split(".macosx", 1)
-			identifier = "fr.fclaerhout.%s" % name # FIXME
+			identifier = raw_input("identifier (e.g. fr.fclaerhout.%s)?" % name)
 			yield ("pkgbuild", basename + ".pkg", "--root", "dist/root", "--version", version, "--identifier", identifier)
+	# build debian package:
+	elif formatid == "deb":
+		# REF: https://nylas.com/blog/packaging-deploying-python
+		yield ("make-deb",) # generates inputs to dh_virtualenv and calls it
+		#TODO: generate requirements.txt from setup.py
+		yield ("dpkg-buildpackage", "-us", "-uc")
+	# or let setuptools handle the packaging:
 	else:
 		targets.append("package", formatid = formatid)
 
@@ -144,13 +151,13 @@ def on_flush(profileid, filename, targets):
 				"sdux": lambda: args.extend(["sdist", "--format=sdux"]),
 				"wininst": lambda: args.extend(["sdist", "--format=wininst"]),
 				"msi": lambda: args.extend(["sdist", "--format=msi"]),
-				"deb": lambda: args,
-				"pkg": lambda: args,
 			}
 			if not target.formatid:
 				target.formatid = "sdist"
 			elif target.formatid == "help":
-				raise SystemExit("\n".join(func.keys()))
+				raise SystemExit("\n".join(["deb", "pkg"] + func.keys()))
+			elif target.formatid not in func:
+				yield "%s: unsupported format id" % target.formatid
 			func[target.formatid]()
 		elif target == "install":
 			args.append("install")

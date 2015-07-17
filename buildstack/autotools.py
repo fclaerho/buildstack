@@ -50,17 +50,20 @@ def on_flush(profileid, filename, targets):
 			yield "%s: unexpected target" % target
 	if args:
 		if not os.path.exists("Makefile"):
-			# Generate Makefile with autotools:
+			# Bootstrap method; generate Makefile with autotools:
 			# REF: https://www.sourceware.org/autobook/autobook/autobook_43.html
+			# TL;DR: don't use autoreconf.
 			yield ("libtoolize",) # => ltmain.sh (to do before aclocal and automake)
-			yield ("aclocal",) # configure.ac => aclocal.m4
-			yield ("autoconf",) # configure.ac => configure
+			yield ("aclocal",) # configure.xx => aclocal.m4
+			yield ("autoconf",) # configure.xx => configure
 			with open(filename, "r") as fp:
 				text = fp.read()
 				if "AC_CONFIG_HEADERS" in text:
-					yield ("autoheader",) # configure.ac => config.h.in
-			yield ("automake", "--add-missing") # Makefile.am => Makefile.in + missing files
-			yield ("./configure",) # system state + Makefile.in => Makefile
+					yield ("autoheader",) # configure.xx => config.h.in
+			if os.path.exists("Makefile.am"):
+				# you'll also need AM_INIT_AUTOMAKE() in configure.xx
+				yield ("automake", "--add-missing") # configure.xx + Makefile.am => Makefile.in + missing files
+			yield ("./configure",) # system state [+ Makefile.in?] => Makefile
 		yield ["make"] + args
 
 manifest = {

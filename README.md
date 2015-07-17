@@ -32,13 +32,19 @@ If you're a developer, being able to test and release your code in one step is n
 Extra Features
 --------------
 
-  * Instantiate configuration file templates,
-    run `build configure help` for details.
+  * Can instantiate configuration file templates,
+    run `build configure help` for the list of supported tools.
   * Python:
     * use `build package:pkg` to build native OS/X packages.
+    * use `build package:deb` to build debian packages (on a debian platform.)
+      Install the following tools beforehands:
+				$ sudo pip install make-deb
+				$ sudo add-apt-repository ppa:dh-virtualenv/daily
+				$ sudo apt-get update
+				$ sudo apt-get install debhelper dh-virtualenv
     * on testing,
-		  if `nose2.cfg` is present and setup.py does not use it,
-			the original setup.py will be backed up and a new one will be generated to call nose2.
+      if `nose2.cfg` is present and setup.py does not use it,
+      the original setup.py will be backed up and a new one will be generated to call nose2.
 
 Pre-requisites
 --------------
@@ -120,8 +126,13 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 		#"on_flush": None | on_flush,
 	}
 
-For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list.
-The handler `on_flush` is called last to unstack targets and build will fail if not all targets have been processed.
-All handlers are generators and can yield either the string `"flush"`, commands or strings.
-A command must be a sequence of strings as specified by `subprocess.call()`.
-A string is considered to be an error message and raise a `BuildError()`.
+For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list. The handler `on_flush` is called last to unstack targets and build will fail if not all targets have been processed. All handlers are generators and can yield either the string `"flush"`, commands or strings. A command must be a sequence of strings as specified by `subprocess.call()`. A string is considered to be an error message and raise a `BuildError()`.
+
+Testing
+-------
+
+By default, only the core infrastructure is tested.
+
+To test the build stacks, use: `TESTSTACKS=1 python build.py test clean:all`
+
+If you add new URLs to test, you may use `PAUSE=1 ...` to inspect the output files and specify the corresponding `target_paths` value in the `builds = {}` dictionary.
