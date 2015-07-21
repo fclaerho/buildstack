@@ -21,9 +21,7 @@ def get_roles_path():
 def galaxy(*args):
 	return cat("ansible-galaxy", *args)
 
-def play(profileid, filename, *args):
-	if profileid:
-		args += ("--tags", profileid)
+def play(filename, *args):
 	return cat("ansible-playbook", filename, *args)
 
 ############

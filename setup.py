@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
 	name = "build", # https://www.python.org/dev/peps/pep-0426/#name
-	version = "3.0.2", # https://www.python.org/dev/peps/pep-0440/
+	version = "3.0.3", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 	#description = "",
 	#long_description = "",
