@@ -16,7 +16,7 @@ setuptools.setup(
 	#keyword = [],
 	py_modules = ["build"],
 	install_requires = [
-		"pyutils==2.*",
+		"pyutils >=2.0,<3a0",
 		"docopt",
 		"PyYAML",
 	], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
@@ -29,7 +29,7 @@ setuptools.setup(
 	}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 	test_suite = "test",
 	tests_require = [
-		"pyutils==2.*",
+		"pyutils >=2.0,<3a0",
 		"docopt",
 		"PyYAML",
 	],
