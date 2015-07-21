@@ -131,7 +131,11 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 		#"on_flush": None | on_flush,
 	}
 
-For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list. The handler `on_flush` is called last to unstack targets and build will fail if not all targets have been processed. All handlers are generators and can yield either the string `"flush"`, `"@trace…"`, commands or strings. A command must be a sequence of strings as specified by `subprocess.call()`. A string is considered to be an error message and raise a `BuildError()`. A plugin should not use print statements directly; use @… directives to trace execution.
+For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list. The handler `on_flush` is called last to unstack targets and build will fail if not all targets have been processed. All handlers are generators and can yield either the string `"flush"`, `"@trace…"`, commands or strings. A command must be a sequence of strings as specified by `subprocess.call()`. A string is considered to be an error message and raise a `BuildError()`.
+
+A plugin should not use print statements directly; use @… directives to trace execution.
+
+If the build tool doesn not implement any "clean" target, you may set `"on_clean": "purge",` to use the VCS purge feature (that is, delete untracked files.)
 
 Testing
 -------
