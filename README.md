@@ -17,7 +17,7 @@ its goal is to abstract the build process of any source code repository through 
 Why, oh why?
 ------------
 
-The target audience is SQA engineers and developers.
+The target audience is SQA engineering, build engineering and development people.
 
 Here's the killer use case: check out any repository and build it. No question asked.
 
