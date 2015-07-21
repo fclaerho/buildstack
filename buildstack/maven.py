@@ -10,7 +10,7 @@ cat = lambda *args: args
 # tools #
 #########
 
-def mvn(profileid, filename, *args):
+def mvn(profileid, filename, args):
 	if filename:
 		args += ("--file", filename)
 	if profileid:
@@ -21,19 +21,12 @@ def mvn(profileid, filename, *args):
 # handlers #
 ############
 
-def on_get(profileid, filename, targets, repositoryid, requirementid):
-	# POST-IT: not tested yet.
-
-	yield mvn(
-		filename = filename,
-		profileid = profileid,
-		args = args)
-
 def on_flush(profileid, filename, targets):
 	args = []
 	while targets:
 		target = targets.pop(0)
 		if target == "get":
+			# EXPERIMENTAL
 			args += ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % requirementid]
 			if repositoryid:
 				args += ["--define", "repoUrl=%s" % repositoryid]
@@ -66,7 +59,6 @@ def on_flush(profileid, filename, targets):
 
 manifest = {
 	"filenames": ("pom.xml",),
-	"on_get": on_get,
 	"on_flush": on_flush,
 	"tools": {
 		"maven": {

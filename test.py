@@ -123,6 +123,10 @@ if os.environ.get("TESTSTACKS", False):
 			"https://github.com/twitter/twemproxy": ["src/nutcracker"],
 			# + libevent-dev, libncurses5-dev
 			#"https://github.com/tmux/tmux": ["tmux"],
+		#
+		# maven stack
+		#
+			"https://github.com/square/retrofit.git": [],
 		}
 		for git_url, target_paths in builds.items():
 			class StackTest(unittest.TestCase):

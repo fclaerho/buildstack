@@ -20,7 +20,6 @@ Options:
 Where <target> is one of:
   * get:<id>             install requirement(s)
   * clean[:<id>]         delete files out of the identified scope
-                         use clean:tracked to delete untracked files.
   * compile              compile code
   * test                 run unit tests
   * package[:<id>]       package code [in the identified format]
@@ -123,7 +122,7 @@ class BuildStack(object):
 	def _check_call(self, args):
 		_dict = self.customization.get(self.profileid or "all", {}).get(args[0], {})
 		args = list(args)
-		args[0] = _dict.get("path", args[0])
+		args[0] = os.path.expanduser(_dict.get("path", args[0]))
 		argslist =\
 			_dict.get("before", [])\
 			+ [args + _dict.get("append", [])]\
@@ -225,7 +224,7 @@ def configure(toolid, vars = None):
 			required = ", ".join(tools[key]["required_vars"])
 			optional = ", ".join("%s=%s" % (k, v) for k,v in tools[key]["defaults"].items())
 			print\
-				utils.blue(key.rjust(name_width)),\
+				utils.magenta(key.rjust(name_width)),\
 				tools[key]["path"].center(path_width),\
 				required,\
 				("[%s]" % optional) if optional else ""
