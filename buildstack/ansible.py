@@ -74,7 +74,6 @@ def on_flush(profileid, filename, targets):
 			yield "%s: unexpected target" % target
 	if args or do_play:
 		yield play(
-			profileid = profileid,
 			filename = filename,
 			*args)
 
