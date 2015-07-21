@@ -133,7 +133,7 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 
 For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list. The handler `on_flush` is called last to unstack targets and build will fail if not all targets have been processed. All handlers are generators and can yield either the string `"flush"`, commands or strings. A command must be a sequence of strings as specified by `subprocess.call()`. A string is considered to be an error message and raise a `BuildError()`. If a command image (i.e. its first element) starts by "@", it is considered to be a function name, e.g. `yield ("@utils.trace", "hello, world!")`.
 
-A plugin should not use print statements directly; use `@utils.trace` instead. Similarly, to remove files or  directories, use `@utils.remove` instead of importing `os` and re-implement the logic. See pyutils for the other available helpers.
+A plugin should not use print statements directly; use `@utils.trace` instead. Similarly, to remove files or  directories, use `@utils.remove` instead of importing `os` and re-implementing the logic. See [pyutils](github.com/fclaerho/pyutils) for the other available helpers.
 
 If the build tool does not implement any "clean" target, you may set `"on_clean": "purge",` to use the VCS purge feature (that is, delete untracked files.)
 
