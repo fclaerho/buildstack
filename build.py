@@ -155,10 +155,12 @@ class BuildStack(object):
 				**kwargs):
 				if isinstance(res, (list, tuple)):
 					self._check_call(res)
-				elif str(res).startswith("flush"):
+				elif res == "flush":
 					assert canflush, "%s: cannot flush from this target" % key
-					self.flush(reason = res)
-				else: # res is an error string
+					self.flush()
+				elif str(res).startswith("@"):
+					utils.trace(res[1:])
+				else: # res is an error object
 					raise Error(self.manifest["name"], name, res)
 		else:
 			assert False, "%s: invalid target handler" % handler
@@ -208,9 +210,8 @@ class BuildStack(object):
 			typeid = typeid,
 			message = message)
 
-	def flush(self, reason):
+	def flush(self):
 		if self.targets:
-			utils.trace(reason)
 			self._handle_target("flush", canflush = False, default = "fail")
 		if self.targets:
 			raise Error(self.manifest["name"], "lingering unhandled target(s) -- please report this bug")
@@ -287,7 +288,7 @@ def main(*args):
 					bs.release(typeid = target.partition(":")[2], message = opts["--message"])
 				else:
 					raise Error(target, "unknown target")
-				bs.flush("invoking build tool")
+				bs.flush()
 	except utils.Error as exc:
 		raise SystemExit(utils.red(exc))
 

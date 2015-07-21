@@ -4,7 +4,7 @@ import os
 
 def on_clean(profileid, filename, targets):
 	targets.append("clean")
-	yield "flush: removing lingering files"
+	yield "flush"
 	for name in ("ABOUT-GNU", "INSTALL", "config.rpath", "ltconfig",
 		"ABOUT-NLS", "NEWS", "config.sub", "ltmain.sh", "AUTHORS", "README",
 		"depcomp", "mdat-sh", "BACKLOG", "THANKS", "install-sh", "missing",
@@ -13,10 +13,10 @@ def on_clean(profileid, filename, targets):
 		"ltcf-cxx.sh", "texinfo.tex", "COPYING.LIB", "config.guess",
 		"ltcf-gcj.sh", "ylwrap", "Changelog"): # list from 'man automake'
 		if os.path.islink(name):
-			print "removing lingering '%s' (from automake --add-missing)" % name
+			yield "@removing lingering '%s' (from automake --add-missing)" % name
 			os.remove(name)
 	for name in ("aclocal.m4", "config.h.in","configure", "Makefile.in", "test-driver"):
-		print "removing lingering '%s' (from autotools)" % name
+		yield "@removing lingering '%s' (from autotools)" % name
 		os.remove(name)
 
 def on_flush(profileid, filename, targets):

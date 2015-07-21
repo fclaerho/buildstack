@@ -35,22 +35,22 @@ def on_get(profileid, filename, targets, requirementid):
 
 def on_clean(profileid, filename, targets):
 	targets.append("clean")
-	yield "flush: removing lingering files"
+	yield "flush"
 	# remove *.pyc and *.pyo files
 	for dirname, _, basenames in os.walk("."):
 		for basename in basenames:
 			_, extname = os.path.splitext(basename)
 			if extname in (".pyc", ".pyo"):
-				print "removing lingering '%s' (bytecode)" % basename
+				yield "@removing lingering '%s' (bytecode)" % basename
 				path = os.path.join(dirname, basename)
 				os.remove(path)
 	# cleanup dist
 	for name in glob.glob("dist") + glob.glob("*.egg-info"):
-		print "removing lingering '%s' (packaging)" % name
+		yield "@removing lingering '%s' (packaging)" % name
 		shutil.rmtree(name)
 	# cleanup requirements
 	for name in glob.glob("*.egg*"):
-		print "removing lingering '%s' (requirement)" % name
+		yield "@removing lingering '%s' (requirement)" % name
 		if os.path.isdir(name):
 			shutil.rmtree(name)
 		else:
@@ -70,7 +70,7 @@ def on_test(profileid, filename, targets):
 	# - "python setup.py sdist test" handles both targets as expected
 	# - "python setup.py test sdist" handles "test" only :-(
 	# solution: flush targets after test
-	yield "flush: working around setuptools issue"
+	yield "flush"
 
 # *** EXPERIMENTAL ***
 def on_package(profileid, filename, targets, formatid):
@@ -98,7 +98,7 @@ def on_package(profileid, filename, targets, formatid):
 		targets.append("package", formatid = formatid)
 
 def on_publish(profileid, filename, targets, repositoryid):
-	yield "flush: publishing package"
+	yield "flush"
 	args = ["upload"] + glob.glob("dist/*")
 	if repositoryid:
 		args += ["--repository", repositoryid]
@@ -106,13 +106,13 @@ def on_publish(profileid, filename, targets, repositoryid):
 
 def on_install(profileid, filename, targets, inventoryid, uninstall):
 	if uninstall:
-		yield "flush: uninstalling"
+		yield "flush"
 		yield pip(("uninstall", os.path.basename(os.getcwd())))
 	else:
 		targets.append("install")
 
 def on_release(profileid, filename, targets, typeid, message):
-	yield "flush: releasing"
+	yield "flush"
 	args = [typeid]
 	if message:
 		args = ["--message", message] + args
