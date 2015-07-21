@@ -34,7 +34,10 @@ Extra Features
 
   * Can instantiate configuration file templates,
     run `build configure help` for the list of supported tools.
-  * Python:
+  * Autotools:
+    * better `clean` (remove lingering generated files)
+  * Setuptools:
+    * better `clean` (remove lingering generated files)
     * use `build package:pkg` to build native OS/X packages (on an OS/X platform.)
     * use `build package:deb` to build debian packages (on a debian platform.)
       Install the following tools beforehands:

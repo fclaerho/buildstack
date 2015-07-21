@@ -35,7 +35,7 @@ def on_get(profileid, filename, targets, requirementid):
 
 def on_clean(profileid, filename, targets):
 	targets.append("clean")
-	yield "flush"
+	yield "flush: removing lingering files"
 	# remove *.pyc and *.pyo files
 	for dirname, _, basenames in os.walk("."):
 		for basename in basenames:
@@ -70,7 +70,7 @@ def on_test(profileid, filename, targets):
 	# - "python setup.py sdist test" handles both targets as expected
 	# - "python setup.py test sdist" handles "test" only :-(
 	# solution: flush targets after test
-	yield "flush"
+	yield "flush: working around setuptools issue"
 
 # *** EXPERIMENTAL ***
 def on_package(profileid, filename, targets, formatid):
@@ -98,7 +98,7 @@ def on_package(profileid, filename, targets, formatid):
 		targets.append("package", formatid = formatid)
 
 def on_publish(profileid, filename, targets, repositoryid):
-	yield "flush"
+	yield "flush: publishing package"
 	args = ["upload"] + glob.glob("dist/*")
 	if repositoryid:
 		args += ["--repository", repositoryid]
@@ -106,13 +106,13 @@ def on_publish(profileid, filename, targets, repositoryid):
 
 def on_install(profileid, filename, targets, inventoryid, uninstall):
 	if uninstall:
-		yield "flush"
+		yield "flush: uninstalling"
 		yield pip(("uninstall", os.path.basename(os.getcwd())))
 	else:
 		targets.append("install")
 
 def on_release(profileid, filename, targets, typeid, message):
-	yield "flush"
+	yield "flush: releasing"
 	args = [typeid]
 	if message:
 		args = ["--message", message] + args

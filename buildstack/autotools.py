@@ -4,8 +4,7 @@ import os
 
 def on_clean(profileid, filename, targets):
 	targets.append("clean")
-	yield "flush"
-	# cleanup lingering files...
+	yield "flush: removing lingering files"
 	for name in ("ABOUT-GNU", "INSTALL", "config.rpath", "ltconfig",
 		"ABOUT-NLS", "NEWS", "config.sub", "ltmain.sh", "AUTHORS", "README",
 		"depcomp", "mdat-sh", "BACKLOG", "THANKS", "install-sh", "missing",
