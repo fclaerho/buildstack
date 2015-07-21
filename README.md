@@ -1,5 +1,5 @@
 *NOTICE!*
-This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build autotools, setuptools, maven, cargo and ansible projects.
+This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build *autotools*, *setuptools*, *maven*, *cargo* and *ansible* projects.
 
 **Build** is a build stack wrapper:
 its goal is to abstract the build process of any source code repository through high-level well-known targets. Focus on the big picture and let **Build** handle the invocation details.
@@ -108,7 +108,7 @@ Plugin Development
 Fill-in the following template and move it to the `buildstack/` directory, it will be loaded automatically.
 
 	def on_get(profileid, filename, targets, requirementid): raise NotImplementedError()
-	def on_clean(profileid, filename, targets, scopeid): raise NotImplementedError()
+	def on_clean(profileid, filename, targets): raise NotImplementedError()
 	def on_test(profileid, filename, targets): raise NotImplementedError()
 	def on_compile(profileid, filename, targets): raise NotImplementedError()
 	def on_package(profileid, filename, targets, formatid): raise NotImplementedError()
