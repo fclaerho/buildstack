@@ -1,20 +1,25 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
+# REF: http://doc.crates.io
 # ** EXPERIMENTAL **
 
 def on_flush(profileid, filename, targets):
-	# http://doc.crates.io
 	args = []
 	while targets:
 		target = targets.pop(0)
-		if target == "get":
+		if target == "clean":
+			args.append("clean")
+		elif target == "get":
 			args.append("update")
 			if target.requirementid:
 				args += ["-p", target.requirementid]
 		elif target == "compile":
-			args += ["build", "--release"]
+			args.append("build")
+			if profileid != "dev":
+				args.append("--release")
 		elif target == "test":
 			args.append("test")
+			args.append("bench")
 		else:
 			yield "%s: unexpected target" % target
 	if args:

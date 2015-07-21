@@ -19,7 +19,7 @@ Options:
 
 Where <target> is one of:
   * get:<id>             install requirement(s)
-  * clean[:<id>]         delete files out of the identified scope
+  * clean                delete generated files
   * compile              compile code
   * test                 run unit tests
   * package[:<id>]       package code [in the identified format]
@@ -31,9 +31,9 @@ Examples:
   To compile the project in subdir foo:
     $ build -C foo/ compile
   To run unit tests, clean-up and release:
-    $ build test clean:all release:patch
+    $ build test clean release:patch
   Clean-up, compile, package and install:
-    $ build clean:all compile package install
+    $ build clean compile package install
 
 Use '~/build.json' to customize commands:
   {
@@ -131,39 +131,15 @@ class BuildStack(object):
 			utils.check_call(*args)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
-		key = "on_%s" % name
-		if key in self.manifest:
-			if self.manifest[key]:
-				assert callable(self.manifest[key]), "%s: %s: not callable" % (self.manifest["name"], key)
-				for res in self.manifest[key](
-					profileid = self.profileid,
-					filename = self.filename,
-					targets = self.targets,
-					**kwargs):
-					if res == "flush":
-						assert canflush, "%s: cannot flush from this target" % key
-						self.flush()
-					elif isinstance(res, (list, tuple)):
-						self._check_call(res)
-					else: # assume res is an error object
-						raise Error(self.manifest["name"], name, res)
-			else: # the manifest explicitly declares this target as unsupported
-				raise Error(self.manifest["name"], name, "unsupported target")
-		elif default == "stack": # stack target and let the on_flush handler deal with it
+		handler = self.manifest.get("on_%s" % name, default)
+		if handler is None:
+			# the manifest explicitly declares this target as unsupported
+			raise Error(self.manifest["name"], name, "unsupported target")
+		elif handler == "stack": # stack target and let the on_flush handler deal with it
 			self.targets.append(name, **kwargs)
-		elif default == "fail":
+		elif handler == "fail":
 			raise Error(self.manifest["name"], name, "unhandled target")
-
-	def get(self, requirementid):
-		self._handle_target(
-			"get",
-			default = "fail",
-			requirementid = requirementid)
-
-	def clean(self, scopeid = None):
-		"delete generated files"
-		if scopeid == "tracked":
-			print "removing untracked files"
+		elif handler == "purge":
 			self.flush()
 			if os.path.exists(".git"):
 				self._check_call(("git", "clean", "--force", "-d", "-x"))
@@ -171,8 +147,32 @@ class BuildStack(object):
 				self._check_call(("hg", "purge", "--config", "extensions.purge="))
 			else:
 				raise Error("unknown VCS, cannot remove untracked files") # NOTE: add svn-cleanup
+		elif callable(handler):
+			for res in (handler)(
+				profileid = self.profileid,
+				filename = self.filename,
+				targets = self.targets,
+				**kwargs):
+				if res == "flush":
+					assert canflush, "%s: cannot flush from this target" % key
+					self.flush()
+				elif isinstance(res, (list, tuple)):
+					self._check_call(res)
+				else: # res is an error string
+					raise Error(self.manifest["name"], name, res)
 		else:
-			self._handle_target("clean", scopeid = scopeid)
+			assert False, "%s: invalid target handler" % handler
+
+	def get(self, requirementid):
+		"get required dependencies"
+		self._handle_target(
+			"get",
+			default = "fail",
+			requirementid = requirementid)
+
+	def clean(self):
+		"delete generated files"
+		self._handle_target("clean")
 
 	def compile(self):
 		"compile source code into target objects"
@@ -183,7 +183,7 @@ class BuildStack(object):
 		self._handle_target("test")
 
 	def package(self, formatid = None):
-		"package target objects"
+		"bundle target objects with metadata"
 		self._handle_target(
 			"package",
 			formatid = formatid)
@@ -209,7 +209,8 @@ class BuildStack(object):
 			message = message)
 
 	def flush(self):
-		self._handle_target("flush", canflush = False, default = "fail")
+		if self.targets:
+			self._handle_target("flush", canflush = False, default = "fail")
 		if self.targets:
 			raise Error(self.manifest["name"], "lingering unhandled target(s) -- please report this bug")
 
@@ -267,8 +268,8 @@ def main(*args):
 			for target in opts["<target>"]:
 				if target.startswith("get:"):
 					bs.get(requirementid = target.split(":")[1])
-				elif target.startswith("clean"):
-					bs.clean(scopeid = target.partition(":")[2])
+				elif target == "clean":
+					bs.clean()
 				elif target == "compile":
 					bs.compile()
 				elif target == "test":

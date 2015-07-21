@@ -15,7 +15,7 @@ def mvn(profileid, filename, args):
 		args += ("--file", filename)
 	if profileid:
 		args += ("--activate-profiles", profileids)
-	return cat("mvn", *args)
+	return cat("mvn", "--update-snapshots", *args)
 
 ############
 # handlers #
@@ -31,12 +31,7 @@ def on_flush(profileid, filename, targets):
 			if repositoryid:
 				args += ["--define", "repoUrl=%s" % repositoryid]
 		elif target == "clean":
-			if not target.scopeid:
-				args.append("clean")
-			elif target.scopeid == "update":
-				args += ["clean", "--update-snapshots"]
-			else:
-				yield "%s: unknown clean scope, expected none or 'update'" % target.scopeid
+			args.append("clean")
 		elif target == "compile":
 			args.append("compile")
 		elif target == "test":

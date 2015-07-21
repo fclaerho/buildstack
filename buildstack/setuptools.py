@@ -33,28 +33,28 @@ def on_get(profileid, filename, targets, requirementid):
 		args += [requirementid]
 	yield pip(args)
 
-def on_clean(profileid, filename, targets, scopeid):
+def on_clean(profileid, filename, targets):
+	targets.append("clean")
 	yield "flush"
 	# remove *.pyc and *.pyo files
 	for dirname, _, basenames in os.walk("."):
 		for basename in basenames:
 			_, extname = os.path.splitext(basename)
 			if extname in (".pyc", ".pyo"):
-				print "removing lingering '%s'" % basename
+				print "removing lingering '%s' (bytecode)" % basename
 				path = os.path.join(dirname, basename)
 				os.remove(path)
-	if scopeid == "all":
-		for name in glob.glob("dist") + glob.glob("*.egg-info"):
-			print "removing lingering '%s' (build byproduct)" % name
+	# cleanup dist
+	for name in glob.glob("dist") + glob.glob("*.egg-info"):
+		print "removing lingering '%s' (packaging)" % name
+		shutil.rmtree(name)
+	# cleanup requirements
+	for name in glob.glob("*.egg*"):
+		print "removing lingering '%s' (requirement)" % name
+		if os.path.isdir(name):
 			shutil.rmtree(name)
-		# cleanup requirements
-		for name in glob.glob("*.egg*"):
-			print "removing lingering '%s' (requirement)" % name
-			if os.path.isdir(name):
-				shutil.rmtree(name)
-			else:
-				os.remove(name)
-	targets.append("clean", scopeid = scopeid)
+		else:
+			os.remove(name)
 
 def on_test(profileid, filename, targets):
 	# if nose2 configuration file exists, use nose2 as test framework
@@ -123,12 +123,7 @@ def on_flush(profileid, filename, targets):
 	while targets:
 		target = targets.pop(0)
 		if target == "clean":
-			if not target.scopeid:
-				args.append("clean")
-			elif target.scopeid == "all":
-				args += ["clean", "--all"]
-			else:
-				yield "%s: unknown clean scope, expected none or 'all'" % target.scopeid
+			args += ["clean", "--all"]
 		elif target == "compile":
 			args.append("build")
 		elif target == "test":
