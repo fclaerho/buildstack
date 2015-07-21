@@ -135,7 +135,7 @@ For all handlers, except `on_flush`, the default behavior is to stack the target
 
 A plugin should not use print statements directly; use @… directives to trace execution.
 
-If the build tool doesn not implement any "clean" target, you may set `"on_clean": "purge",` to use the VCS purge feature (that is, delete untracked files.)
+If the build tool does not implement any "clean" target, you may set `"on_clean": "purge",` to use the VCS purge feature (that is, delete untracked files.)
 
 Testing
 -------
