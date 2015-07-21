@@ -41,20 +41,14 @@ def on_clean(profileid, filename, targets):
 		for basename in basenames:
 			_, extname = os.path.splitext(basename)
 			if extname in (".pyc", ".pyo"):
-				yield "@removing lingering '%s' (bytecode)" % basename
 				path = os.path.join(dirname, basename)
-				os.remove(path)
+				yield ("@utils.remove", path, "lingering bytecode")
 	# cleanup dist
 	for name in glob.glob("dist") + glob.glob("*.egg-info"):
-		yield "@removing lingering '%s' (packaging)" % name
-		shutil.rmtree(name)
+		yield ("@utils.remove", name, "lingering packaging byproduct")
 	# cleanup requirements
-	for name in glob.glob("*.egg*"):
-		yield "@removing lingering '%s' (requirement)" % name
-		if os.path.isdir(name):
-			shutil.rmtree(name)
-		else:
-			os.remove(name)
+	for name in glob.glob("*.egg*") + glob.glob(".eggs"):
+		yield ("@utils.remove", name, "lingering requirement")
 
 def on_test(profileid, filename, targets):
 	# if nose2 configuration file exists, use nose2 as test framework

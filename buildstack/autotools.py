@@ -13,11 +13,9 @@ def on_clean(profileid, filename, targets):
 		"ltcf-cxx.sh", "texinfo.tex", "COPYING.LIB", "config.guess",
 		"ltcf-gcj.sh", "ylwrap", "Changelog"): # list from 'man automake'
 		if os.path.islink(name):
-			yield "@removing lingering '%s' (from automake --add-missing)" % name
-			os.remove(name)
+			yield ("@utils.remove", name, "lingering from automake --add-missing")
 	for name in ("aclocal.m4", "config.h.in","configure", "Makefile.in", "test-driver"):
-		yield "@removing lingering '%s' (from autotools)" % name
-		os.remove(name)
+		yield ("@utils.remove", name, "lingering from autotools")
 
 def on_flush(profileid, filename, targets):
 	# Invoke Make standard targets:

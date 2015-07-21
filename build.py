@@ -154,12 +154,13 @@ class BuildStack(object):
 				targets = self.targets,
 				**kwargs):
 				if isinstance(res, (list, tuple)):
-					self._check_call(res)
+					if res[0].startswith("@"):
+						eval(res[0][1:])(*res[1:])
+					else:
+						self._check_call(res)
 				elif res == "flush":
 					assert canflush, "%s: cannot flush from this target" % key
 					self.flush()
-				elif str(res).startswith("@"):
-					utils.trace(res[1:])
 				else: # res is an error object
 					raise Error(self.manifest["name"], name, res)
 		else:
