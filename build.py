@@ -155,7 +155,10 @@ class BuildStack(object):
 				**kwargs):
 				if isinstance(res, (list, tuple)):
 					if res[0].startswith("@"):
-						eval(res[0][1:])(*res[1:])
+						{
+							"@trace": utils.trace,
+							"@remove": utils.remove,
+						}[res[0]](*res[1:])
 					else:
 						self._check_call(res)
 				elif res == "flush":

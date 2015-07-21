@@ -1,7 +1,6 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
 # REF: http://doc.crates.io
-# ** EXPERIMENTAL **
 
 def on_flush(profileid, filename, targets):
 	args = []
