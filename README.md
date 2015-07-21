@@ -1,12 +1,12 @@
-*NOTICE!
-This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build [autotools](https://www.sourceware.org/autobook), [setuptools](https://packaging.python.org), [maven](https://maven.apache.org), [cargo](http://doc.crates.io) and [ansible](http://docs.ansible.com/ansible/index.html) projects.*
+*FOREWORD:
+This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build [autotools](https://www.sourceware.org/autobook), [setuptools](https://packaging.python.org), [maven](https://maven.apache.org), [cargo](http://doc.crates.io) and [ansible](http://docs.ansible.com/ansible/index.html)-based projects.*
 
 **Build** is a build stack wrapper:
 its goal is to abstract the build process of any source code repository through high-level well-known targets. Focus on the big picture and let **Build** handle the invocation details.
 
 **Build** understands the following well-known targets:
   * `get:<id>`             install requirement
-  * `clean[:all]`          delete compilation objects [and build artifacts]
+  * `clean`          delete compilation objects [and build artifacts]
   * `compile`              compile code
   * `test`                 run unit tests
   * `package[:<id>]`       package code [in the specified format]
