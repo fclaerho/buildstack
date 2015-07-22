@@ -86,7 +86,6 @@ class BuildStack(object):
 	def __init__(self, customization = None, profileid = None, path = None):
 		self.customization = customization or {}
 		self.profileid = profileid
-		self.filename = None
 		if path:
 			path = utils.Path(path)
 			if os.path.isdir(path):
@@ -98,6 +97,8 @@ class BuildStack(object):
 				raise Error(path, "invalid path")
 			if dirname:
 				utils.chdir(dirname)
+		else:
+			self.filename = None
 		# resolve manifest:
 		manifests = []
 		if self.filename:
