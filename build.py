@@ -11,7 +11,7 @@ Usage:
 Options:
   -C <path>, --directory <path>  set working directory
   -m <str>, --message <str>      set commit message on release
-  -f <path>, --file <path>       set build manifest path
+  -f <path>, --file <path>       set build manifest path (overrides -C)
   -p <id>, --profile <id>        set build profile
   -v, --verbose                  trace execution
   -h, --help                     display full help text
@@ -83,12 +83,21 @@ class Targets(list):
 
 class BuildStack(object):
 
-	def __init__(self, customization = None, profileid = None, filename = None, dirname = None):
+	def __init__(self, customization = None, profileid = None, path = None):
 		self.customization = customization or {}
 		self.profileid = profileid
-		self.filename = filename and os.path.basename(filename)
-		if dirname:
-			utils.chdir(dirname)
+		self.filename = None
+		if path:
+			path = utils.Path(path)
+			if os.path.isdir(path):
+				dirname = path
+				self.filename = None
+			elif os.path.isfile(path):
+				dirname, self.filename = os.path.split(path)
+			else:
+				raise Error(path, "invalid path")
+			if dirname:
+				utils.chdir(dirname)
 		# resolve manifest:
 		manifests = []
 		if self.filename:
@@ -268,8 +277,7 @@ def main(*args):
 			bs = BuildStack(
 				customization = utils.parse_file("~/build.json", default = None),
 				profileid = opts["--profile"],
-				filename = opts["--file"],
-				dirname = opts["--directory"])
+				path = opts["--file"] or opts["--directory"])
 			for target in opts["<target>"]:
 				if target.startswith("get:"):
 					bs.get(requirementid = target.split(":")[1])
