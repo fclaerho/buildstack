@@ -6,22 +6,11 @@
 
 cat = lambda *args: args
 
-#########
-# tools #
-#########
-
-def mvn(profileid, filename, args):
-	if filename:
-		args += ("--file", filename)
-	if profileid:
-		args += ("--activate-profiles", profileids)
-	return cat("mvn", "--update-snapshots", *args)
-
 ############
 # handlers #
 ############
 
-def on_flush(profileid, filename, targets):
+def on_flush(filename, targets):
 	args = []
 	while targets:
 		target = targets.pop(0)
@@ -47,10 +36,7 @@ def on_flush(profileid, filename, targets):
 		else:
 			yield "%s: unexpected target" % target
 	if args:
-		yield mvn(
-			filename = filename,
-			profileid = profileid,
-			args = args)
+		yield cat("mvn", "--update-snapshots", "--file", filename, *args)
 
 manifest = {
 	"filenames": ("pom.xml",),

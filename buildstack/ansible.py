@@ -28,7 +28,7 @@ def play(filename, *args):
 # handlers #
 ############
 
-def on_get(profileid, filename, targets, requirementid):
+def on_get(filename, targets, requirementid):
 	yield "flush"
 	# create roles_path if it does not exist:
 	roles_path = get_roles_path()
@@ -44,7 +44,7 @@ def on_get(profileid, filename, targets, requirementid):
 		args = (requirementid,)
 	yield galaxy("install", "--force", *args)
 
-def on_clean(profileid, filename, targets, scopeid):
+def on_clean(filename, targets, scopeid):
 	yield "flush"
 	# given a requirements file, remove each requirement:
 	if os.path.isfile(scopeid):
@@ -58,7 +58,7 @@ def on_clean(profileid, filename, targets, scopeid):
 	else:
 		yield "%s: unknown clean scope, expected requirements file" % scopeid
 
-def on_flush(profileid, filename, targets):
+def on_flush(filename, targets):
 	do_play = False
 	args = []
 	while targets:

@@ -2,7 +2,7 @@
 
 # REF: http://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile/
 
-def on_flush(profileid, filename, targets):
+def on_flush(filename, targets):
 	raise NotImplementedError()
 
 manifest = {

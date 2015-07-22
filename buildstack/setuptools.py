@@ -23,7 +23,7 @@ def bumpversion(args):
 # handlers #
 ############
 
-def on_get(profileid, filename, targets, requirementid):
+def on_get(filename, targets, requirementid):
 	args = ["install"]
 	if os.path.exists(requirementid):
 		# requirements file
@@ -33,7 +33,7 @@ def on_get(profileid, filename, targets, requirementid):
 		args += [requirementid]
 	yield pip(args)
 
-def on_clean(profileid, filename, targets):
+def on_clean(filename, targets):
 	targets.append("clean")
 	yield "flush"
 	# remove *.pyc and *.pyo files
@@ -50,7 +50,7 @@ def on_clean(profileid, filename, targets):
 	for name in glob.glob("*.egg*") + glob.glob(".eggs"):
 		yield ("@remove", name, "lingering requirement")
 
-def on_test(profileid, filename, targets):
+def on_test(filename, targets):
 	# if nose2 configuration file exists, use nose2 as test framework
 	text = open(filename).read()
 	if os.path.exists("nose2.cfg") and "nose2.collector.collector" not in text:
@@ -67,7 +67,7 @@ def on_test(profileid, filename, targets):
 	yield "flush"
 
 # *** EXPERIMENTAL ***
-def on_package(profileid, filename, targets, formatid):
+def on_package(filename, targets, formatid):
 	# build OS/X package:
 	if formatid == "pkg":
 		args += ["bdist", "--format=tar"]
@@ -91,28 +91,28 @@ def on_package(profileid, filename, targets, formatid):
 	else:
 		targets.append("package", formatid = formatid)
 
-def on_publish(profileid, filename, targets, repositoryid):
+def on_publish(filename, targets, repositoryid):
 	yield "flush"
 	args = ["upload"] + glob.glob("dist/*")
 	if repositoryid:
 		args += ["--repository", repositoryid]
 	yield twine(args)
 
-def on_install(profileid, filename, targets, inventoryid, uninstall):
+def on_install(filename, targets, inventoryid, uninstall):
 	if uninstall:
 		yield "flush"
 		yield pip(("uninstall", os.path.basename(os.getcwd())))
 	else:
 		targets.append("install")
 
-def on_release(profileid, filename, targets, typeid, message):
+def on_release(filename, targets, typeid, message):
 	yield "flush"
 	args = [typeid]
 	if message:
 		args = ["--message", message] + args
 	yield bumpversion(args)
 
-def on_flush(profileid, filename, targets):
+def on_flush(filename, targets):
 	args = []
 	while targets:
 		target = targets.pop(0)

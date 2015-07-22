@@ -27,7 +27,7 @@ do
 done
 """
 
-def _foo_on_flush(profileid, filename, targets):
+def _foo_on_flush(filename, targets):
 	args = map(lambda target: target.name, targets)
 	del targets[:]
 	yield ["bash", filename] + args

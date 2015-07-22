@@ -2,7 +2,7 @@
 
 import os
 
-def on_clean(profileid, filename, targets):
+def on_clean(filename, targets):
 	targets.append("clean")
 	yield "flush"
 	for name in ("ABOUT-GNU", "INSTALL", "config.rpath", "ltconfig",
@@ -17,7 +17,7 @@ def on_clean(profileid, filename, targets):
 	for name in ("aclocal.m4", "config.h.in","configure", "Makefile.in", "test-driver"):
 		yield ("@remove", name, "lingering from autotools")
 
-def on_flush(profileid, filename, targets):
+def on_flush(filename, targets):
 	# Invoke Make standard targets:
 	# REF: http://www.gnu.org/prep/standards/html_node/Standard-Targets.html
 	args = []

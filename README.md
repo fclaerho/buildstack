@@ -5,14 +5,14 @@ This tool is stable for the use cases it covers but it does not cover all major 
 its goal is to abstract the build process of any source code repository through high-level well-known targets. Focus on the big picture and let **Build** handle the invocation details.
 
 **Build** understands the following well-known targets:
-  * `get:<id>`             install requirement
-  * `clean`          delete compilation objects [and build artifacts]
-  * `compile`              compile code
-  * `test`                 run unit tests
-  * `package[:<id>]`       package code [in the specified format]
-  * `publish[:<id>]`       publish package [to the specified repository]
-  * `[un]install[:<id>]`   [un]install locally [or [un]provision inventory]
-  * `release[:<id>] [-m]`  bump project version, commit and tag
+  * `get:<id>` install requirement
+  * `clean` delete compilation objects [and build artifacts]
+  * `compile` compile code
+  * `test` run unit tests
+  * `package[:<id>]` package code [in the specified format]
+  * `publish[:<id>]` publish package [to the specified repository]
+  * `[un]install[:<id>]` [un]install locally [or [un]provision inventory]
+  * `release[:<id>] [-m]` bump project version, commit and tag
 
 Why, oh why?
 ------------

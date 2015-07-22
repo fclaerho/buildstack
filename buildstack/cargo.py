@@ -2,7 +2,7 @@
 
 # REF: http://doc.crates.io
 
-def on_flush(profileid, filename, targets):
+def on_flush(filename, targets):
 	args = []
 	while targets:
 		target = targets.pop(0)
@@ -14,8 +14,7 @@ def on_flush(profileid, filename, targets):
 				args += ["-p", target.requirementid]
 		elif target == "compile":
 			args.append("build")
-			if profileid != "dev":
-				args.append("--release")
+			#args += ["build", "--release"] ?
 		elif target == "test":
 			args.append("test")
 			args.append("bench")

@@ -4,7 +4,7 @@
 Detect and drive a source code build stack to reach well-known targets.
 
 Usage:
-  build [options] configure (<toolid>|help) [<vars>]
+  build [options] init <toolid> [<setting>...]
   build [options] <target>...
   build --help
 
@@ -19,21 +19,21 @@ Options:
 
 Where <target> is one of:
   * get:<id>             install requirement(s)
-  * clean                delete generated files
-  * compile              compile code
+  * clean                delete generated objects
+  * compile              generate target objects from source code
   * test                 run unit tests
-  * package[:<id>]       package code [in the identified format]
-  * publish[:<id>]       publish package [to the identified repository]
-  * [un]install[:<id>]   [un]install locally [or [un]provision inventory]
+  * package[:<id>]       bundle target objects with metadata [in the identified format]
+  * publish[:<id>]       publish packages [to the identified repository]
+  * [un]install[:<id>]   [un]deploy target objects [onto the identified inventory]
   * release[:<id>] [-m]  bump project version, commit and tag
 
 Examples:
-  To compile the project in subdir foo:
-    $ build -C foo/ compile
+  To compile the project in subdir foo and install it:
+    $ build -C foo/ clean compile install
   To run unit tests, clean-up and release:
     $ build test clean release:patch
-  Clean-up, compile, package and install:
-    $ build clean compile package install
+  Clean-up, compile, package and publish:
+    $ build clean compile package publish
 
 Use '~/build.json' to customize commands:
   {
@@ -110,7 +110,9 @@ class BuildStack(object):
 		if not manifests:
 			raise Error("no supported build stack detected")
 		elif len(manifests) > 1:
-			raise Error("/".join(map(lambda m: m["name"], manifests)), "multiple build stacks detected")
+			raise Error(
+				"/".join(map(lambda m: m["name"], manifests)),
+				"multiple build stacks detected, use -f to select a manifest")
 		else:
 			self.manifest, = manifests
 		for key in ("name", "filenames"):
@@ -119,14 +121,20 @@ class BuildStack(object):
 		self.targets = Targets()
 		utils.trace("using '%s' build stack" % self.manifest["name"])
 
-	def _check_call(self, args):
-		_dict = self.customization.get(self.profileid or "all", {}).get(args[0], {})
-		args = list(args)
-		args[0] = os.path.expanduser(_dict.get("path", args[0]))
+	def _check_call(self, args, _cache = {}):
+		key = args[0]
+		if not key in _cache:
+			# fetch general customization, if any:
+			_cache[key] = self.customization.get("all", {}).get(key, {})
+			# fetch profile customization, if any:
+			if self.profileid:
+				_cache[key].update(self.customization.get(self.profileid, {}).get(key, {}))
+		tmp = list(args)
+		tmp[0] = os.path.expanduser(_cache[key].get("path", key))
 		argslist =\
-			_dict.get("before", [])\
-			+ [args + _dict.get("append", [])]\
-			+ _dict.get("after", [])
+			_cache[key].get("before", [])\
+			+ [tmp + _cache[key].get("append", [])]\
+			+ _cache[key].get("after", [])
 		for args in argslist:
 			utils.check_call(*args)
 
@@ -142,25 +150,21 @@ class BuildStack(object):
 		elif handler == "purge":
 			self.flush()
 			if os.path.exists(".git"):
-				self._check_call(("git", "clean", "--force", "-d", "-x"))
+				self._check_call(("git", "clean", "--force", "-d", "-x")) # "Danger, Will Robinson!"
 			elif os.path.exists(".hg"):
 				self._check_call(("hg", "purge", "--config", "extensions.purge="))
 			else:
 				raise Error("unknown VCS, cannot remove untracked files") # NOTE: add svn-cleanup
 		elif callable(handler):
 			for res in (handler)(
-				profileid = self.profileid,
 				filename = self.filename,
 				targets = self.targets,
 				**kwargs):
 				if isinstance(res, (list, tuple)):
-					if res[0].startswith("@"):
-						{
-							"@trace": utils.trace,
-							"@remove": utils.remove,
-						}[res[0]](*res[1:])
-					else:
-						self._check_call(res)
+					{
+						"@trace": utils.trace,
+						"@remove": utils.remove,
+					}.get(res[0], lambda *args: self._check_call([res[0]] + list(args)))(*res[1:])
 				elif res == "flush":
 					assert canflush, "%s: cannot flush from this target" % key
 					self.flush()
@@ -170,45 +174,37 @@ class BuildStack(object):
 			assert False, "%s: invalid target handler" % handler
 
 	def get(self, requirementid):
-		"get required dependencies"
 		self._handle_target(
 			"get",
 			default = "fail",
 			requirementid = requirementid)
 
 	def clean(self):
-		"delete generated files"
 		self._handle_target("clean")
 
 	def compile(self):
-		"compile source code into target objects"
 		self._handle_target("compile")
 
 	def test(self):
-		"run unit tests"
 		self._handle_target("test")
 
 	def package(self, formatid = None):
-		"bundle target objects with metadata"
 		self._handle_target(
 			"package",
 			formatid = formatid)
 
 	def publish(self, repositoryid = None):
-		"publish package to the target repository"
 		self._handle_target(
 			"publish",
 			repositoryid = repositoryid)
 
 	def install(self, inventoryid = None, uninstall = False):
-		"deploy target objects in production mode"
 		self._handle_target(
 			"install",
 			inventoryid = inventoryid,
 			uninstall = uninstall)
 
 	def release(self, typeid, message):
-		"increment project version and commit"
 		self._handle_target(
 			"release",
 			typeid = typeid,
@@ -220,7 +216,7 @@ class BuildStack(object):
 		if self.targets:
 			raise Error(self.manifest["name"], "lingering unhandled target(s) -- please report this bug")
 
-def configure(toolid, vars = None):
+def init(toolid, settings):
 	tools = {}
 	for manifest in buildstack.manifests:
 		tools.update(manifest.get("tools", {}))
@@ -236,21 +232,24 @@ def configure(toolid, vars = None):
 				required,\
 				("[%s]" % optional) if optional else ""
 	else:
-		suffix = ", run 'build configure help' for details"
+		suffix = "-- see 'build init help'"
 		if not toolid in tools:
-			raise Error(toolid, "unknown tool" + suffix)
+			raise Error(toolid, "unknown tool", suffix)
 		path = os.path.expanduser(tools[toolid]["path"])
-		vars = dict(tools[toolid]["defaults"], **(dict(map(lambda item: item.split("="), vars.split(","))) if vars else {}))
-		if not os.path.exists(path) or vars.get("overwrite", "no") == "yes":
+		if settings:
+			_dict = dict(tools[toolid]["defaults"], **(dict(map(lambda item: item.split("="), settings))))
+		else:
+			_dict = {}
+		if not os.path.exists(path) or parms.get("overwrite", "no") == "yes":
 			try:
-				text = textwrap.dedent(tools[toolid]["template"]).lstrip() % vars
+				text = textwrap.dedent(tools[toolid]["template"]).lstrip() % _dict
 			except KeyError as exc:
 				raise Error(" ".join(exc.args), "missing required variable" + suffix)
 			with open(path, "w") as fp:
 				fp.write(text)
 			utils.trace("%s: template instantiated" % path)
 		else:
-			raise Error(path, "file already exists, use overwrite=yes to overwrite it")
+			raise Error(path, "file already exists, set overwrite=yes to force")
 
 def main(*args):
 	opts = docopt.docopt(
@@ -261,10 +260,10 @@ def main(*args):
 			utils.disable_colors()
 		if opts["--verbose"]:
 			utils.enable_tracing()
-		if opts["configure"]:
-			configure(
+		if opts["init"]:
+			init(
 				toolid = opts["<toolid>"],
-				vars = opts["<vars>"])
+				settings = opts["<setting>"])
 		else:
 			bs = BuildStack(
 				customization = utils.parse_file("~/build.json", default = None),
