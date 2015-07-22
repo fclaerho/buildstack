@@ -33,7 +33,7 @@ Extra Features
 --------------
 
   * Can instantiate configuration file templates,
-    run `build configure help` for the list of supported tools.
+    run `build init help` for the list of supported tools.
   * Autotools:
     * better `clean` (remove lingering generated files)
   * Setuptools:
