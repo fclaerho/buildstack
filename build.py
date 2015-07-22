@@ -237,12 +237,12 @@ def init(toolid, settings):
 			raise Error(toolid, "unknown tool", suffix)
 		path = os.path.expanduser(tools[toolid]["path"])
 		if settings:
-			_dict = dict(tools[toolid]["defaults"], **(dict(map(lambda item: item.split("="), settings))))
+			settings = dict(tools[toolid]["defaults"], **(dict(map(lambda item: item.split("="), settings))))
 		else:
-			_dict = {}
-		if not os.path.exists(path) or parms.get("overwrite", "no") == "yes":
+			settings = {}
+		if not os.path.exists(path) or settings.get("overwrite", "no") == "yes":
 			try:
-				text = textwrap.dedent(tools[toolid]["template"]).lstrip() % _dict
+				text = textwrap.dedent(tools[toolid]["template"]).lstrip() % settings
 			except KeyError as exc:
 				raise Error(" ".join(exc.args), "missing required variable" + suffix)
 			with open(path, "w") as fp:
