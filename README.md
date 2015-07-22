@@ -110,17 +110,17 @@ Plugin Development
 
 Fill-in the following template and move it to the `buildstack/` directory, it will be loaded automatically.
 
-	def on_get(profileid, filename, targets, requirementid): raise NotImplementedError()
-	def on_clean(profileid, filename, targets): raise NotImplementedError()
-	def on_test(profileid, filename, targets): raise NotImplementedError()
-	def on_compile(profileid, filename, targets): raise NotImplementedError()
-	def on_package(profileid, filename, targets, formatid): raise NotImplementedError()
-	def on_publish(profileid, filename, targets, repositoryid): raise NotImplementedError()
-	def on_install(profileid, filename, targets, uninstall): raise NotImplementedError()
-	def on_flush(profileid, filename, targets): raise NotImplementedError()
+	def on_get(filename, targets, requirementid): raise NotImplementedError()
+	def on_clean(filename, targets): raise NotImplementedError()
+	def on_test(filename, targets): raise NotImplementedError()
+	def on_compile(filename, targets): raise NotImplementedError()
+	def on_package(filename, targets, formatid): raise NotImplementedError()
+	def on_publish(filename, targets, repositoryid): raise NotImplementedError()
+	def on_install(filename, targets, uninstall): raise NotImplementedError()
+	def on_flush(filename, targets): raise NotImplementedError()
 	manifest = {
 		#"name": # if unset, use the module name
-		"filenames": [], # list of supported build manifest filenames
+		"filenames": [], # list of patterns matching supported build manifest filenames
 		#"on_get": None | on_get,
 		#"on_clean": None | on_clean,
 		#"on_test": None | on_test,
