@@ -35,9 +35,9 @@ Extra Features
 
   * Can instantiate configuration file templates,
     run `build init help` for the list of supported tools.
-  * Autotools:
+  * **Autotools**:
     * better `clean` (remove lingering generated files)
-  * Setuptools:
+  * **Setuptools**:
     * better `clean` (remove lingering generated files)
     * use `build package:pkg` to build native OS/X packages (on an OS/X platform.)
     * use `build package:deb` to build debian packages (on a debian platform.)
@@ -56,7 +56,7 @@ Notes
 -----
 
   * For any build stack, use `build init <toolid> <vars>…` to instantiate a minimal build manifest.
-  * **Cargo**
+  * **Cargo**:
     `build compile` invokes `cargo build` without `--release`,
     if you want to turn optimizations on, create a profile appending this flag.
 
