@@ -63,7 +63,7 @@ Notes
 Pre-requisites
 --------------
 
-**Build** is not bundled with any build stack, provision the machine appropriately beforehand.
+**Build** is not bundled with any build tool, provision the machine appropriately beforehand.
 
 Installation
 ------------
