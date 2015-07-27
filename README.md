@@ -5,8 +5,8 @@ This tool is stable for the use cases it covers but it does not cover all major 
 its goal is to abstract the build process of any source code repository through high-level well-known targets. Focus on the big picture and let **Build** handle the invocation details.
 
 **Build** understands the following well-known targets:
-  * `get:<id>` install requirement
-  * `clean` delete compilation objects [and build artifacts]
+  * `get:<id>` install requirement (id might be a requirements file)
+  * `clean` delete build byproducts
   * `compile` compile code
   * `test` run unit tests
   * `package[:<id>]` package code [in the specified format]
@@ -17,15 +17,16 @@ its goal is to abstract the build process of any source code repository through 
 Why, oh why?
 ------------
 
-The target audience is SQA engineering, build engineering and development people.
-
-Here's the killer use case: check out any repository and build it. No question asked.
+The target audience is _SQA engineering_, _build engineering_ and _development_ folks
+and here's the killer use case: check out any repository and build it.
+No question asked.
+No need for arcane build knowledge.
 
 	$ git pull $GITSERVER/$MYREPO.git
 	$ cd $MYREPO
 	$ build clean compile package install
 
-If you're a developer, being able to test and release your code in one step is neat too:
+Being able to test and release your code in one step is neat too:
 
 	$ build test clean:all release:patch -m "fix bug foobar"
 
