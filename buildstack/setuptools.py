@@ -24,6 +24,7 @@ def bumpversion(args):
 ############
 
 def on_get(filename, targets, requirementid):
+	yield "flush"
 	args = ["install"]
 	if os.path.exists(requirementid):
 		# requirements file

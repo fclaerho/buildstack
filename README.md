@@ -51,11 +51,18 @@ Extra Features
       if `nose2.cfg` is present and setup.py does not use it,
       the original setup.py will be backed up and a new one will be generated to call nose2.
 
+Notes
+-----
+
+  * For any build stack, use `build init <toolid> <vars>…` to instantiate a minimal build manifest.
+  * **Cargo**
+    `build compile` invokes `cargo build` without `--release`,
+    if you want to turn optimizations on, create a profile appending this flag.
+
 Pre-requisites
 --------------
 
-**Build** is not bundled with any build stack.
-Make sure to install your compiler and other tools beforehand.
+**Build** is not bundled with any build stack, provision the machine appropriately beforehand.
 
 Installation
 ------------
@@ -74,7 +81,7 @@ To uninstall:
 Advanced Configuration
 ----------------------
 
-You can create the `~/build.json` to customize the commands executed by `build`:
+Create the file `~/build.json` to customize the commands executed by `build`:
 
   * before: run commands before
   * after: run commands after
@@ -96,14 +103,14 @@ For instance, to push after bumpversion (called for a python project on release)
 Or to provision an Ansible inventory as root with a password (on install):
 
 	{
-		"asroot": {
+		"as-root": {
 			"ansible-playbook": {
 				"append": ["--user", "root", "--ask-pass"]
 			}
 		}
 	}
 
-Specifying a profile means you have to call `build -p asroot ...` to use the customization.
+Specifying a profile means you have to call `build -p as-root ...` to use the customization.
 
 Plugin Development
 ------------------
@@ -144,6 +151,7 @@ Testing
 
 By default, only the core infrastructure is tested.
 
-To test the build stacks, use: `TESTSTACKS=1 python build.py test clean:all`
+To test the build stacks, use: `TESTSTACKS=1 python build.py test clean:all`.
+This will check-out various github repositories meeting a standard build process and build them.
 
 If you add new URLs to test, you may use `PAUSE=1 ...` to inspect the output files and specify the corresponding `target_paths` value in the `builds = {}` dictionary.

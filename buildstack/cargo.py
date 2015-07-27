@@ -13,11 +13,14 @@ def on_flush(filename, targets):
 			if target.requirementid:
 				args += ["-p", target.requirementid]
 		elif target == "compile":
-			args.append("build")
-			#args += ["build", "--release"] ?
+			args.append("build") # create a profile to append "--release" when needed
 		elif target == "test":
 			args.append("test")
 			args.append("bench")
+		elif target == "package":
+			args.append("package")
+		elif target == "publish":
+			args.append("publish")
 		else:
 			yield "%s: unexpected target" % target
 	if args:
