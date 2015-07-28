@@ -18,9 +18,9 @@ Why, oh why?
 ------------
 
 The target audience is _SQA engineering_, _build engineering_ and _development_ folks
-and here's the killer use case: check out any repository and build it.
+and here's the main use case: check out any repository and build it.
 No question asked.
-No need for arcane build knowledge.
+No need to lookup documentation if you're in a hurry or not interested into build details.
 
 	$ git pull $GITSERVER/$MYREPO.git
 	$ cd $MYREPO
@@ -55,6 +55,7 @@ Extra Features
 Notes
 -----
 
+  * **build** behavior can be customized through profiles, see advanced configuration below.
   * For any build stack, use `build init <toolid> <vars>…` to instantiate a minimal build manifest.
   * **Cargo**:
     `build compile` invokes `cargo build` without `--release`,
@@ -89,6 +90,9 @@ Create the file `~/build.json` to customize the commands executed by `build`:
   * append: append extra arguments to the command
   * path: set command path (e.g. on user-wide installation)
 
+You can group customizations into "profiles".
+Use the `-p` switch on the command line to select the one you want to use.
+
 For instance, to push after bumpversion (called for a python project on release):
 
 	{
@@ -99,7 +103,7 @@ For instance, to push after bumpversion (called for a python project on release)
 		}
 	}
 
-`all` means "for all profile".
+`all` is a particular profile; those customization are applied in all cases.
 
 Or to provision an Ansible inventory as root with a password (on install):
 
@@ -111,7 +115,7 @@ Or to provision an Ansible inventory as root with a password (on install):
 		}
 	}
 
-Specifying a profile means you have to call `build -p as-root ...` to use the customization.
+This would be called with `build -p as-root …`.
 
 Plugin Development
 ------------------
