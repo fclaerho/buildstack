@@ -26,7 +26,7 @@ No need to lookup documentation if you're in a hurry or not interested into buil
 	$ cd $MYREPO
 	$ build clean compile package install
 
-Being able to test and release your code in one step is neat too:
+Being able to test and release your code in one step is also handy:
 
 	$ build test clean:all release:patch -m "fix bug foobar"
 
