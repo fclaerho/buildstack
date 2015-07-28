@@ -55,7 +55,7 @@ Extra Features
 Notes
 -----
 
-  * **build** behavior can be customized through profiles, see advanced configuration below.
+  * **Build** behavior can be customized through _profiles_, see advanced configuration below.
   * For any build stack, use `build init <toolid> <vars>…` to instantiate a minimal build manifest.
   * **Cargo**:
     `build compile` invokes `cargo build` without `--release`,
