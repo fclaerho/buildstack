@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
 	name = "build", # https://www.python.org/dev/peps/pep-0426/#name
-	version = "3.6.0", # https://www.python.org/dev/peps/pep-0440/
+	version = "3.7.0", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 	#description = "",
 	#long_description = "",
@@ -16,7 +16,7 @@ setuptools.setup(
 	#keyword = [],
 	py_modules = ["build"],
 	install_requires = [
-		"pyutils >=2.5,<3a0",
+		"pyutils >=3,<4a0",
 		"docopt",
 		"PyYAML",
 	], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
@@ -29,7 +29,7 @@ setuptools.setup(
 	}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 	test_suite = "test",
 	tests_require = [
-		"pyutils >=2.5,<3a0",
+		"pyutils >=3,<4a0",
 		"docopt",
 		"PyYAML",
 	],

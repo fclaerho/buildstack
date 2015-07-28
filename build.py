@@ -276,7 +276,7 @@ def main(*args):
 				settings = opts["<setting>"])
 		else:
 			bs = BuildStack(
-				customization = utils.parse_file("~/build.json", default = None),
+				customization = utils.unmarshall("~/build.json", default = None),
 				profileid = opts["--profile"],
 				path = opts["--file"] or opts["--directory"])
 			for target in opts["<target>"]:
