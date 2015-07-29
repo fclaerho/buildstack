@@ -5,9 +5,10 @@ This tool is stable for the use cases it covers but it does not cover all major 
 its goal is to abstract the build process of any source code repository through high-level well-known targets. Focus on the big picture and let **Build** handle the invocation details.
 
 **Build** understands the following well-known targets:
-  * `get:<id>` install requirement (id might be a requirements file)
+  * `get:<id>` install requirements
   * `clean` delete build byproducts
   * `compile` compile code
+  * `run` run project
   * `test` run unit tests
   * `package[:<id>]` package code [in the specified format]
   * `publish[:<id>]` publish package [to the specified repository]
@@ -143,7 +144,7 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 		#"on_flush": None | on_flush,
 	}
 
-For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list. The handler `on_flush` is called last to unstack targets and build will fail if not all targets have been processed. All handlers are generators and can yield either the string `"flush"`, commands or strings. A command must be a sequence of strings as specified by `subprocess.call()`. A string is considered to be an error message and raise a `BuildError()`. If a command image (i.e. its first element) starts by "@", it is considered to be a function name, e.g. `yield ("@trace", "hello, world!")` — see the available functions below.
+For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list. The handler `on_flush` is called last to unstack targets and **Build** will fail if not all targets have been processed. All handlers are generators and can yield either the string `"flush"`, commands or strings. A command must be a sequence of strings as specified by `subprocess.call()`. A string is considered to be an error message and raise a `BuildError()`. If a command image (i.e. its first element) starts by "@", it is considered to be a function name, e.g. `yield ("@trace", "hello, world!")` — see the available functions below.
 
 Available built-in functions:
   * `@trace(*strings)` — trace execution
@@ -160,3 +161,9 @@ To test the build stacks, use: `TESTSTACKS=1 python build.py test clean:all`.
 This will check-out various github repositories meeting a standard build process and build them.
 
 If you add new URLs to test, you may use `PAUSE=1 ...` to inspect the output files and specify the corresponding `target_paths` value in the `builds = {}` dictionary.
+
+Ongoing Development
+-------------------
+
+  * Formal handling of manifests -- deprecate init
+  * Docker images to test build stacks -- deprecate environment variables

@@ -19,21 +19,17 @@ Options:
 
 Where <target> is one of:
   * get:<id>             install requirement(s)
-  * clean                delete generated objects
+  * clean                delete generated files
   * compile              generate target objects from source code
+  * run                  execute project from its entry point
   * test                 run unit tests
   * package[:<id>]       bundle target objects with metadata [in the identified format]
   * publish[:<id>]       publish packages [to the identified repository]
   * [un]install[:<id>]   [un]deploy target objects [onto the identified inventory]
   * release[:<id>] [-m]  bump project version, commit and tag
 
-Examples:
-  To compile the project in subdir foo and install it:
-    $ build -C foo/ clean compile install
-  To run unit tests, clean-up and release:
-    $ build test clean release:patch
-  Clean-up, compile, package and publish:
-    $ build clean compile package publish
+Example:
+  $ build -C hello/ clean compile run
 
 Use '~/build.json' to customize commands:
   {
@@ -125,9 +121,8 @@ class BuildStack(object):
 				"multiple build stacks detected, use -f to select a manifest")
 		else:
 			self.manifest, = manifests
-		for key in ("name", "filenames"):
-			if not key in self.manifest:
-				raise Error(key, "missing required manifest property")
+		assert "name" in manifest, "missing name property"
+		assert "filenames" in manifest, "missing filenames property"
 		self.targets = Targets()
 		utils.trace("using '%s' build stack" % self.manifest["name"])
 
@@ -195,6 +190,9 @@ class BuildStack(object):
 	def compile(self):
 		self._handle_target("compile")
 
+	def run(self):
+		self._handle_target("run")
+
 	def test(self):
 		self._handle_target("test")
 
@@ -223,8 +221,7 @@ class BuildStack(object):
 	def flush(self):
 		if self.targets:
 			self._handle_target("flush", canflush = False, default = "fail")
-		if self.targets:
-			raise Error(self.manifest["name"], "lingering unhandled target(s) -- please report this bug")
+		assert not self.targets, "lingering unhandled target(s) -- please report this bug"
 
 def init(toolid, settings):
 	tools = {}
@@ -286,6 +283,8 @@ def main(*args):
 					bs.clean()
 				elif target == "compile":
 					bs.compile()
+				elif target == "run":
+					bs.run()
 				elif target == "test":
 					bs.test()
 				elif target.startswith("package"):

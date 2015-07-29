@@ -14,6 +14,8 @@ def on_flush(filename, targets):
 				args += ["-p", target.requirementid]
 		elif target == "compile":
 			args.append("build") # create a profile to append "--release" when needed
+		elif target == "build":
+			args.append("run")
 		elif target == "test":
 			args.append("test")
 			args.append("bench")
