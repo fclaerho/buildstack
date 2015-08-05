@@ -93,32 +93,17 @@ def Cargofile(path = "Cargo.toml"):
 	src = utils.unmarshall(
 		path = path,
 		extname = ".cfg")
-	tgt = {
+	kwargs = {
 		"path": path,
+		"package": {}
 	}
 	for key, value in src["package"]:
 		if key == "name":
-			tgt["name"] = value
+			kwargs["name"] = value
 		elif key == "version":
-			tgt["version"] = value
+			kwargs["version"] = value
 		elif key == "authors":
-			tgt["maintainers"] = map(lambda obj: Maintainer(other = obj), parse(value))
-	copy(src, "package/name", tgt, required = True)
-	copy(src, "package/version", tgt, required = True)
-	copy(src, "package/authors", tgt, "maintainers", required = True, adapter = parse)
-	# http://doc.crates.io/manifest.html#the-build-field-(optional)
-	copy(src, "package/build", tgt)
-	# http://doc.crates.io/manifest.html#the-exclude-and-include-fields-(optional)
-	copy(src, "package/exclude", tgt)
-	copy(src, "package/include", tgt)
-	# http://doc.crates.io/manifest.html#package-metadata
-	copy(src, "package/description", tgt)
-	copy(src, "package/documentation", tgt)
-	copy(src, "package/homepage", tgt)
-	copy(src, "package/repository", tgt)
-	copy(src, "package/readme", tgt)
-	copy(src, "package/keywords", tgt, adapter = parse)
-	copy(src, "package/license", tgt)
-	copy(src, "package/license-file", tgt)
-	# http://doc.crates.io/manifest.html#the-[dependencies.*]-sections
+			kwargs["maintainers"] = map(lambda obj: Maintainer(other = obj), parse(value))
+		else:
+			kwargs["package"][key] = value
 	return Manifest(**kwargs)
