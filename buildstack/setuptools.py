@@ -1,29 +1,11 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 # coding: utf-8
 
-import shutil, glob, os, re
+import shutil, glob, imp, sys, os, re
 
-#########
-# tools #
-#########
+cat = lambda *args: args
 
-def pip(args):
-	return ["pip"] + list(args)
-
-def setup(filename, args):
-	return ["python", filename] + list(args)
-
-def twine(args):
-	return ["twine"] + list(args)
-
-def bumpversion(args):
-	return ["bumpversion"] + list(args)
-
-############
-# handlers #
-############
-
-def on_get(filename, targets, requirementid):
+def on_get(filename, targets, requirementid = "requirements.txt"):
 	yield "flush"
 	args = ["install"]
 	if os.path.exists(requirementid):
@@ -32,7 +14,7 @@ def on_get(filename, targets, requirementid):
 	else:
 		# single module
 		args += [requirementid]
-	yield pip(args)
+	yield cat("pip", *args)
 
 def on_clean(filename, targets):
 	targets.append("clean")
@@ -43,13 +25,40 @@ def on_clean(filename, targets):
 			_, extname = os.path.splitext(basename)
 			if extname in (".pyc", ".pyo"):
 				path = os.path.join(dirname, basename)
-				yield ("@remove", path, "lingering bytecode")
+				yield "@remove", path, "lingering bytecode"
 	# cleanup dist
 	for name in glob.glob("dist") + glob.glob("*.egg-info"):
-		yield ("@remove", name, "lingering packaging byproduct")
+		yield "@remove", name, "lingering packaging byproduct"
 	# cleanup requirements
 	for name in glob.glob("*.egg*") + glob.glob(".eggs"):
-		yield ("@remove", name, "lingering requirement")
+		yield "@remove", name, "lingering requirement"
+
+# pretend to be setuptools.setup(); used by on_run() below
+def setup(**kwargs):
+	global ENTRY_POINTS
+	ENTRY_POINTS = kwargs.get("entry_points", {})
+
+def on_run(filename, targets, entrypointid):
+	"Run entry entry points defined in the build manifest"
+	yield "flush"
+	# entry points are platform-dependent and therefore generated on installation only
+	# thus we need to install the package with as few side effects as possible:
+	yield "python", filename, "develop", "--user"
+	# importing setup.py calls setuptools.setup()
+	# which call the above setup() as the current module is also named "setuptools".
+	__import__("setup")
+	for item in ENTRY_POINTS.get("console_scripts", ()):
+		name, _ = item.split("=", 1)
+		if not entrypointid or entrypointid == name:
+			yield "@try", name
+	for item in ENTRY_POINTS.get("gui_scripts", ()):
+		name, _ = item.split("=", 1)
+		if not entrypointid or entrypointid == name:
+			yield "@try", name
+	# ideally we would use a try/finally block here to uninstall the package
+	# but this would forbid any "yield" as the generator is already exited;
+	# instead we ignore user-land errors with the "@try" directive above.
+	yield "python", filename, "develop", "--user", "--uninstall"
 
 def on_test(filename, targets):
 	# if nose2 configuration file exists, use nose2 as test framework
@@ -72,22 +81,20 @@ def on_package(filename, targets, formatid):
 	# build OS/X package:
 	if formatid == "pkg":
 		args += ["bdist", "--format=tar"]
-		yield setup(
-			filename = filename,
-			args = args)
+		yield setup(filename, *args)
 		for path in glob.glob("dist/*.tar"):
-			yield ("mkdir", "-p", "dist/root")
-			yield ("tar", "-C", "dist/root", "-xf", path)
+			yield "mkdir", "-p", "dist/root"
+			yield "tar", "-C", "dist/root", "-xf", path
 			basename, extname = os.path.splitext(path)
 			name, tail = basename.split("-", 1)
 			identifier = raw_input("identifier (e.g. fr.fclaerhout.%s)?" % name)
-			yield ("pkgbuild", basename + ".pkg", "--root", "dist/root", "--version", version, "--identifier", identifier)
+			yield "pkgbuild", basename + ".pkg", "--root", "dist/root", "--version", version, "--identifier", identifier
 	# build debian package:
 	elif formatid == "deb":
 		# REF: https://nylas.com/blog/packaging-deploying-python
-		yield ("make-deb",) # generates inputs to dh_virtualenv and calls it
+		yield "make-deb", # generates inputs to dh_virtualenv and calls it
 		#TODO: generate requirements.txt from setup.py
-		yield ("dpkg-buildpackage", "-us", "-uc")
+		yield "dpkg-buildpackage", "-us", "-uc"
 	# or let setuptools handle the packaging:
 	else:
 		targets.append("package", formatid = formatid)
@@ -97,21 +104,14 @@ def on_publish(filename, targets, repositoryid):
 	args = ["upload"] + glob.glob("dist/*")
 	if repositoryid:
 		args += ["--repository", repositoryid]
-	yield twine(args)
+	yield cat("twine", *args)
 
 def on_install(filename, targets, inventoryid, uninstall):
 	if uninstall:
 		yield "flush"
-		yield pip(("uninstall", os.path.basename(os.getcwd())))
+		yield "pip", "uninstall", os.path.basename(os.getcwd())
 	else:
 		targets.append("install")
-
-def on_release(filename, targets, typeid, message):
-	yield "flush"
-	args = [typeid]
-	if message:
-		args = ["--message", message] + args
-	yield bumpversion(args)
 
 def on_flush(filename, targets):
 	args = []
@@ -156,19 +156,17 @@ def on_flush(filename, targets):
 		else:
 			yield "%s: unexpected target" % target
 	if args:
-		yield setup(
-			filename = filename,
-			args = args)
+		yield cat("python", filename, *args)
 
 manifest = {
 	"filenames": ("setup.py",),
 	"on_get": on_get,
 	"on_clean": on_clean,
+	"on_run": on_run,
 	"on_test": on_test,
 	"on_package": on_package,
 	"on_publish": on_publish,
 	"on_install": on_install,
-	"on_release": on_release,
 	"on_flush": on_flush,
 	"tools": {
 		"setuptools": {
@@ -205,33 +203,6 @@ manifest = {
 				)
 			""",
 			"path": "setup.py",
-		},
-		"bumpversion": {
-			"required_vars": ["current_version"],
-			"defaults": {},
-			"template": """
-				# REF: https://github.com/peritus/bumpversion
-				
-				[bumpversion]
-				current_version = %(current_version)s
-				#new_version=
-				commit = True
-				tag = True
-				#tag_name = v{new_version}
-				#message = Bump version: {current_version} → {new_version}
-				#parse = (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)
-				#serialize = {major}.{minor}.{patch}
-				
-				#[bumpversion:part:<name>]
-				#values =
-				#optional_values =
-				#first_value =
-				
-				[bumpversion:file:setup.py]
-				#search = {current_version}
-				#replace = {new_version}
-			""",
-			"path": ".bumpversion.cfg",
 		},
 		"nose2": {
 			"required_vars": [],

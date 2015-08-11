@@ -13,29 +13,27 @@ its goal is to abstract the build process of any source code repository through 
   * `package[:<id>]` package code [in the specified format]
   * `publish[:<id>]` publish package [to the specified repository]
   * `[un]install[:<id>]` [un]install locally [or [un]provision inventory]
-  * `release[:<id>] [-m]` bump project version, commit and tag
 
 Why, oh why?
 ------------
 
 The target audience is _SQA engineering_, _build engineering_ and _development_ folks
-and here's the main use case: check out any repository and build it.
+who are all dealing with the same problem: how to quickly build (or run test, or install it…)
+a project which is using a build stack you're not familiar with?
+By using **Build**, check out any repository and build it.
 No question asked.
-No need to lookup documentation if you're in a hurry or not interested into build details.
+No need to lookup documentation.
 
 	$ git pull $GITSERVER/$MYREPO.git
 	$ cd $MYREPO
 	$ build clean compile package install
 
-Being able to test and release your code in one step is also handy:
-
-	$ build test clean:all release:patch -m "fix bug foobar"
-
 Extra Features
 --------------
 
-  * Can instantiate configuration file templates,
-    run `build init help` for the list of supported tools.
+  * **Build** behavior can be customized through _profiles_, see advanced configuration below.
+  * For any build stack, use `build setup <toolid> <vars>…` to instantiate a minimal build manifest.
+    run `build setup help` for the list of supported tools.
   * **Autotools**:
     * better `clean` (remove lingering generated files)
   * **Setuptools**:
@@ -49,18 +47,10 @@ Extra Features
 			$ sudo apt-get update
 			$ sudo apt-get install debhelper dh-virtualenv
 
+    * support the `run` target to execute entry points
     * on testing,
       if `nose2.cfg` is present and setup.py does not use it,
       the original setup.py will be backed up and a new one will be generated to call nose2.
-
-Notes
------
-
-  * **Build** behavior can be customized through _profiles_, see advanced configuration below.
-  * For any build stack, use `build init <toolid> <vars>…` to instantiate a minimal build manifest.
-  * **Cargo**:
-    `build compile` invokes `cargo build` without `--release`,
-    if you want to turn optimizations on, create a profile appending this flag.
 
 Pre-requisites
 --------------
@@ -118,35 +108,48 @@ Or to provision an Ansible inventory as root with a password (on install):
 
 This would be called with `build -p as-root …`.
 
-Plugin Development
-------------------
+Adding a Build Stack
+--------------------
 
 Fill-in the following template and move it to the `buildstack/` directory, it will be loaded automatically.
 
 	def on_get(filename, targets, requirementid): raise NotImplementedError()
 	def on_clean(filename, targets): raise NotImplementedError()
-	def on_test(filename, targets): raise NotImplementedError()
 	def on_compile(filename, targets): raise NotImplementedError()
+	def on_run(filename, targets, entrypointid): raise NotImplementedError()
+	def on_test(filename, targets): raise NotImplementedError()
 	def on_package(filename, targets, formatid): raise NotImplementedError()
 	def on_publish(filename, targets, repositoryid): raise NotImplementedError()
 	def on_install(filename, targets, uninstall): raise NotImplementedError()
 	def on_flush(filename, targets): raise NotImplementedError()
 	manifest = {
-		#"name": # if unset, use the module name
+		#"name": # optional, defaults to module name
 		"filenames": [], # list of patterns matching supported build manifest filenames
 		#"on_get": None | on_get,
 		#"on_clean": None | on_clean,
-		#"on_test": None | on_test,
 		#"on_compile": None | on_compile,
+		#"on_run": None | on_run,
+		#"on_test": None | on_test,
 		#"on_package": None | on_package,
 		#"on_publish": None | on_publish,
 		#"on_install": None | on_install,
 		#"on_flush": None | on_flush,
 	}
 
-For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list. The handler `on_flush` is called last to unstack targets and **Build** will fail if not all targets have been processed. All handlers are generators and can yield either the string `"flush"`, commands or strings. A command must be a sequence of strings as specified by `subprocess.call()`. A string is considered to be an error message and raise a `BuildError()`. If a command image (i.e. its first element) starts by "@", it is considered to be a function name, e.g. `yield ("@trace", "hello, world!")` — see the available functions below.
+For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list.
+The handler `on_flush` is called last to unstack targets;
+**Build** will fail if not all targets have been processed.
+The rationale is that most build tool are able to handle multiple targets at the same time and calling them independently is less efficient.
 
+All handlers are generators and can yield either the string `"flush"`, commands or any single object:
+  * flush will call on_flush
+  * a command must be a sequence of strings as specified by `subprocess.call()`
+  * an object is considered to be an error and raise a `BuildError()`
+
+If a command image (i.e. its first element) starts by "@", it is considered to be a builtin call,
+e.g. `yield "@trace", "hello, world!"`.
 Available built-in functions:
+  * `@try(*args)` — on failure, discard exception
   * `@trace(*strings)` — trace execution
   * `@remove(path[, reason])` — remove file or directory
 
@@ -161,9 +164,3 @@ To test the build stacks, use: `TESTSTACKS=1 python build.py test clean:all`.
 This will check-out various github repositories meeting a standard build process and build them.
 
 If you add new URLs to test, you may use `PAUSE=1 ...` to inspect the output files and specify the corresponding `target_paths` value in the `builds = {}` dictionary.
-
-Ongoing Development
--------------------
-
-  * Formal handling of manifests -- deprecate init
-  * Docker images to test build stacks -- deprecate environment variables

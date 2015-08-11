@@ -2,6 +2,8 @@
 
 import os
 
+cat = lambda *args: args
+
 def on_clean(filename, targets):
 	targets.append("clean")
 	yield "flush"
@@ -13,9 +15,9 @@ def on_clean(filename, targets):
 		"ltcf-cxx.sh", "texinfo.tex", "COPYING.LIB", "config.guess",
 		"ltcf-gcj.sh", "ylwrap", "Changelog"): # list from 'man automake'
 		if os.path.islink(name):
-			yield ("@remove", name, "lingering from automake --add-missing")
+			yield "@remove", name, "lingering from automake --add-missing"
 	for name in ("aclocal.m4", "config.h.in","configure", "Makefile.in", "test-driver"):
-		yield ("@remove", name, "lingering from autotools")
+		yield "@remove", name, "lingering from autotools"
 
 def on_flush(filename, targets):
 	# Invoke Make standard targets:
@@ -43,18 +45,18 @@ def on_flush(filename, targets):
 			# Bootstrap method; generate Makefile with autotools:
 			# REF: https://www.sourceware.org/autobook/autobook/autobook_43.html
 			# TL;DR: don't use autoreconf.
-			yield ("libtoolize",) # => ltmain.sh (to do before aclocal and automake)
-			yield ("aclocal",) # configure.xx => aclocal.m4
-			yield ("autoconf",) # configure.xx => configure
+			yield "libtoolize", # => ltmain.sh (to do before aclocal and automake)
+			yield "aclocal", # configure.xx => aclocal.m4
+			yield "autoconf", # configure.xx => configure
 			with open(filename, "r") as fp:
 				text = fp.read()
 				if "AC_CONFIG_HEADERS" in text:
-					yield ("autoheader",) # configure.xx => config.h.in
+					yield "autoheader", # configure.xx => config.h.in
 			if os.path.exists("Makefile.am"):
 				# you'll also need AM_INIT_AUTOMAKE() in configure.xx
-				yield ("automake", "--add-missing") # configure.xx + Makefile.am => Makefile.in + missing files
-			yield ("./configure",) # system state [+ Makefile.in?] => Makefile
-		yield ["make"] + args
+				yield "automake", "--add-missing" # configure.xx + Makefile.am => Makefile.in + missing files
+			yield "./configure", # system state [+ Makefile.in?] => Makefile
+		yield cat("make", *args)
 
 manifest = {
 	"filenames": ("configure.ac", "configure.in", "Makefile"),

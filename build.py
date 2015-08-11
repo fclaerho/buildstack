@@ -4,32 +4,30 @@
 Detect and drive a source code build stack to reach well-known targets.
 
 Usage:
-  build [options] init <toolid> [<setting>...]
-  build [options] <target>...
+  build [options] setup TOOLID [SETTING...]
+  build [options] TARGET...
   build --help
 
 Options:
-  -C <path>, --directory <path>  set working directory
-  -m <str>, --message <str>      set commit message on release
-  -f <path>, --file <path>       set build manifest path (overrides -C)
-  -p <id>, --profile <id>        set build profile
-  -v, --verbose                  trace execution
-  -h, --help                     display full help text
-  --no-color                     disable colored output
+  -C PATH, --directory PATH  set working directory
+  -f PATH, --file PATH       set build manifest path (overrides -C)
+  -p ID, --profile ID        set build profile
+  -v, --verbose              trace execution
+  -h, --help                 display full help text
+  --no-color                 disable colored output
 
-Where <target> is one of:
-  * get:<id>             install requirement(s)
-  * clean                delete generated files
-  * compile              generate target objects from source code
-  * run                  execute project from its entry point
-  * test                 run unit tests
-  * package[:<id>]       bundle target objects with metadata [in the identified format]
-  * publish[:<id>]       publish packages [to the identified repository]
-  * [un]install[:<id>]   [un]deploy target objects [onto the identified inventory]
-  * release[:<id>] [-m]  bump project version, commit and tag
+Where TARGET is one of:
+  * get[:ID]           install requirement(s)
+  * clean              delete generated files
+  * compile            generate target objects from source code
+  * run[:ID]           execute entry point(s)
+  * test               run unit tests
+  * package[:ID]       bundle target objects with metadata [in the identified format]
+  * publish[:ID]       publish packages [to the identified repository]
+  * [un]install[:ID]   [un]deploy target objects [onto the identified inventory]
 
 Example:
-  $ build -C hello/ clean compile run
+  $ build clean compile test
 
 Use '~/build.json' to customize commands:
   {
@@ -82,6 +80,7 @@ class BuildStack(object):
 	def __init__(self, customization = None, profileid = None, path = None):
 		self.customization = customization or {}
 		self.profileid = profileid
+		# jump into the base directory:
 		if path:
 			path = utils.Path(path)
 			if os.path.isdir(path):
@@ -144,15 +143,13 @@ class BuildStack(object):
 			utils.check_call(*args)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
+		"generic target handler"
 		handler = self.manifest.get("on_%s" % name, default)
 		if handler is None:
-			# the manifest explicitly declares this target as unsupported
 			raise Error(self.manifest["name"], name, "unsupported target")
 		elif handler == "stack": # stack target and let the on_flush handler deal with it
 			self.targets.append(name, **kwargs)
-		elif handler == "fail":
-			raise Error(self.manifest["name"], name, "unhandled target")
-		elif handler == "purge":
+		elif handler == "purge": # FIXME: redesign this feature, having it here is awkward
 			self.flush()
 			if os.path.exists(".git"):
 				self._check_call(("git", "clean", "--force", "-d", "-x")) # "Danger, Will Robinson!"
@@ -166,10 +163,17 @@ class BuildStack(object):
 				targets = self.targets,
 				**kwargs):
 				if isinstance(res, (list, tuple)):
-					{
-						"@trace": utils.trace,
-						"@remove": utils.remove,
-					}.get(res[0], lambda *args: self._check_call([res[0]] + list(args)))(*res[1:])
+					if res[0] == "@try":
+						try:
+							self._check_call(res[1:])
+						except:
+							utils.trace("command failure ignored")
+					elif res[0] == "@trace":
+						utils.trace(*res[1:])
+					elif res[0] == "@remove":
+						utils.remove(*res[1:])
+					else:
+						self._check_call(res)
 				elif res == "flush":
 					assert canflush, "%s: cannot flush from this target" % key
 					self.flush()
@@ -178,10 +182,10 @@ class BuildStack(object):
 		else:
 			assert False, "%s: invalid target handler" % handler
 
-	def get(self, requirementid):
+	def get(self, requirementid = None):
 		self._handle_target(
 			"get",
-			default = "fail",
+			default = None,
 			requirementid = requirementid)
 
 	def clean(self):
@@ -190,8 +194,10 @@ class BuildStack(object):
 	def compile(self):
 		self._handle_target("compile")
 
-	def run(self):
-		self._handle_target("run")
+	def run(self, entrypointid = None):
+		self._handle_target(
+			"run",
+			entrypointid = entrypointid)
 
 	def test(self):
 		self._handle_target("test")
@@ -212,18 +218,13 @@ class BuildStack(object):
 			inventoryid = inventoryid,
 			uninstall = uninstall)
 
-	def release(self, typeid, message):
-		self._handle_target(
-			"release",
-			typeid = typeid,
-			message = message)
-
 	def flush(self):
 		if self.targets:
-			self._handle_target("flush", canflush = False, default = "fail")
+			self._handle_target("flush", canflush = False, default = None)
 		assert not self.targets, "lingering unhandled target(s) -- please report this bug"
 
-def init(toolid, settings):
+def setup(toolid, settings):
+	"render a tool configuration template"
 	tools = {}
 	for manifest in buildstack.manifests:
 		tools.update(manifest.get("tools", {}))
@@ -239,7 +240,7 @@ def init(toolid, settings):
 				required,\
 				("[%s]" % optional) if optional else ""
 	else:
-		suffix = "-- see 'build init help'"
+		suffix = "-- see 'build setup help'"
 		if not toolid in tools:
 			raise Error(toolid, "unknown tool", suffix)
 		path = os.path.expanduser(tools[toolid]["path"])
@@ -267,24 +268,24 @@ def main(*args):
 			utils.disable_colors()
 		if opts["--verbose"]:
 			utils.enable_tracing()
-		if opts["init"]:
-			init(
-				toolid = opts["<toolid>"],
-				settings = opts["<setting>"])
+		if opts["setup"]:
+			setup(
+				toolid = opts["TOOLID"],
+				settings = opts["SETTING"])
 		else:
 			bs = BuildStack(
 				customization = utils.unmarshall("~/build.json", default = None),
 				profileid = opts["--profile"],
 				path = opts["--file"] or opts["--directory"])
-			for target in opts["<target>"]:
-				if target.startswith("get:"):
-					bs.get(requirementid = target.split(":")[1])
+			for target in opts["TARGET"]:
+				if target.startswith("get"):
+					bs.get(requirementid = target.partition(":")[2])
 				elif target == "clean":
 					bs.clean()
 				elif target == "compile":
 					bs.compile()
-				elif target == "run":
-					bs.run()
+				elif target.startswith("run"):
+					bs.run(entrypointid = target.partition(":")[2])
 				elif target == "test":
 					bs.test()
 				elif target.startswith("package"):
@@ -295,8 +296,6 @@ def main(*args):
 					bs.install(
 						inventoryid = target.partition(":")[2],
 						uninstall = target == "uninstall")
-				elif target.startswith("release"):
-					bs.release(typeid = target.partition(":")[2], message = opts["--message"])
 				else:
 					raise Error(target, "unknown target")
 				bs.flush()

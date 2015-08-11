@@ -2,6 +2,8 @@
 
 # REF: http://doc.crates.io
 
+cat = lambda *args: args
+
 def on_flush(filename, targets):
 	args = []
 	while targets:
@@ -26,7 +28,7 @@ def on_flush(filename, targets):
 		else:
 			yield "%s: unexpected target" % target
 	if args:
-		yield ["cargo"] + args
+		yield cat("cargo", *args)
 
 manifest = {
 	"filenames": ("Cargo.toml",),

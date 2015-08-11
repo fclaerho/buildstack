@@ -5,6 +5,8 @@
 def on_get(filename, targets, requirementid):
 	yield "flush"
 	if requirementid:
+		# This will create the node_modules directory (if one doesn't exist yet),
+		# and will download the package to that directory.
 		yield ("npm", "install", requirementid)
 	else:
 		yield ("npm", "update")

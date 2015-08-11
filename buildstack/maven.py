@@ -1,14 +1,6 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
-###########
-# helpers #
-###########
-
 cat = lambda *args: args
-
-############
-# handlers #
-############
 
 def on_flush(filename, targets):
 	args = []
@@ -16,7 +8,10 @@ def on_flush(filename, targets):
 		target = targets.pop(0)
 		if target == "get":
 			# EXPERIMENTAL
-			args += ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % requirementid]
+			if not target.requirementid:
+				yield "oops, unable yet to get all dependencies"
+			else:
+				args += ["org.apache.maven.plugins:maven-dependency-plugin:2.1:get", "--define", "artifact=%s" % requirementid]
 			if repositoryid:
 				args += ["--define", "repoUrl=%s" % repositoryid]
 		elif target == "clean":
@@ -25,8 +20,6 @@ def on_flush(filename, targets):
 			args.append("compile")
 		elif target == "test":
 			args.append("test")
-		elif target == "release":
-			args.append("release:prepare")
 		elif target == "package":
 			args.append("package")
 		elif target == "publish":
