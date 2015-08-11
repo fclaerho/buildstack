@@ -33,7 +33,7 @@ Extra Features
 
   * **Build** behavior can be customized through _profiles_, see advanced configuration below.
   * For any build stack, use `build setup <toolid> <vars>…` to instantiate a minimal build manifest.
-    run `build setup help` for the list of supported tools.
+    Run `build setup help` for the list of supported tools.
   * **Autotools**:
     * better `clean` (remove lingering generated files)
   * **Setuptools**:
@@ -139,7 +139,7 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list.
 The handler `on_flush` is called last to unstack targets;
 **Build** will fail if not all targets have been processed.
-The rationale is that most build tool are able to handle multiple targets at the same time and calling them independently is less efficient.
+The rationale behind this is that most build tools are able to handle multiple targets at the same time and calling them independently is less efficient.
 
 All handlers are generators and can yield either the string `"flush"`, commands or any single object:
   * flush will call on_flush
