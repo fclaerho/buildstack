@@ -144,7 +144,7 @@ The rationale behind this is that most build tools are able to handle multiple t
 All handlers are generators and can yield either the string `"flush"`, commands or any single object:
   * flush will call on_flush
   * a command must be a sequence of strings as specified by `subprocess.call()`
-  * an object is considered to be an error and raise a `BuildError()`
+  * anything else is considered to be an error object and raise a `BuildError()` containing it.
 
 If a command image (i.e. its first element) starts by "@", it is considered to be a builtin call,
 e.g. `yield "@trace", "hello, world!"`.
