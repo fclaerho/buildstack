@@ -18,7 +18,7 @@ Why, oh why?
 ------------
 
 The target audience is _SQA engineering_, _build engineering_ and _development_ folks
-who are all dealing with the same problem: how to quickly build (or run test, or install it…)
+who are all dealing with the same problem: how to quickly build (or run test, or install…)
 a project which is using a build stack you're not familiar with?
 By using **Build**, check out any repository and build it.
 No question asked.
