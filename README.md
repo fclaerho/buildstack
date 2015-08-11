@@ -147,7 +147,7 @@ All handlers are generators and can yield either the string `"flush"`, commands 
   * a command must be a sequence of strings as specified by `subprocess.call()`
   * anything else is considered to be an error object and raise a `BuildError()` containing it.
 
-If a command image (i.e. its first element) starts by "@", it is considered to be a builtin call,
+If a command name (i.e. its first element) starts by "@", it is considered to be a builtin call,
 e.g. `yield "@trace", "hello, world!"`.
 Available built-in functions:
   * `@try(*args)` — on failure, discard exception
