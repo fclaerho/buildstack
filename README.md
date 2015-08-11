@@ -140,6 +140,7 @@ For all handlers, except `on_flush`, the default behavior is to stack the target
 The handler `on_flush` is called last to unstack targets;
 **Build** will fail if not all targets have been processed.
 The rationale behind this is that most build tools are able to handle multiple targets at the same time and calling them independently is less efficient.
+Therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked.
 
 All handlers are generators and can yield either the string `"flush"`, commands or any single object:
   * flush will call on_flush
