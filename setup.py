@@ -10,7 +10,7 @@ setuptools.setup(
 	#long_description = "",
 	#url = "",
 	#author = "",
-	author_email = "contact@fclaerhout.fr",
+	author_email = "code@fclaerhout.fr",
 	#license = "",
 	#classifiers = [], # https://pypi.python.org/pypi?%3Aaction=list_classifiers
 	#keyword = [],
