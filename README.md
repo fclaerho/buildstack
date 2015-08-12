@@ -60,7 +60,7 @@ Pre-requisites
 Installation
 ------------
 
-	$ sudo pip install --extra-index-url https://pypi.fclaerhout.fr/simple/ build
+	$ pip install --user --extra-index-url https://pypi.fclaerhout.fr/simple/ build
 
 or, if that repository is not available:
 

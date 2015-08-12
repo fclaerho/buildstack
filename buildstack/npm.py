@@ -7,19 +7,19 @@ def on_get(filename, targets, requirementid):
 	if requirementid:
 		# This will create the node_modules directory (if one doesn't exist yet),
 		# and will download the package to that directory.
-		yield ("npm", "install", requirementid)
+		yield "npm", "install", requirementid
 	else:
-		yield ("npm", "update")
+		yield "npm", "update"
 
 #def on_clean(filename, targets): raise NotImplementedError()
 
-def on_test(filename, targets): yield ("npm", "test")
+def on_test(filename, targets): yield "npm", "test"
 
 def on_compile(filename, targets): pass # nothing to do
 
 def on_package(filename, targets, formatid): pass # nothing to do
 
-def on_publish(filename, targets, repositoryid): yield ("npm", "publish")
+def on_publish(filename, targets, repositoryid): yield "npm", "publish"
 
 #def on_install(filename, targets, uninstall): raise NotImplementedError()
 
