@@ -64,20 +64,18 @@ Pre-requisites
 Installation
 ------------
 
-The package will be installed in your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) directory; make sure its `bin/` sub-directory is in your shell `PATH`.
-
-### Recommended
-
 	$ pip install --user --extra-index-url https://pypi.fclaerhout.fr/simple/ build
+
+or, if that repository is not available:
+
+	$ git clone https://github.com/fclaerho/build.git
+	$ python setup.py install --user
+
+The package will be installed in your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) directory; make sure its `bin/` sub-directory is in your shell `PATH`.
 
 To uninstall:
 
 	$ pip uninstall build
-
-### Alternative
-
-	$ git clone https://github.com/fclaerho/build.git
-	$ python setup.py install --user
 
 
 Advanced Configuration
