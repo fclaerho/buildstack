@@ -65,11 +65,13 @@ Installation
 or, if that repository is not available:
 
 	$ git clone $this
-	$ sudo python setup.py install
+	$ python setup.py install --user
+
+Make sure [PYTHONUSERPATH](https://www.python.org/dev/peps/pep-0370/#specification)/bin is in your shell PATH.
 
 To uninstall:
 
-	$ sudo pip uninstall build
+	$ pip uninstall build
 
 Advanced Configuration
 ----------------------
@@ -165,3 +167,5 @@ To test the build stacks, use: `TESTSTACKS=1 python build.py test clean:all`.
 This will check-out various github repositories meeting a standard build process and build them.
 
 If you add new URLs to test, you may use `PAUSE=1 ...` to inspect the output files and specify the corresponding `target_paths` value in the `builds = {}` dictionary.
+
+TODO: This poorman procedure will be replaced soon by docker containers.
