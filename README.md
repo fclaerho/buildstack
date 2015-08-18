@@ -14,7 +14,8 @@ its goal is to abstract the build process of any source code repository through 
   * `publish[:<id>]` publish package [to the specified repository]
   * `[un]install[:<id>]` [un]install locally [or [un]provision inventory]
 
-Why, oh why?
+
+Why, Oh Why?
 ------------
 
 The target audience is _SQA engineering_, _build engineering_ and _development_ folks
@@ -27,6 +28,7 @@ No need to lookup documentation.
 	$ git pull $GITSERVER/$MYREPO.git
 	$ cd $MYREPO
 	$ build clean compile package install
+
 
 Extra Features
 --------------
@@ -52,26 +54,31 @@ Extra Features
       if `nose2.cfg` is present and setup.py does not use it,
       the original setup.py will be backed up and a new one will be generated to call nose2.
 
+
 Pre-requisites
 --------------
 
 **Build** is not bundled with any build tool, provision the machine appropriately beforehand.
 
+
 Installation
 ------------
 
+The package will be installed in your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) directory; make sure its `bin/` sub-directory is in your shell `PATH`.
+
+### Recommended
+
 	$ pip install --user --extra-index-url https://pypi.fclaerhout.fr/simple/ build
-
-or, if that repository is not available:
-
-	$ git clone https://github.com/fclaerho/build.git
-	$ python setup.py install --user
-
-Make sure your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) bin directory is in your shell `PATH`.
 
 To uninstall:
 
 	$ pip uninstall build
+
+### Alternative
+
+	$ git clone https://github.com/fclaerho/build.git
+	$ python setup.py install --user
+
 
 Advanced Configuration
 ----------------------
@@ -109,6 +116,7 @@ Or to provision an Ansible inventory as root with a password (on install):
 	}
 
 This would be called with `build -p as-root …`.
+
 
 Adding a Build Stack
 --------------------
@@ -157,6 +165,7 @@ Available built-in functions:
   * `@remove(path[, reason])` — remove file or directory
 
 If the build tool does not implement any "clean" target, you may set `"on_clean": "purge",` to use the VCS purge feature (that is, delete untracked files.)
+
 
 Testing
 -------
