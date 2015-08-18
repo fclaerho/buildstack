@@ -67,7 +67,7 @@ or, if that repository is not available:
 	$ git clone $this
 	$ python setup.py install --user
 
-Make sure [PYTHONUSERPATH](https://www.python.org/dev/peps/pep-0370/#specification)/bin is in your shell PATH.
+Make sure your user site-packages bin directory is in your shell `PATH`.
 
 To uninstall:
 
