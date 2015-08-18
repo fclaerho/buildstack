@@ -64,7 +64,7 @@ Installation
 
 or, if that repository is not available:
 
-	$ git clone https://github.com/fclaerho/build
+	$ git clone https://github.com/fclaerho/build.git
 	$ python setup.py install --user
 
 Make sure your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) bin directory is in your shell `PATH`.
