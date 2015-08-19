@@ -9,12 +9,12 @@ setuptools.setup(
 	#description = "",
 	#long_description = "",
 	#url = "",
-	#author = "",
+	author = "Florent Claerhout",
 	author_email = "code@fclaerhout.fr",
-	#license = "",
+	license = "MIT",
 	#classifiers = [], # https://pypi.python.org/pypi?%3Aaction=list_classifiers
 	#keyword = [],
-	py_modules = ["build"],
+	#py_modules = [],
 	install_requires = [
 		"pyutils >=3,<5a0",
 		"docopt",
@@ -24,7 +24,7 @@ setuptools.setup(
 	#data_files = {},
 	entry_points = {
 		"console_scripts": [
-			"build=build:main",
+			"build=buildstack:main",
 		],
 	}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 	test_suite = "test",

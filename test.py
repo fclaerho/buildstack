@@ -9,7 +9,7 @@ Environment variables:
 
 import unittest, shutil, sys, os
 
-import build, utils # 3rd-party
+import buildstack, utils # 3rd-party
 
 ################
 # CORE TESTING #
@@ -32,7 +32,7 @@ def _foo_on_flush(filename, targets):
 	del targets[:]
 	yield ["bash", filename] + args
 
-build.buildstack.manifests.append({
+buildstack.MANIFESTS.append({
 	"name": "foo",
 	"filenames": ["Foobuild"],
 	"on_flush": _foo_on_flush,
@@ -68,30 +68,30 @@ class CoreTest(unittest.TestCase):
 		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.publish")))
 
 	def test_clean(self):
-		build.main("-C", self.dirname, "clean")
+		buildstack.main("-C", self.dirname, "clean")
 
 	def test_compile(self):
-		build.main("-C", self.dirname, "compile")
+		buildstack.main("-C", self.dirname, "compile")
 		self.assert_is_compiled()
 
 	def test_test(self):
-		build.main("-C", self.dirname, "test")
+		buildstack.main("-C", self.dirname, "test")
 		self.assert_is_tested()
 
 	def test_package(self):
-		build.main("-C", self.dirname, "package")
+		buildstack.main("-C", self.dirname, "package")
 		self.assert_is_packaged()
 
 	def test_install(self):
-		build.main("-C", self.dirname, "install")
+		buildstack.main("-C", self.dirname, "install")
 		self.assert_is_installed()
 
 	def test_publish(self):
-		build.main("-C", self.dirname, "publish")
+		buildstack.main("-C", self.dirname, "publish")
 		self.assert_is_published()
 
 	def test_build(self):
-		build.main("-C", self.dirname, "clean", "compile", "test", "package", "install", "publish")
+		buildstack.main("-C", self.dirname, "clean", "compile", "test", "package", "install", "publish")
 		self.assert_is_cleaned()
 		self.assert_is_compiled()
 		self.assert_is_tested()
