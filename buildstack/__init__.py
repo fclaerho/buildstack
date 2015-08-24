@@ -47,6 +47,23 @@ import textwrap, fnmatch, glob, os
 
 import docopt, utils # 3rd-party
 
+MANIFESTS = reduce(
+	lambda _tuple, _dict: _tuple + (_dict,),
+	(__import__(name, globals()).MANIFEST for name in (
+		"ansible",
+		"ant",
+		"autotools",
+		"builtin",
+		"cargo",
+		"gradle",
+		"grunt",
+		"maven",
+		"npm",
+		"rake",
+		"setuptools",
+		"vagrant")),
+	())
+
 class Error(utils.Error): pass
 
 class Vcs(object):
@@ -98,7 +115,7 @@ class Version(object):
 			"patch": 2,
 			"minor": 1,
 			"major": 0,
-		}.get(partid, int(partid))
+		}.get(partid)
 		if idx < len(value):
 			value[idx] += 1
 		else:
@@ -204,16 +221,16 @@ class BuildStack(object):
 						except:
 							utils.trace("command failure ignored")
 					elif res[0] == "@tag":
-						self._check_call(*self.vcs.tag(*res[1:]))
+						self._check_call(self.vcs.tag(*res[1:]))
 					elif res[0] == "@flush":
 						assert canflush, "%s: cannot flush from this target" % key
 						self.flush()
 					elif res[0] == "@trace":
 						utils.trace(*res[1:])
 					elif res[0] == "@purge":
-						self._check_call(*self.vcs.purge())
+						self._check_call(self.vcs.purge())
 					elif res[0] == "@commit":
-						self._check_call(*self.vcs.commit(*res[1:]))
+						self._check_call(self.vcs.commit(*res[1:]))
 					elif res[0] == "@remove":
 						utils.remove(*res[1:])
 					else:
@@ -270,10 +287,10 @@ class BuildStack(object):
 			self._handle_target("flush", canflush = False, default = None)
 		assert not self.targets, "lingering target(s) -- please report this bug"
 
-def setup(toolid, settings):
+def setup(toolid, settings, manifests):
 	"render a tool configuration template"
 	tools = {}
-	for manifest in utils.get_manifests(__path__):
+	for manifest in manifests:
 		tools.update(manifest.get("tools", {}))
 	if toolid == "help":
 		name_width = max(map(len, tools))
@@ -318,12 +335,13 @@ def main(*args):
 		if opts["setup"]:
 			setup(
 				toolid = opts["TOOLID"],
-				settings = opts["SETTING"])
+				settings = opts["SETTING"],
+				manifests = MANIFESTS)
 		else:
 			bs = BuildStack(
 				preferences = utils.unmarshall("~/buildstack.json"),
 				profileid = opts["--profile"],
-				manifests = utils.get_manifests(__path__),
+				manifests = MANIFESTS,
 				path = opts["--file"] or opts["--directory"])
 			for target in opts["TARGET"]:
 				if target.startswith("get"):
@@ -351,5 +369,3 @@ def main(*args):
 				bs.flush()
 	except utils.Error as exc:
 		raise SystemExit(utils.red(exc))
-
-if __name__ == "__main__": main()

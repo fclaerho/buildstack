@@ -113,6 +113,16 @@ def on_install(filename, targets, inventoryid, uninstall):
 	else:
 		targets.append("install")
 
+def on_release(filename, targets, partid, version):
+	version.parse_stdout("python", filename, "--version")
+	next_version = version.bump(partid)
+	with open(filename, "r") as fp:
+		text = fp.read()
+	with open(filename, "w") as fp:
+		fp.write(text.replace(str(version), str(next_version)))
+	yield "@commit", "release %s → %s" % (version, next_version)
+	yield "@tag", str(next_version)
+
 def on_flush(filename, targets):
 	args = []
 	while targets:
@@ -158,17 +168,8 @@ def on_flush(filename, targets):
 	if args:
 		yield cat("python", filename, *args)
 
-# FIXME
-def on_release(filename, targets, partid, cur_version):
-	version.parse_stdout("python", filename, "--version")
-	next_version = version.bump(partid)
-	with open(filename, "rw") as fp:
-		text = fp.read()
-		text = text.replace("%s" % version, "%s" % next_version)
-	yield "@commit", "bump version to %s" % next_version
-	yield "@tag", next_version
-
 MANIFEST = {
+	"name": "setuptools",
 	"filenames": ("setup.py",),
 	"on_get": on_get,
 	"on_clean": on_clean,

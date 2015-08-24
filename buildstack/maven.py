@@ -32,6 +32,7 @@ def on_flush(filename, targets):
 		yield cat("mvn", "--update-snapshots", "--file", filename, *args)
 
 MANIFEST = {
+	"name": "maven",
 	"filenames": ("pom.xml",),
 	"on_flush": on_flush,
 	"tools": {

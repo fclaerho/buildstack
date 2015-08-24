@@ -31,6 +31,7 @@ def on_flush(filename, targets):
 		yield cat("cargo", *args)
 
 MANIFEST = {
+	"name": "cargo",
 	"filenames": ("Cargo.toml",),
 	"on_flush": on_flush,
 	"tools": {

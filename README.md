@@ -119,7 +119,7 @@ For instance, to always push after `bumpversion`:
 Build Stack Development Process
 -------------------------------
 
-### Module
+### Module ###
 
 Create a python module named from the new build stack in the `build/` directory.
 The new module will be loaded automatically as long as the `MANIFEST` is defined.
@@ -152,7 +152,7 @@ Module template:
 		#"tools": {}
 	}
 
-### Target Stack
+### Target Stack ###
 
 For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list.
 The handler `on_flush` is automatically called _last_ to unstack and process the targets or it can also be called manually from any handler with the `@flush` command (details below.)
@@ -160,7 +160,7 @@ The `targets` list _must_ be empty when `on_flush` terminates or the plugin is c
 The rationale behind the usage of a stack is that most build tools are able to handle multiple targets at the same time (e.g. make clean all) and calling them independently is less efficient.
 However, what can be stack or not varies for each build tool: therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked. Also, when using a handler keep in mind to flush the current stack at the appropriate point (usually at the beginning before anything else.)
 
-### Handlers
+### Handlers ###
 
 All handlers are generators and can yield either:
   * a command, i.e. a sequence of strings, e.g. `yield "echo", "hello"`
@@ -178,7 +178,7 @@ The following builtins are available:
   * `@commit([message])` — triggers a VCS commit
   * `@remove(path[, reason])` — remove file or directory
 
-### Release Target
+### Release Target ###
 
 Few build stacks are able to handle a `release` target (maven is among those few.)
 As it's nevertheless a critical feature, **BuildStack** offers a way to work around this issue.
@@ -197,9 +197,11 @@ Example (setuptools plugin):
 
 If your build stack is able to handle the release target, you can safely ignore the `version` argument.
 
+### Testing ###
 
-Testing
--------
+You can use buildstack to test itself without installing it:
+
+	$ python -m buildstack test
 
 By default, only the core infrastructure is tested.
 
