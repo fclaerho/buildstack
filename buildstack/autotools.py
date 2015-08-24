@@ -6,7 +6,7 @@ cat = lambda *args: args
 
 def on_clean(filename, targets):
 	targets.append("clean")
-	yield "flush"
+	yield "@flush",
 	for name in ("ABOUT-GNU", "INSTALL", "config.rpath", "ltconfig",
 		"ABOUT-NLS", "NEWS", "config.sub", "ltmain.sh", "AUTHORS", "README",
 		"depcomp", "mdat-sh", "BACKLOG", "THANKS", "install-sh", "missing",
@@ -58,7 +58,7 @@ def on_flush(filename, targets):
 			yield "./configure", # system state [+ Makefile.in?] => Makefile
 		yield cat("make", *args)
 
-manifest = {
+MANIFEST = {
 	"filenames": ("configure.ac", "configure.in", "Makefile"),
 	"on_get": None,
 	"on_clean": on_clean,

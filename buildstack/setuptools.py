@@ -6,7 +6,7 @@ import shutil, glob, imp, sys, os, re
 cat = lambda *args: args
 
 def on_get(filename, targets, requirementid = "requirements.txt"):
-	yield "flush"
+	yield "@flush",
 	args = ["install"]
 	if os.path.exists(requirementid):
 		# requirements file
@@ -18,7 +18,7 @@ def on_get(filename, targets, requirementid = "requirements.txt"):
 
 def on_clean(filename, targets):
 	targets.append("clean")
-	yield "flush"
+	yield "@flush",
 	# remove *.pyc and *.pyo files
 	for dirname, _, basenames in os.walk("."):
 		for basename in basenames:
@@ -40,7 +40,7 @@ def setup(**kwargs):
 
 def on_run(filename, targets, entrypointid):
 	"Run entry entry points defined in the build manifest"
-	yield "flush"
+	yield "@flush",
 	# entry points are platform-dependent and therefore generated on installation only
 	# thus we need to install the package with as few side effects as possible:
 	yield "python", filename, "develop", "--user"
@@ -74,7 +74,7 @@ def on_test(filename, targets):
 	# - "python setup.py sdist test" handles both targets as expected
 	# - "python setup.py test sdist" handles "test" only :-(
 	# solution: flush targets after test
-	yield "flush"
+	yield "@flush",
 
 # *** EXPERIMENTAL ***
 def on_package(filename, targets, formatid):
@@ -100,7 +100,7 @@ def on_package(filename, targets, formatid):
 		targets.append("package", formatid = formatid)
 
 def on_publish(filename, targets, repositoryid):
-	yield "flush"
+	yield "@flush",
 	args = ["upload"] + glob.glob("dist/*")
 	if repositoryid:
 		args += ["--repository", repositoryid]
@@ -108,7 +108,7 @@ def on_publish(filename, targets, repositoryid):
 
 def on_install(filename, targets, inventoryid, uninstall):
 	if uninstall:
-		yield "flush"
+		yield "@flush",
 		yield "pip", "uninstall", os.path.basename(os.getcwd())
 	else:
 		targets.append("install")
@@ -158,7 +158,19 @@ def on_flush(filename, targets):
 	if args:
 		yield cat("python", filename, *args)
 
-manifest = {
+def on_release(filename, targets, partid, version):
+	version.parse_stdout("python", filename, "--version")
+	print "VERSION", version.bump(partid)
+	with open(filename, "rw") as fp:
+		text = fp.read()
+		print "TEXT", text.replace(str(version), str(version.bump(partid)))
+	#	fp.write(text.replace(version, version.bump(partid)))
+	#yield "@commit",
+	#yield "@tag",
+	raise StopIteration
+	yield
+
+MANIFEST = {
 	"filenames": ("setup.py",),
 	"on_get": on_get,
 	"on_clean": on_clean,
@@ -167,6 +179,7 @@ manifest = {
 	"on_package": on_package,
 	"on_publish": on_publish,
 	"on_install": on_install,
+	"on_release": on_release,
 	"on_flush": on_flush,
 	"tools": {
 		"setuptools": {

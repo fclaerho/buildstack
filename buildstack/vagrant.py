@@ -2,6 +2,6 @@
 
 # REF: https://docs.vagrantup.com/v2/
 
-manifest = {
+MANIFEST = {
 	"filenames": ("Vagrantfile", "vagrantfile"),
 }

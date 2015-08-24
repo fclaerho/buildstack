@@ -31,7 +31,7 @@ def on_flush(filename, targets):
 	if args:
 		yield cat("mvn", "--update-snapshots", "--file", filename, *args)
 
-manifest = {
+MANIFEST = {
 	"filenames": ("pom.xml",),
 	"on_flush": on_flush,
 	"tools": {

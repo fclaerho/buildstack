@@ -30,7 +30,7 @@ def on_flush(filename, targets):
 	if args:
 		yield cat("cargo", *args)
 
-manifest = {
+MANIFEST = {
 	"filenames": ("Cargo.toml",),
 	"on_flush": on_flush,
 	"tools": {

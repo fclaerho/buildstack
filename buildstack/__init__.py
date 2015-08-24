@@ -1,4 +1,4 @@
-# copyright (c) 2015 fclaerhout.fr, all rights reserved
+# copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
 """
 Detect and drive a source code build stack to reach well-known targets.
@@ -25,6 +25,7 @@ Where TARGET is one of:
   * package[:ID]       bundle target objects with metadata [in the identified format]
   * publish[:ID]       publish packages [to the identified repository]
   * [un]install[:ID]   [un]deploy target objects [onto the identified inventory]
+  * release:ID         bump source code version, commit and tag
 
 Example:
   $ build clean compile test
@@ -44,11 +45,63 @@ Use '~/build.json' to customize commands:
 
 import textwrap, fnmatch, glob, os
 
-import buildstack, docopt, utils # 3rd-party
-
-MANIFESTS = utils.get_manifests(__path__)
+import docopt, utils # 3rd-party
 
 class Error(utils.Error): pass
+
+class Vcs(object):
+	"tiny VCS abstraction handling commit(), purge() and tag()"
+
+	def __init__(self):
+		for key in (".hg", ".git", ".svn"):
+			if os.path.exists(key):
+				self.key = key
+
+	def commit(self, message = None):
+		if message:
+			return {
+				".git": ("git", "commit", "-am", message),
+			}.get(self.key, "unsupported operation")
+		else:
+			return {
+				".git": ("git", "commit", "-a"),
+			}.get(self.key, "unsupported operation")
+
+	def purge(self):
+		return {
+			".git": ("git", "clean", "--force", "-d", "-x"),
+			".hg": ("hg", "purge", "--config", "extensions.purge="),
+		}.get(self.key, "unsupported operation")
+
+	def tag(self):
+		raise NotImplementedError
+
+class Version(object):
+	"immutable N(.N)* version object"
+
+	def __init__(self, *value):
+		self.value = value
+
+	def __str__(self):
+		return ".".join(str(i) for i in self.value)
+
+	def parse_stdout(self, *args):
+		stdout = utils.check_output(*args)
+		self.value = map(int, stdout.split("."))
+
+	def bump(self, partid):
+		"return a new version object with a bumped value"
+		value = [i for i in self.value]
+		idx = {
+			"patch": 2,
+			"minor": 1,
+			"major": 0,
+		}.get(partid, int(partid))
+		if idx < len(value):
+			value[idx] += 1
+		else:
+			raise Error(partid, "out of bound")
+		return Version(*value)
 
 class Target(object):
 
@@ -59,7 +112,7 @@ class Target(object):
 	def __str__(self):
 		return "%s %s" % (self.name, " ".join("%s=%s" % (k, v) for k, v in self.kwargs.items()))
 
-	def __eq__(self, other):
+	def __eq__(self, other): # FIXME: deprecated this?
 		if isinstance(other, (str, unicode)):
 			return self.name == other
 		else:
@@ -79,86 +132,64 @@ class Targets(list):
 
 class BuildStack(object):
 
-	def __init__(self, customization = None, profileid = None, path = None):
-		self.customization = customization or {}
-		self.profileid = profileid
-		# jump into the base directory:
+	def __init__(self, preferences = None, profileid = None, manifests = None, path = None):
+		# resolve preferences:
+		if preferences:
+			self.preferences = preferences.get("all", {})
+			if profileid:
+				self.preferences.update(preferences.get(profileid, {}))
+		else:
+			self.preferences = {}
+		# resolve base directory:
 		if path:
 			path = utils.Path(path)
 			if os.path.isdir(path):
 				dirname = path
 				self.filename = None
-			elif os.path.isfile(path):
-				dirname, self.filename = os.path.split(path)
 			else:
-				raise Error(path, "invalid path")
+				dirname, self.filename = os.path.split(path)
 			if dirname:
 				utils.chdir(dirname)
 		else:
 			self.filename = None
 		# resolve manifest:
-		manifests = []
-		if self.filename:
-			# find all stacks able to handle this manifest:
-			for manifest in MANIFESTS:
-				for pattern in manifest["filenames"]:
+		cnt = 0
+		for manifest in manifests:
+			for pattern in manifest["filenames"]:
+				if self.filename:
 					if fnmatch.fnmatch(self.filename, pattern):
-						manifests.append(manifest)
-						break
-		else:
-			# otherwise try all filenames declared by all stacks:
-			for manifest in MANIFESTS:
-				for pattern in manifest["filenames"]:
+						self.manifest = manifest
+						cnt += 1
+				else:
 					filenames = glob.glob(pattern)
 					if filenames:
 						self.filename = filenames[0] # pick first match
-						manifests.append(manifest)
-						break
-		if not manifests:
+						self.manifest = manifest
+						cnt += 1
+		if not cnt:
 			raise Error("no supported build stack detected")
-		elif len(manifests) > 1:
-			raise Error(
-				"/".join(map(lambda m: m["name"], manifests)),
-				"multiple build stacks detected, use -f to select a manifest")
-		else:
-			self.manifest, = manifests
-		assert "name" in manifest, "missing name property"
-		assert "filenames" in manifest, "missing filenames property"
+		elif cnt > 1:
+			raise Error("multiple build stacks detected, use -f to select a manifest")
+		utils.trace("using %s build stack" % self.manifest["name"])
 		self.targets = Targets()
-		utils.trace("using '%s' build stack" % self.manifest["name"])
+		self.vcs = Vcs()
 
-	def _check_call(self, args, _cache = {}):
-		key = args[0]
-		if not key in _cache:
-			# fetch general customization, if any:
-			_cache[key] = self.customization.get("all", {}).get(key, {})
-			# fetch profile customization, if any:
-			if self.profileid:
-				_cache[key].update(self.customization.get(self.profileid, {}).get(key, {}))
+	def _check_call(self, args):
+		prefs = self.preferences.get(args[0], {})
 		tmp = list(args)
-		tmp[0] = os.path.expanduser(_cache[key].get("path", key))
-		argslist =\
-			_cache[key].get("before", [])\
-			+ [tmp + _cache[key].get("append", [])]\
-			+ _cache[key].get("after", [])
+		tmp[0] = prefs.get("path", args[0]) # FIXME: this is ugly
+		argslist = prefs.get("before", []) + [tmp + prefs.get("append", [])] + prefs.get("after", [])
 		for args in argslist:
+			args[0] = utils.Path(args[0])
 			utils.check_call(*args)
 
 	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
-		"generic target handler"
+		"generic target handler: call the custom handler if it exists, or fallback on default"
 		handler = self.manifest.get("on_%s" % name, default)
 		if handler is None:
 			raise Error(self.manifest["name"], name, "unsupported target")
 		elif handler == "stack": # stack target and let the on_flush handler deal with it
 			self.targets.append(name, **kwargs)
-		elif handler == "purge": # FIXME: redesign this feature, having it here is awkward
-			self.flush()
-			if os.path.exists(".git"):
-				self._check_call(("git", "clean", "--force", "-d", "-x")) # "Danger, Will Robinson!"
-			elif os.path.exists(".hg"):
-				self._check_call(("hg", "purge", "--config", "extensions.purge="))
-			else:
-				raise Error("unknown VCS, cannot remove untracked files") # NOTE: add svn-cleanup
 		elif callable(handler):
 			for res in (handler)(
 				filename = self.filename,
@@ -170,19 +201,25 @@ class BuildStack(object):
 							self._check_call(res[1:])
 						except:
 							utils.trace("command failure ignored")
+					elif res[0] == "@tag":
+						self._check_call(*self.vcs.tag())
+					elif res[0] == "@flush":
+						assert canflush, "%s: cannot flush from this target" % key
+						self.flush()
 					elif res[0] == "@trace":
 						utils.trace(*res[1:])
+					elif res[0] == "@purge":
+						self._check_call(*self.vcs.purge())
+					elif res[0] == "@commit":
+						self._check_call(*self.vcs.commit(*res[1:]))
 					elif res[0] == "@remove":
 						utils.remove(*res[1:])
 					else:
 						self._check_call(res)
-				elif res == "flush":
-					assert canflush, "%s: cannot flush from this target" % key
-					self.flush()
 				else: # res is an error object
 					raise Error(self.manifest["name"], name, res)
 		else:
-			assert False, "%s: invalid target handler" % handler
+			raise AssertionError("invalid target handler")
 
 	def get(self, requirementid = None):
 		self._handle_target(
@@ -220,15 +257,21 @@ class BuildStack(object):
 			inventoryid = inventoryid,
 			uninstall = uninstall)
 
+	def release(self, partid):
+		self._handle_target(
+			"release",
+			partid = partid,
+			version = Version())
+
 	def flush(self):
 		if self.targets:
 			self._handle_target("flush", canflush = False, default = None)
-		assert not self.targets, "lingering unhandled target(s) -- please report this bug"
+		assert not self.targets, "lingering target(s) -- please report this bug"
 
 def setup(toolid, settings):
 	"render a tool configuration template"
 	tools = {}
-	for manifest in MANIFESTS:
+	for manifest in utils.get_manifests(__path__):
 		tools.update(manifest.get("tools", {}))
 	if toolid == "help":
 		name_width = max(map(len, tools))
@@ -276,8 +319,9 @@ def main(*args):
 				settings = opts["SETTING"])
 		else:
 			bs = BuildStack(
-				customization = utils.unmarshall("~/build.json", default = None),
+				preferences = utils.unmarshall("~/buildstack.json"),
 				profileid = opts["--profile"],
+				manifests = utils.get_manifests(__path__),
 				path = opts["--file"] or opts["--directory"])
 			for target in opts["TARGET"]:
 				if target.startswith("get"):
@@ -298,6 +342,8 @@ def main(*args):
 					bs.install(
 						inventoryid = target.partition(":")[2],
 						uninstall = target == "uninstall")
+				elif target.startswith("release"):
+					bs.release(partid = target.partition(":")[2])
 				else:
 					raise Error(target, "unknown target")
 				bs.flush()

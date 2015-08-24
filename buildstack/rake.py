@@ -2,6 +2,6 @@
 
 # REF: http://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile/
 
-manifest = {
+MANIFEST = {
 	"filenames": ("Rakefile",),
 }

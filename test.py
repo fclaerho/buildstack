@@ -7,7 +7,7 @@ Environment variables:
   * PAUSE: pause before cleaning the working directory, for inspection
 """
 
-import unittest, shutil, sys, os
+import unittest, sys, os
 
 import buildstack, utils # 3rd-party
 
@@ -32,11 +32,11 @@ def _foo_on_flush(filename, targets):
 	del targets[:]
 	yield ["bash", filename] + args
 
-buildstack.MANIFESTS.append({
+MANIFEST = {
 	"name": "foo",
 	"filenames": ["Foobuild"],
 	"on_flush": _foo_on_flush,
-})
+}
 
 class CoreTest(unittest.TestCase):
 
@@ -45,9 +45,12 @@ class CoreTest(unittest.TestCase):
 		self.dirname = utils.mkdir()
 		with open(os.path.join(self.dirname, "Foobuild"), "w") as fp:
 			fp.write(FOOBUILD)
+		self.buildstack = buildstack.BuildStack(
+			manifests = (MANIFEST,),
+			path = self.dirname)
 
 	def tearDown(self):
-		shutil.rmtree(self.dirname)
+		utils.remove(self.dirname)
 
 	def assert_is_cleaned(self):
 		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.clean")))
@@ -68,36 +71,42 @@ class CoreTest(unittest.TestCase):
 		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.publish")))
 
 	def test_clean(self):
-		buildstack.main("-C", self.dirname, "clean")
+		self.buildstack.clean()
+		self.buildstack.flush()
 
 	def test_compile(self):
-		buildstack.main("-C", self.dirname, "compile")
+		self.buildstack.compile()
+		self.buildstack.flush()
 		self.assert_is_compiled()
 
 	def test_test(self):
-		buildstack.main("-C", self.dirname, "test")
+		self.buildstack.test()
+		self.buildstack.flush()
 		self.assert_is_tested()
 
 	def test_package(self):
-		buildstack.main("-C", self.dirname, "package")
+		self.buildstack.package()
+		self.buildstack.flush()
 		self.assert_is_packaged()
 
 	def test_install(self):
-		buildstack.main("-C", self.dirname, "install")
+		self.buildstack.install()
+		self.buildstack.flush()
 		self.assert_is_installed()
 
 	def test_publish(self):
-		buildstack.main("-C", self.dirname, "publish")
+		self.buildstack.publish()
+		self.buildstack.flush()
 		self.assert_is_published()
 
-	def test_build(self):
-		buildstack.main("-C", self.dirname, "clean", "compile", "test", "package", "install", "publish")
+	def test_stacking(self):
+		self.buildstack.clean()
+		self.buildstack.compile()
+		self.buildstack.test()
+		self.buildstack.flush()
 		self.assert_is_cleaned()
 		self.assert_is_compiled()
 		self.assert_is_tested()
-		self.assert_is_packaged()
-		self.assert_is_installed()
-		self.assert_is_published()
 
 #################
 # STACK TESTING #

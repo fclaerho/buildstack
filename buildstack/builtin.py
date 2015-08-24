@@ -776,7 +776,7 @@ def on_flush(filename, targets):
 	raise StopIteration
 	yield # force this function to be a generator
 
-manifest = {
+MANIFEST = {
 	"filenames": ("build.ini",),
 	"on_get": on_get,
 	"on_flush": on_flush,

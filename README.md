@@ -1,41 +1,39 @@
-*NOTICE!
-This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build [autotools](https://www.sourceware.org/autobook), [setuptools](https://packaging.python.org), [maven](https://maven.apache.org), [cargo](http://doc.crates.io) and [ansible](http://docs.ansible.com/ansible/index.html)-based projects.*
 
-**Build** is a build stack wrapper:
-its goal is to abstract the build process of any source code repository through high-level well-known targets. Focus on the big picture and let **Build** handle the invocation details.
+*NOTICE! This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build [autotools](https://www.sourceware.org/autobook), [setuptools](https://packaging.python.org), [maven](https://maven.apache.org), [cargo](http://doc.crates.io) and [ansible](http://docs.ansible.com/ansible/index.html)-based projects.*
 
-**Build** understands the following well-known targets:
-  * `get:<id>` install requirements
+**BuildStack** is a wrapper around build tools and their ecosystem:
+its goal is to abstract the build process of any source code repository by driving the underlying build stack through _well-known targets_. Focus on the big picture and let **BuildStack** handle the details.
+
+**BuildStack** understands the following _well-known targets_:
+  * `get:ID` install requirements
   * `clean` delete build byproducts
   * `compile` compile code
   * `run` run project
   * `test` run unit tests
-  * `package[:<id>]` package code [in the specified format]
-  * `publish[:<id>]` publish package [to the specified repository]
-  * `[un]install[:<id>]` [un]install locally [or [un]provision inventory]
+  * `package[:ID]` package code [in the specified format]
+  * `publish[:ID]` publish package [to the specified repository]
+  * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
+  * `release:ID` bump version, commit and tag source code
 
 
 Why, Oh Why?
 ------------
 
-The target audience is _SQA engineering_, _build engineering_ and _development_ folks
-who are all dealing with the same problem: how to quickly build (or run test, or install…)
-a project which is using a build stack you're not familiar with?
-By using **Build**, check out any repository and build it.
+_SQA engineers_, _build engineers_ and _developers_ are all dealing with the same problem:
+how to quickly build (or unit-test, or install…) a project using a build stack they are not familiar with?
+
+By using **BuildStack**, check out any repository and reach your build targets.
 No question asked.
 No need to lookup documentation.
 
-	$ git pull $GITSERVER/$MYREPO.git
-	$ cd $MYREPO
-	$ build clean compile package install
+	$ git pull $HOST/$FOO.git
+	$ build -C $FOO clean compile package install
 
 
 Extra Features
 --------------
 
-  * **Build** behavior can be customized through _profiles_, see advanced configuration below.
-  * For any build stack, use `build setup <toolid> <vars>…` to instantiate a minimal build manifest.
-    Run `build setup help` for the list of supported tools.
+  * **BuildStack** can instantiate manifest (or related tool configuration) templates, see `build setup help`.
   * **Autotools**:
     * better `clean` (remove lingering generated files)
   * **Setuptools**:
@@ -58,7 +56,7 @@ Extra Features
 Pre-requisites
 --------------
 
-**Build** is not bundled with any build tool, provision the machine appropriately beforehand.
+**BuildStack** is not bundled with any build tool, provision the machine appropriately beforehand.
 
 
 Installation
@@ -80,56 +78,65 @@ To uninstall:
 Advanced Configuration
 ----------------------
 
-Create the file `~/build.json` to customize the commands executed by `build`:
+Create the file `~/build.json` to customize each command executed by `build`:
 
   * before: run commands before
   * after: run commands after
   * append: append extra arguments to the command
   * path: set command path (e.g. on user-wide installation)
 
-You can group customizations into "profiles".
-Use the `-p` switch on the command line to select the one you want to use.
+You can group customizations into "profiles",
+use the `-p, --profile` switch on the command line to select the one to use.
 
-For instance, to push after bumpversion (called for a python project on release):
-
-	{
-		"all": {
-			"bumpversion": {
-				"after": [["git", "push", "origin", "master", "--tags"]]
-			}
-		}
-	}
-
-`all` is a particular profile; those customization are applied in all cases.
-
-Or to provision an Ansible inventory as root with a password (on install):
+For instance to provision an Ansible inventory as root with a password (on install):
 
 	{
+		…
 		"as-root": {
 			"ansible-playbook": {
 				"append": ["--user", "root", "--ask-pass"]
 			}
 		}
+		…
 	}
 
-This would be called with `build -p as-root …`.
+This would be invoked with `build --profile as-root …`
+
+You may also use the special profile `all` which is always applied.
+For instance, to always push after `bumpversion`:
+
+	{
+		…
+		"all": {
+			"bumpversion": {
+				"after": [["git", "push", "origin", "master", "--tags"]]
+			}
+		}
+		…
+	}
 
 
-Adding a Build Stack
---------------------
+Build Stack Development Process
+-------------------------------
 
-Fill-in the following template and move it to the `buildstack/` directory, it will be loaded automatically.
+### Module
 
-	def on_get(filename, targets, requirementid): raise NotImplementedError()
-	def on_clean(filename, targets): raise NotImplementedError()
-	def on_compile(filename, targets): raise NotImplementedError()
-	def on_run(filename, targets, entrypointid): raise NotImplementedError()
-	def on_test(filename, targets): raise NotImplementedError()
-	def on_package(filename, targets, formatid): raise NotImplementedError()
-	def on_publish(filename, targets, repositoryid): raise NotImplementedError()
-	def on_install(filename, targets, uninstall): raise NotImplementedError()
-	def on_flush(filename, targets): raise NotImplementedError()
-	manifest = {
+Create a python module named from the new build stack in the `build/` directory.
+The new module will be loaded automatically as long as the `MANIFEST` is defined.
+
+Module template:
+
+	def on_get(filename, targets, requirementid): raise NotImplementedError
+	def on_clean(filename, targets): raise NotImplementedError
+	def on_compile(filename, targets): raise NotImplementedError
+	def on_run(filename, targets, entrypointid): raise NotImplementedError
+	def on_test(filename, targets): raise NotImplementedError
+	def on_package(filename, targets, formatid): raise NotImplementedError
+	def on_publish(filename, targets, repositoryid): raise NotImplementedError
+	def on_install(filename, targets, uninstall): raise NotImplementedError
+	def on_release(filename, targets, partid, version): raise NotImplementedError
+	def on_flush(filename, targets): raise NotImplementedError
+	MANIFEST = {
 		#"name": # optional, defaults to module name
 		"filenames": [], # list of patterns matching supported build manifest filenames
 		#"on_get": None | on_get,
@@ -140,28 +147,55 @@ Fill-in the following template and move it to the `buildstack/` directory, it wi
 		#"on_package": None | on_package,
 		#"on_publish": None | on_publish,
 		#"on_install": None | on_install,
+		#"on_release": None | on_release,
 		#"on_flush": None | on_flush,
+		#"tools": {}
 	}
 
+### Target Stack
+
 For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list.
-The handler `on_flush` is called last to unstack targets;
-**Build** will fail if not all targets have been processed.
-The rationale behind this is that most build tools are able to handle multiple targets at the same time and calling them independently is less efficient.
-Therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked.
+The handler `on_flush` is automatically called _last_ to unstack and process the targets or it can also be called manually from any handler with the `@flush` command (details below.)
+The `targets` list _must_ be empty when `on_flush` terminates or the plugin is considered faulty.
+The rationale behind the usage of a stack is that most build tools are able to handle multiple targets at the same time (e.g. make clean all) and calling them independently is less efficient.
+However, what can be stack or not varies for each build tool: therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked. Also, when using a handler keep in mind to flush the current stack at the appropriate point (usually at the beginning before anything else.)
 
-All handlers are generators and can yield either the string `"flush"`, commands or any single object:
-  * flush will call on_flush
-  * a command must be a sequence of strings as specified by `subprocess.call()`
-  * anything else is considered to be an error object and raise a `BuildError()` containing it.
+### Handlers
 
-If a command name (i.e. its first element) starts by "@", it is considered to be a builtin call,
-e.g. `yield "@trace", "hello, world!"`.
-Available built-in functions:
+All handlers are generators and can yield either:
+  * a command, i.e. a sequence of strings, e.g. `yield "echo", "hello"`
+  * any single object -- considered as an error object and raising `build.Error()`
+
+If a command image name (i.e. its first element) starts with "@",
+it is considered to be a builtin function, e.g. `yield "@trace", "hello"`.
+
+The following builtins are available:
   * `@try(*args)` — on failure, discard exception
+  * `@tag` — triggers a VCS tag
+  * `@flush([reason])` — triggers `on_flush()`
   * `@trace(*strings)` — trace execution
+  * `@purge()` — use with caution! triggers a VCS purge, i.e. delete all untracked files
+  * `@commit([message])` — triggers a VCS commit
   * `@remove(path[, reason])` — remove file or directory
 
-If the build tool does not implement any "clean" target, you may set `"on_clean": "purge",` to use the VCS purge feature (that is, delete untracked files.)
+### Release Target
+
+Few build stacks are able to handle a `release` target (maven is among those few.)
+As it's nevertheless a critical feature, **BuildStack** offers a way to work around this issue.
+To use this option you must be able to 1/ fetch the current project version and 2/ write back the new version.
+In general, build tools offer options to extract project attributes (e.g. `python setup.py --version`) and most build manifests are easily parsable anyway.
+To calculate the new version, **BuildStack** provides a `Version` object that you will have to initialize and a `bump()` method to calculate the new version.
+How you write back the bumped version is up to you.
+
+Example (setuptools plugin):
+
+	def on_release(filename, targets, partid, version):
+		version.set_from_stdout("python", filename, "--version")
+		with open(filename, "rw") as fp:
+			text = fp.read()
+			fp.write(text.replace(version, version.bump(partid)))
+
+If your build stack is able to handle the release target, you can safely ignore the `version` argument.
 
 
 Testing

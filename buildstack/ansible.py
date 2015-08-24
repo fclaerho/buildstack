@@ -29,7 +29,7 @@ def play(filename, *args):
 ############
 
 def on_get(filename, targets, requirementid):
-	yield "flush"
+	yield "@flush",
 	# create roles_path if it does not exist:
 	roles_path = get_roles_path()
 	if not os.path.exists(roles_path):
@@ -45,7 +45,7 @@ def on_get(filename, targets, requirementid):
 	yield galaxy("install", "--force", *args)
 
 def on_clean(filename, targets, scopeid):
-	yield "flush"
+	yield "@flush",
 	# given a requirements file, remove each requirement:
 	if os.path.isfile(scopeid):
 		with open(scopeid, "r") as fp:
@@ -77,7 +77,7 @@ def on_flush(filename, targets):
 			filename = filename,
 			*args)
 
-manifest = {
+MANIFEST = {
 	"filenames": ("playbook.yml", "*.yml"),
 	"on_get": on_get,
 	"on_clean": on_clean,
