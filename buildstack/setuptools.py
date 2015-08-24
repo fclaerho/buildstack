@@ -120,7 +120,7 @@ def on_release(filename, targets, partid, version):
 		text = fp.read()
 	with open(filename, "w") as fp:
 		fp.write(text.replace(str(version), str(next_version)))
-	yield "@commit", "release %s → %s" % (version, next_version)
+	yield "@commit", "%s → %s" % (version, next_version)
 	yield "@tag", str(next_version)
 
 def on_flush(filename, targets):

@@ -17,15 +17,15 @@ Options:
   --no-color                 disable colored output
 
 Where TARGET is one of:
-  * get[:ID]           install requirement(s)
-  * clean              delete generated files
-  * compile            generate target objects from source code
-  * run[:ID]           execute entry point(s)
-  * test               run unit tests
-  * package[:ID]       bundle target objects with metadata [in the identified format]
-  * publish[:ID]       publish packages [to the identified repository]
-  * [un]install[:ID]   [un]deploy target objects [onto the identified inventory]
-  * release:ID         bump source code version, commit and tag
+  * get[:ID]          install requirement(s)
+  * clean             delete generated files
+  * compile           generate target objects from source code
+  * run[:ID]          execute entry point(s)
+  * test              run unit tests
+  * package[:ID]      bundle target objects with metadata [in the identified format]
+  * publish[:ID]      publish packages [to the identified repository]
+  * [un]install[:ID]  [un]deploy target objects [onto the identified inventory]
+  * release:ID        bump source code version, commit and tag
 
 Example:
   $ build clean compile test
@@ -64,7 +64,9 @@ MANIFESTS = reduce(
 		"vagrant")),
 	())
 
+
 class Error(utils.Error): pass
+
 
 class Vcs(object):
 	"tiny VCS abstraction handling commit(), purge() and tag()"
@@ -74,17 +76,13 @@ class Vcs(object):
 			if os.path.exists(key):
 				self.key = key
 
-	def commit(self, message = None):
-		if message:
-			return {
-				".git": ("git", "commit", "-am", message),
-			}.get(self.key, "unsupported operation")
-		else:
-			return {
-				".git": ("git", "commit", "-a"),
-			}.get(self.key, "unsupported operation")
+	def commit(self, message):
+		return {
+			".git": ("git", "commit", "-am", message),
+		}.get(self.key, "unsupported operation")
 
 	def purge(self):
+		"Danger, Will Robinson! -- you may loose data"
 		return {
 			".git": ("git", "clean", "--force", "-d", "-x"),
 			".hg": ("hg", "purge", "--config", "extensions.purge="),
@@ -95,32 +93,42 @@ class Vcs(object):
 			".git": ("git", "tag", name),
 		}.get(self.key, "unsupported operation")
 
+
 class Version(object):
 	"immutable N(.N)* version object"
 
-	def __init__(self, *value):
-		self.value = value
+	def __init__(self, *number):
+		self.number = number
+
+	def __eq__(self, other):
+		return self.number == other.number
 
 	def __str__(self):
-		return ".".join(str(i) for i in self.value)
+		return ".".join(map(str, self.number))
 
 	def parse_stdout(self, *args):
 		stdout = utils.check_output(*args)
-		self.value = map(int, stdout.split("."))
+		self.number = map(int, stdout.split("."))
 
 	def bump(self, partid):
-		"return a bumped version object"
-		value = [i for i in self.value]
-		idx = {
-			"patch": 2,
-			"minor": 1,
-			"major": 0,
-		}.get(partid)
-		if idx < len(value):
-			value[idx] += 1
+		"return a new bumped version object"
+		number = [i for i in self.number]
+		if partid == "major":
+			i = 0
+		elif partid == "minor":
+			i = 1
+		elif partid == "patch":
+			i = max(2, len(number) - 1)
 		else:
-			raise Error(partid, "out of bound")
-		return Version(*value)
+			try:
+				i = int(partid)
+			except ValueError:
+				raise Error(partid, "unexpected partid")
+		if i >= len(number):
+			number += [0] * (i - len(number) + 1)
+		number[i] += 1
+		return Version(*number)
+
 
 class Target(object):
 
@@ -144,10 +152,12 @@ class Target(object):
 		except KeyError:
 			return None
 
+
 class Targets(list):
 
 	def append(self, name, **kwargs):
 		super(Targets, self).append(Target(name, **kwargs))
+
 
 class BuildStack(object):
 
@@ -287,6 +297,7 @@ class BuildStack(object):
 			self._handle_target("flush", canflush = False, default = None)
 		assert not self.targets, "lingering target(s) -- please report this bug"
 
+
 def setup(toolid, settings, manifests):
 	"render a tool configuration template"
 	tools = {}
@@ -322,6 +333,7 @@ def setup(toolid, settings, manifests):
 			utils.trace("%s: template instantiated" % path)
 		else:
 			raise Error(path, "file already exists, set overwrite=yes to force")
+
 
 def main(*args):
 	opts = docopt.docopt(

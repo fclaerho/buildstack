@@ -123,8 +123,8 @@ Build Stack Development Process
 
 ### Module ###
 
-Create a python module named from the new build stack in the `build/` directory.
-The new module will be loaded automatically as long as the `MANIFEST` is defined.
+Create a python module named from the new build stack in the `buildstack/` directory,
+and add it to the list initializing `MANIFESTS` in `__init__.py`.
 
 Module template:
 
@@ -139,7 +139,7 @@ Module template:
 	def on_release(filename, targets, partid, version): raise NotImplementedError
 	def on_flush(filename, targets): raise NotImplementedError
 	MANIFEST = {
-		#"name": # optional, defaults to module name
+		"name": "%string%" # build stack friendly name
 		"filenames": [], # list of patterns matching supported build manifest filenames
 		#"on_get": None | on_get,
 		#"on_clean": None | on_clean,
@@ -187,7 +187,7 @@ As it's nevertheless a critical feature, **BuildStack** offers a way to work aro
 To use this option you must be able to 1/ fetch the current project version and 2/ write back the new version.
 In general, build tools offer options to extract project attributes (e.g. `python setup.py --version`) and most build manifests are easily parsable anyway.
 To calculate the new version, **BuildStack** provides a `Version` object that you will have to initialize and a `bump()` method to calculate the new version.
-How you write back the bumped version is up to you.
+The write back implementation is up to you.
 
 Example (setuptools plugin):
 
