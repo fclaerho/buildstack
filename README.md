@@ -136,7 +136,7 @@ Module template:
 	def on_package(filename, targets, formatid): raise NotImplementedError
 	def on_publish(filename, targets, repositoryid): raise NotImplementedError
 	def on_install(filename, targets, uninstall): raise NotImplementedError
-	def on_release(filename, targets, partid, version): raise NotImplementedError
+	def on_release(filename, targets, partid, message, version): raise NotImplementedError
 	def on_flush(filename, targets): raise NotImplementedError
 	MANIFEST = {
 		"name": "…" # build stack friendly name

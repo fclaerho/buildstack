@@ -11,6 +11,7 @@ Usage:
 Options:
   -C PATH, --directory PATH  set working directory
   -f PATH, --file PATH       set build manifest path (overrides -C)
+  -m STR, --message STR      set commit message
   -p ID, --profile ID        set build profile
   -v, --verbose              trace execution
   -h, --help                 display full help text
@@ -286,10 +287,11 @@ class BuildStack(object):
 			inventoryid = inventoryid,
 			uninstall = uninstall)
 
-	def release(self, partid):
+	def release(self, partid, message = None):
 		self._handle_target(
 			"release",
 			partid = partid,
+			message = message,
 			version = Version())
 
 	def flush(self):
@@ -375,7 +377,9 @@ def main(*args):
 						inventoryid = target.partition(":")[2],
 						uninstall = target == "uninstall")
 				elif target.startswith("release"):
-					bs.release(partid = target.partition(":")[2])
+					bs.release(
+						partid = target.partition(":")[2],
+						message = opts["--message"])
 				else:
 					raise Error(target, "unknown target")
 				bs.flush()

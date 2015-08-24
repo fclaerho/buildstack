@@ -113,14 +113,14 @@ def on_install(filename, targets, inventoryid, uninstall):
 	else:
 		targets.append("install")
 
-def on_release(filename, targets, partid, version):
+def on_release(filename, targets, partid, message, version):
 	version.parse_stdout("python", filename, "--version")
 	next_version = version.bump(partid)
 	with open(filename, "r") as fp:
 		text = fp.read()
 	with open(filename, "w") as fp:
 		fp.write(text.replace(str(version), str(next_version)))
-	yield "@commit", "%s → %s" % (version, next_version)
+	yield "@commit", "%s → %s%s" % (version, next_version, (": %s" % message) if message else "")
 	yield "@tag", str(next_version)
 
 def on_flush(filename, targets):
