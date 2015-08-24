@@ -47,6 +47,7 @@ Extra Features
 			$ sudo apt-get update
 			$ sudo apt-get install debhelper dh-virtualenv
 
+    * support the `release:(patch|minor|major)` target
     * support the `run` target to execute entry points
     * on testing,
       if `nose2.cfg` is present and setup.py does not use it,
@@ -56,7 +57,8 @@ Extra Features
 Pre-requisites
 --------------
 
-**BuildStack** is not bundled with any build tool, provision the machine appropriately beforehand.
+**BuildStack** is not bundled with any build tool;
+provision the machine appropriately beforehand.
 
 
 Installation
