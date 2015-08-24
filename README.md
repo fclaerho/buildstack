@@ -20,7 +20,7 @@ Why, Oh Why?
 ------------
 
 _SQA engineers_, _build engineers_ and _developers_ are all dealing with the same problem:
-how to quickly build (or unit-test, or install…) a project using a build stack they are not familiar with?
+how to quickly build and use a project using a build stack they are not familiar with?
 
 By using **BuildStack**, check out any repository and reach your build targets.
 No question asked.
