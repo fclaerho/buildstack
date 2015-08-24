@@ -158,17 +158,15 @@ def on_flush(filename, targets):
 	if args:
 		yield cat("python", filename, *args)
 
-def on_release(filename, targets, partid, version):
+# FIXME
+def on_release(filename, targets, partid, cur_version):
 	version.parse_stdout("python", filename, "--version")
-	print "VERSION", version.bump(partid)
+	next_version = version.bump(partid)
 	with open(filename, "rw") as fp:
 		text = fp.read()
-		print "TEXT", text.replace(str(version), str(version.bump(partid)))
-	#	fp.write(text.replace(version, version.bump(partid)))
-	#yield "@commit",
-	#yield "@tag",
-	raise StopIteration
-	yield
+		text = text.replace("%s" % version, "%s" % next_version)
+	yield "@commit", "bump version to %s" % next_version
+	yield "@tag", next_version
 
 MANIFEST = {
 	"filenames": ("setup.py",),

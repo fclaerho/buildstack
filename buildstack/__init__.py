@@ -73,8 +73,10 @@ class Vcs(object):
 			".hg": ("hg", "purge", "--config", "extensions.purge="),
 		}.get(self.key, "unsupported operation")
 
-	def tag(self):
-		raise NotImplementedError
+	def tag(self, name):
+		return {
+			".git": ("git", "tag", name),
+		}.get(self.key, "unsupported operation")
 
 class Version(object):
 	"immutable N(.N)* version object"
@@ -90,7 +92,7 @@ class Version(object):
 		self.value = map(int, stdout.split("."))
 
 	def bump(self, partid):
-		"return a new version object with a bumped value"
+		"return a bumped version object"
 		value = [i for i in self.value]
 		idx = {
 			"patch": 2,
@@ -202,7 +204,7 @@ class BuildStack(object):
 						except:
 							utils.trace("command failure ignored")
 					elif res[0] == "@tag":
-						self._check_call(*self.vcs.tag())
+						self._check_call(*self.vcs.tag(*res[1:]))
 					elif res[0] == "@flush":
 						assert canflush, "%s: cannot flush from this target" % key
 						self.flush()
