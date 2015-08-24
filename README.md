@@ -48,7 +48,7 @@ Extra Features
 			$ sudo apt-get install debhelper dh-virtualenv
 
     * support the `release:(patch|minor|major)` target
-    * support the `run` target to execute entry points
+    * support the `run` target: fetch entry points from manifest and run them
     * on testing,
       if `nose2.cfg` is present and setup.py does not use it,
       the original setup.py will be backed up and a new one will be generated to call nose2.
@@ -139,7 +139,7 @@ Module template:
 	def on_release(filename, targets, partid, version): raise NotImplementedError
 	def on_flush(filename, targets): raise NotImplementedError
 	MANIFEST = {
-		"name": "%string%" # build stack friendly name
+		"name": "…" # build stack friendly name
 		"filenames": [], # list of patterns matching supported build manifest filenames
 		#"on_get": None | on_get,
 		#"on_clean": None | on_clean,
