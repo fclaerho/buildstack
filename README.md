@@ -64,17 +64,17 @@ provision the machine appropriately beforehand.
 Installation
 ------------
 
-	$ pip install --user --extra-index-url https://pypi.fclaerhout.fr/simple/ build
+	$ pip install --user --extra-index-url https://pypi.fclaerhout.fr/simple/ buildstack
 
 or, if that repository is not available:
 
-	$ pip install --user git+https://github.com/fclaerho/build.git
+	$ pip install --user git+https://github.com/fclaerho/buildstack.git
 
 The package will be installed in your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) directory; make sure its `bin/` sub-directory is in your shell lookup path.
 
 To uninstall:
 
-	$ pip uninstall build
+	$ pip uninstall buildstack
 
 
 Advanced Configuration
