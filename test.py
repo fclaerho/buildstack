@@ -111,19 +111,19 @@ class CoreTest(unittest.TestCase):
 class VersionTest(unittest.TestCase):
 
 	def setUp(self):
-		self.version = buildstack.Version(1)
+		self.version = buildstack.Version(1, 2, 3)
 
 	def test_bump_major(self):
-		self.assertEqual(self.version.bump("major"), buildstack.Version(2))
+		self.assertEqual(self.version.bump("major").number, buildstack.Version(2, 0, 0).number)
 
 	def test_bump_minor(self):
-		self.assertEqual(self.version.bump("minor"), buildstack.Version(1, 1))
+		self.assertEqual(self.version.bump("minor").number, buildstack.Version(1, 3, 0).number)
 
 	def test_bump_patch(self):
-		self.assertEqual(self.version.bump("patch"), buildstack.Version(1, 0, 1))
+		self.assertEqual(self.version.bump("patch").number, buildstack.Version(1, 2, 4).number)
 
 	def test_bump_N(self):
-		self.assertEqual(self.version.bump(3), buildstack.Version(1, 0, 0, 1))
+		self.assertEqual(self.version.bump(3).number, buildstack.Version(1, 2, 3, 1).number)
 
 #################
 # STACK TESTING #

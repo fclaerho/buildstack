@@ -70,7 +70,6 @@ class Error(utils.Error): pass
 
 
 class Vcs(object):
-	"tiny VCS abstraction handling commit(), purge() and tag()"
 
 	def __init__(self):
 		for key in (".hg", ".git", ".svn"):
@@ -80,10 +79,10 @@ class Vcs(object):
 	def commit(self, message):
 		return {
 			".git": ("git", "commit", "-am", message),
+			".hg": ("hg", "commit", "-m", message),
 		}.get(self.key, "unsupported operation")
 
 	def purge(self):
-		"Danger, Will Robinson! -- you may loose data"
 		return {
 			".git": ("git", "clean", "--force", "-d", "-x"),
 			".hg": ("hg", "purge", "--config", "extensions.purge="),
@@ -92,27 +91,26 @@ class Vcs(object):
 	def tag(self, name):
 		return {
 			".git": ("git", "tag", name),
+			".hg": ("hg", "tag", name),
 		}.get(self.key, "unsupported operation")
 
 
 class Version(object):
 	"immutable N(.N)* version object"
 
+	@staticmethod
+	def parse_stdout(*args):
+		stdout = utils.check_output(*args)
+		number = map(int, stdout.split("."))
+		return Version(*number)
+
 	def __init__(self, *number):
 		self.number = number
-
-	def __eq__(self, other):
-		return self.number == other.number
 
 	def __str__(self):
 		return ".".join(map(str, self.number))
 
-	def parse_stdout(self, *args):
-		stdout = utils.check_output(*args)
-		self.number = map(int, stdout.split("."))
-
 	def bump(self, partid):
-		"return a new bumped version object"
 		number = [i for i in self.number]
 		if partid == "major":
 			i = 0
@@ -124,10 +122,16 @@ class Version(object):
 			try:
 				i = int(partid)
 			except ValueError:
-				raise Error(partid, "unexpected partid")
+				raise Error(partid, "expected (major|minor|patch) or index")
 		if i >= len(number):
 			number += [0] * (i - len(number) + 1)
-		number[i] += 1
+		for j in range(0, len(number)):
+			if j < i:
+				continue
+			elif j == i:
+				number[j] += 1
+			else:
+				number[j] = 0
 		return Version(*number)
 
 
@@ -292,7 +296,7 @@ class BuildStack(object):
 			"release",
 			partid = partid,
 			message = message,
-			version = Version())
+			Version = Version)
 
 	def flush(self):
 		if self.targets:

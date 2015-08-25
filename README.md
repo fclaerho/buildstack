@@ -38,6 +38,8 @@ Extra Features
     * better `clean` (remove lingering generated files)
   * **Setuptools**:
     * better `clean` (remove lingering generated files)
+    * support the `run` target: fetch and run entry points from the manifest
+    * support the `release` target
     * use `build package:pkg` to build native OS/X packages (on an OS/X platform.)
     * use `build package:deb` to build debian packages (on a debian platform.)
       Install the following tools beforehands:
@@ -47,8 +49,6 @@ Extra Features
 			$ sudo apt-get update
 			$ sudo apt-get install debhelper dh-virtualenv
 
-    * support the `release:(patch|minor|major)` target
-    * support the `run` target: fetch entry points from manifest and run them
     * on testing,
       if `nose2.cfg` is present and setup.py does not use it,
       the original setup.py will be backed up and a new one will be generated to call nose2.
@@ -90,31 +90,31 @@ Create the file `~/build.json` to customize each command executed by `build`:
 You can group customizations into "profiles",
 use the `-p, --profile` switch on the command line to select the one to use.
 
-For instance to provision an Ansible inventory as root with a password (on install):
+For instance to provision an Ansible inventory as root with a password:
 
 	{
-		…
+		[…]
 		"as-root": {
 			"ansible-playbook": {
 				"append": ["--user", "root", "--ask-pass"]
 			}
 		}
-		…
+		[…]
 	}
 
-This would be invoked with `build --profile as-root …`
+This would be invoked with the option `--profile as-root`.
 
 You may also use the special profile `all` which is always applied.
 For instance, to always push after `bumpversion`:
 
 	{
-		…
+		[…]
 		"all": {
 			"bumpversion": {
 				"after": [["git", "push", "origin", "master", "--tags"]]
 			}
 		}
-		…
+		[…]
 	}
 
 
@@ -123,10 +123,11 @@ Build Stack Development Process
 
 ### Module ###
 
-Create a python module named from the new build stack in the `buildstack/` directory,
-and add it to the list initializing `MANIFESTS` in `__init__.py`.
-
-Module template:
+Create a python module in the `buildstack/` directory,
+and add its name to the list initializing `MANIFESTS` in `__init__.py`.
+You might use the following template as bootstrap.
+The module must define a `MANIFEST` global variable to be loaded;
+this variable is a dictionary declaring the module properties and handlers.
 
 	def on_get(filename, targets, requirementid): raise NotImplementedError
 	def on_clean(filename, targets): raise NotImplementedError
@@ -136,7 +137,7 @@ Module template:
 	def on_package(filename, targets, formatid): raise NotImplementedError
 	def on_publish(filename, targets, repositoryid): raise NotImplementedError
 	def on_install(filename, targets, uninstall): raise NotImplementedError
-	def on_release(filename, targets, partid, message, version): raise NotImplementedError
+	def on_release(filename, targets, partid, message, Version): raise NotImplementedError
 	def on_flush(filename, targets): raise NotImplementedError
 	MANIFEST = {
 		"name": "…" # build stack friendly name
@@ -156,9 +157,9 @@ Module template:
 
 ### Target Stack ###
 
-For all handlers, except `on_flush`, the default behavior is to stack the target in the `targets` list.
-The handler `on_flush` is automatically called _last_ to unstack and process the targets or it can also be called manually from any handler with the `@flush` command (details below.)
-The `targets` list _must_ be empty when `on_flush` terminates or the plugin is considered faulty.
+For all handlers, except `on_flush()`, the default behavior is to stack the target in the `targets` list.
+The handler `on_flush()` is automatically called _last_ to unstack and process the targets or it can also be called manually from any handler with the `@flush` command (details below.)
+The `targets` list _must_ be empty when `on_flush()` terminates or the plugin is considered faulty.
 The rationale behind the usage of a stack is that most build tools are able to handle multiple targets at the same time (e.g. make clean all) and calling them independently is less efficient.
 However, what can be stack or not varies for each build tool: therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked. Also, when using a handler keep in mind to flush the current stack at the appropriate point (usually at the beginning before anything else.)
 
@@ -172,44 +173,28 @@ If a command image name (i.e. its first element) starts with "@",
 it is considered to be a builtin function, e.g. `yield "@trace", "hello"`.
 
 The following builtins are available:
-  * `@try(*args)` — on failure, discard exception
+  * `@try(*args)` — exec args, resume on exception
   * `@tag` — triggers a VCS tag
   * `@flush([reason])` — triggers `on_flush()`
   * `@trace(*strings)` — trace execution
-  * `@purge()` — use with caution! triggers a VCS purge, i.e. delete all untracked files
+  * `@purge()` — triggers a VCS purge, i.e. delete all untracked files
   * `@commit([message])` — triggers a VCS commit
   * `@remove(path[, reason])` — remove file or directory
 
 ### Release Target ###
 
-Few build stacks are able to handle a `release` target (maven is among those few.)
-As it's nevertheless a critical feature, **BuildStack** offers a way to work around this issue.
-To use this option you must be able to 1/ fetch the current project version and 2/ write back the new version.
-In general, build tools offer options to extract project attributes (e.g. `python setup.py --version`) and most build manifests are easily parsable anyway.
-To calculate the new version, **BuildStack** provides a `Version` object that you will have to initialize and a `bump()` method to calculate the new version.
-The write back implementation is up to you.
-
-Example (setuptools plugin):
-
-	def on_release(filename, targets, partid, version):
-		version.set_from_stdout("python", filename, "--version")
-		with open(filename, "rw") as fp:
-			text = fp.read()
-			fp.write(text.replace(version, version.bump(partid)))
-
-If your build stack is able to handle the release target, you can safely ignore the `version` argument.
+Few build stacks are able to handle a `release` target natively,
+**BuildStack** therefore provides some support to work around this issue provided that you can:
+  1. fetch the current project version:
+     * via the build tools offer options to extract project attributes (e.g. `python setup.py --version`)
+     * by parsing parse the build manifest directly
+  2. write back the new version into the build manifest
+To calculate the new version, **BuildStack** passes the `Version` class to your release handler — of course, you can ignore this argument if you have another mean to do version calculation.
+  * `Version.parse_stdout(*args)` — return version instance from the command output (it should match N(.N)*)
+  * `version.bump(partid[, reason])` — bump version, where partid is (major|minor|patch) or an index.
 
 ### Testing ###
 
-You can use buildstack to test itself without installing it:
+You can use buildstack to unit-test itself without installing it:
 
 	$ python -m buildstack test
-
-By default, only the core infrastructure is tested.
-
-To test the build stacks, use: `TESTSTACKS=1 python build.py test clean:all`.
-This will check-out various github repositories meeting a standard build process and build them.
-
-If you add new URLs to test, you may use `PAUSE=1 ...` to inspect the output files and specify the corresponding `target_paths` value in the `builds = {}` dictionary.
-
-TODO: This poorman procedure will be replaced soon by docker containers.

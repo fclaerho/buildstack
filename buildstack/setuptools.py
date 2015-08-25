@@ -1,5 +1,4 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
-# coding: utf-8
 
 import shutil, glob, imp, sys, os, re
 
@@ -113,14 +112,14 @@ def on_install(filename, targets, inventoryid, uninstall):
 	else:
 		targets.append("install")
 
-def on_release(filename, targets, partid, message, version):
-	version.parse_stdout("python", filename, "--version")
-	next_version = version.bump(partid)
+def on_release(filename, targets, partid, message, Version):
+	last_version = Version.parse_stdout("python", filename, "--version")
+	next_version = last_version.bump(partid)
 	with open(filename, "r") as fp:
 		text = fp.read()
 	with open(filename, "w") as fp:
-		fp.write(text.replace(str(version), str(next_version)))
-	yield "@commit", "%s → %s%s" % (version, next_version, (": %s" % message) if message else "")
+		fp.write(text.replace(str(last_version), str(next_version)))
+	yield "@commit", "%s: %s" % (str(next_version), message) if message else str(next_version)
 	yield "@tag", str(next_version)
 
 def on_flush(filename, targets):
