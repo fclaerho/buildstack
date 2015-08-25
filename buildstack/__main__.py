@@ -1,5 +1,5 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
-import buildstack, sys
+import buildstack
 
-buildstack.main(*sys.argv[1:])
+buildstack.main()

@@ -343,7 +343,7 @@ def setup(toolid, settings, manifests):
 			raise Error(path, "file already exists, set overwrite=yes to force")
 
 
-def main(*args):
+def main(args = None):
 	opts = docopt.docopt(
 		doc = __doc__,
 		argv = args)
