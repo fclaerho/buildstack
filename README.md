@@ -189,6 +189,7 @@ Few build stacks are able to handle a `release` target natively,
      * by using the build tool to extract project attributes (e.g. `python setup.py --version`)
      * by parsing the build manifest directly
   2. write back the new version into the build manifest
+
 To calculate the new version, **BuildStack** passes the `Version` class to your release handler — of course, you can ignore this argument if you have another mean to do version calculation.
   * `Version.parse_stdout(*args)` — return version instance from the command output (it should match N(.N)*)
   * `version.bump(partid[, reason])` — bump version, where partid is (major|minor|patch) or an index.
