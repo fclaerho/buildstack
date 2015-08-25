@@ -33,7 +33,7 @@ No need to lookup documentation.
 Extra Features
 --------------
 
-  * **BuildStack** can instantiate manifest (or related tool configuration) templates, see `build setup help`.
+  * Instantiate manifest (or related tool configuration) templates, see `build setup help`.
   * **Autotools**:
     * better `clean` (remove lingering generated files)
   * **Setuptools**:
