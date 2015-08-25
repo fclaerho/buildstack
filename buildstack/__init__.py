@@ -4,9 +4,9 @@
 Detect and drive a source code build stack to reach well-known targets.
 
 Usage:
-  build [options] setup TOOLID [SETTING...]
-  build [options] TARGET...
-  build --help
+  buildstack [options] setup TOOLID [SETTING...]
+  buildstack [options] TARGET...
+  buildstack --help
 
 Options:
   -C PATH, --directory PATH  set working directory
@@ -26,10 +26,10 @@ Where TARGET is one of:
   * package[:ID]      bundle target objects with metadata [in the identified format]
   * publish[:ID]      publish packages [to the identified repository]
   * [un]install[:ID]  [un]deploy target objects [onto the identified inventory]
-  * release:ID        bump source code version, commit and tag
+  * release:ID [-m]   bump source code version, commit and tag
 
 Example:
-  $ build clean compile test
+  $ buildstack clean compile test
 
 Use '~/build.json' to customize commands:
   {
