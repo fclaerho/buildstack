@@ -194,12 +194,14 @@ class BuildStack(object):
 					if fnmatch.fnmatch(self.filename, pattern):
 						self.manifest = manifest
 						cnt += 1
+						break
 				else:
 					filenames = glob.glob(pattern)
 					if filenames:
 						self.filename = filenames[0] # pick first match
 						self.manifest = manifest
 						cnt += 1
+						break
 		if not cnt:
 			raise Error("no supported build stack detected")
 		elif cnt > 1:
