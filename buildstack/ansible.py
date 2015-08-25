@@ -78,7 +78,6 @@ def on_flush(filename, targets):
 			*args)
 
 MANIFEST = {
-	"name": "ansible",
 	"filenames": ("playbook.yml", "*.yml"),
 	"on_get": on_get,
 	"on_clean": on_clean,

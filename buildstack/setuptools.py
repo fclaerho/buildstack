@@ -168,7 +168,6 @@ def on_flush(filename, targets):
 		yield cat("python", filename, *args)
 
 MANIFEST = {
-	"name": "setuptools",
 	"filenames": ("setup.py",),
 	"on_get": on_get,
 	"on_clean": on_clean,

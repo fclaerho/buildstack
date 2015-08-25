@@ -3,6 +3,5 @@
 # REF: http://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile/
 
 MANIFEST = {
-	"name": "rake",
 	"filenames": ("Rakefile",),
 }

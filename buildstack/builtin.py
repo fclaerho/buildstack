@@ -777,7 +777,6 @@ def on_flush(filename, targets):
 	yield # force this function to be a generator
 
 MANIFEST = {
-	"name": "builtin",
 	"filenames": ("build.ini",),
 	"on_get": on_get,
 	"on_flush": on_flush,

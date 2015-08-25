@@ -48,22 +48,19 @@ import textwrap, fnmatch, glob, os
 
 import docopt, utils # 3rd-party
 
-MANIFESTS = reduce(
-	lambda _tuple, _dict: _tuple + (_dict,),
-	(__import__(name, globals()).MANIFEST for name in (
-		"ansible",
-		"ant",
-		"autotools",
-		"builtin",
-		"cargo",
-		"gradle",
-		"grunt",
-		"maven",
-		"npm",
-		"rake",
-		"setuptools",
-		"vagrant")),
-	())
+MANIFESTS = tuple(dict({"name": name}, **__import__(name, globals()).MANIFEST) for name in (
+	"ansible",
+	"ant",
+	"autotools",
+	"builtin",
+	"cargo",
+	"gradle",
+	"grunt",
+	"maven",
+	"npm",
+	"rake",
+	"setuptools",
+	"vagrant"))
 
 
 class Error(utils.Error): pass
@@ -308,9 +305,7 @@ class BuildStack(object):
 
 def setup(toolid, settings, manifests):
 	"render a tool configuration template"
-	tools = {}
-	for manifest in manifests:
-		tools.update(manifest.get("tools", {}))
+	tools = {k: v for m in manifests for k, v in m.get("tools", {}).items()}
 	if toolid == "help":
 		name_width = max(map(len, tools))
 		path_width = max(map(lambda key: len(tools[key]["path"]), tools))
@@ -363,31 +358,24 @@ def main(args = None):
 				profileid = opts["--profile"],
 				manifests = MANIFESTS,
 				path = opts["--file"] or opts["--directory"])
+			_dict = {
+				"get": lambda value: bs.get(requirementid = value),
+				"clean": lambda _: bs.clean(),
+				"compile": lambda _: bs.compile(),
+				"run": lambda value: bs.run(entrypointid = value),
+				"test": lambda _: bs.test(),
+				"package": lambda value: bs.package(formatid = value),
+				"publish": lambda value: bs.publish(repositoryid = value),
+				"install": lambda value: bs.install(inventoryid = value),
+				"uninstall": lambda value: bs.install(inventoryid = value, uninstall = True),
+				"release": lambda value: bs.release(partid = value, message = opts["--message"])
+			}
 			for target in opts["TARGET"]:
-				if target.startswith("get"):
-					bs.get(requirementid = target.partition(":")[2])
-				elif target == "clean":
-					bs.clean()
-				elif target == "compile":
-					bs.compile()
-				elif target.startswith("run"):
-					bs.run(entrypointid = target.partition(":")[2])
-				elif target == "test":
-					bs.test()
-				elif target.startswith("package"):
-					bs.package(formatid = target.partition(":")[2])
-				elif target.startswith("publish"):
-					bs.publish(repositoryid = target.partition(":")[2])
-				elif target.startswith("install") or target.startswith("uninstall"):
-					bs.install(
-						inventoryid = target.partition(":")[2],
-						uninstall = target == "uninstall")
-				elif target.startswith("release"):
-					bs.release(
-						partid = target.partition(":")[2],
-						message = opts["--message"])
+				key, _, value = target.partition(":")
+				if key in _dict:
+					_dict[key](value)
 				else:
 					raise Error(target, "unknown target")
-				bs.flush()
+			bs.flush()
 	except utils.Error as exc:
 		raise SystemExit(utils.red(exc))

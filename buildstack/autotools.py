@@ -59,7 +59,6 @@ def on_flush(filename, targets):
 		yield cat("make", *args)
 
 MANIFEST = {
-	"name": "autotools",
 	"filenames": ("configure.ac", "configure.in", "Makefile"),
 	"on_get": None,
 	"on_clean": on_clean,

@@ -24,7 +24,6 @@ def on_publish(filename, targets, repositoryid): yield "npm", "publish"
 #def on_install(filename, targets, uninstall): raise NotImplementedError
 
 MANIFEST = {
-	"name": "npm",
 	"filenames": ("package.json",),
 	"on_get": on_get,
 	#"on_clean": None | on_clean,

@@ -3,6 +3,5 @@
 # REF: https://docs.vagrantup.com/v2/
 
 MANIFEST = {
-	"name": "vagrant",
 	"filenames": ("Vagrantfile", "vagrantfile"),
 }
