@@ -173,13 +173,13 @@ If a command image name (i.e. its first element) starts with "@",
 it is considered to be a builtin function, e.g. `yield "@trace", "hello"`.
 
 The following builtins are available:
-  * `@try(*args)` — exec args, resume on exception
-  * `@tag` — triggers a VCS tag
-  * `@flush([reason])` — triggers `on_flush()`
-  * `@trace(*strings)` — trace execution
-  * `@purge()` — triggers a VCS purge, i.e. delete all untracked files
-  * `@commit([message])` — triggers a VCS commit
-  * `@remove(path[, reason])` — remove file or directory
+  * `try(*args)` — exec args, resume on exception
+  * `tag` — triggers a VCS tag
+  * `flush([reason])` — triggers `on_flush()`
+  * `trace(*strings)` — trace execution
+  * `purge()` — triggers a VCS purge, i.e. delete all untracked files
+  * `commit([message])` — triggers a VCS commit
+  * `remove(path[, reason])` — remove file or directory
 
 ### Release Target ###
 
