@@ -13,7 +13,7 @@ its goal is to abstract the build process of any source code repository by drivi
   * `package[:ID]` package code [in the specified format]
   * `publish[:ID]` publish package [to the specified repository]
   * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
-  * `release:ID` bump version, commit and tag source code
+  * `release:ID [-m]` bump version, commit and tag source code
 
 
 Why, Oh Why?
@@ -80,7 +80,7 @@ To uninstall:
 Advanced Configuration
 ----------------------
 
-Create the file `~/build.json` to customize each command executed by `build`:
+Create the file `~/buildstack.json` to customize each command executed by `build`:
 
   * before: run commands before
   * after: run commands after
@@ -192,7 +192,7 @@ Few build stacks are able to handle a `release` target natively,
 
 To calculate the new version, **BuildStack** passes the `Version` class to your release handler — of course, you can ignore this argument if you have another mean to do version calculation.
   * `Version.parse_stdout(*args)` — return version instance from the command output (it should match N(.N)*)
-  * `version.bump(partid[, reason])` — bump version, where partid is (major|minor|patch) or an index.
+  * `version.bump(partid)` — return bumped version, where partid is (major|minor|patch) or an index.
 
 ### Testing ###
 
