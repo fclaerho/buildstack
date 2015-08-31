@@ -341,8 +341,7 @@ def setup(toolid, settings, manifests):
 def main(args = None):
 	opts = docopt.docopt(
 		doc = __doc__,
-		argv = args,
-		options_first = True)
+		argv = args)
 	try:
 		if opts["--no-color"]:
 			utils.disable_colors()
