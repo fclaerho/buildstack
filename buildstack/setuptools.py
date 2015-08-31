@@ -1,6 +1,6 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
-import shutil, glob, imp, sys, os, re
+import shutil, glob, ast, sys, os, re
 
 cat = lambda *args: args
 
@@ -32,32 +32,25 @@ def on_clean(filename, targets):
 	for name in glob.glob("*.egg*") + glob.glob(".eggs"):
 		yield "@remove", name, "lingering requirement"
 
-# pretend to be setuptools.setup(); used by on_run() below
-def setup(**kwargs):
-	global ENTRY_POINTS
-	ENTRY_POINTS = kwargs.get("entry_points", {})
+def get_entry_points():
+	with open("setup.py") as fp:
+		t = ast.parse(fp.read())
+		for stmt in t.body:
+			if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call): #FIXME: check name="setup"
+				for kw in stmt.value.keywords:
+					if kw.arg == "entry_points":
+						return ast.literal_eval(kw.value)
 
 def on_run(filename, targets, entrypointid):
-	"Run entry entry points defined in the build manifest"
+	"run entry points defined in the build manifest"
 	yield "@flush",
-	# entry points are platform-dependent and therefore generated on installation only
-	# thus we need to install the package with as few side effects as possible:
-	yield "python", filename, "develop", "--user"
-	# importing setup.py calls setuptools.setup()
-	# which call the above setup() as the current module is also named "setuptools".
-	__import__("setup")
-	for item in ENTRY_POINTS.get("console_scripts", ()):
-		name, _ = item.split("=", 1)
-		if not entrypointid or entrypointid == name:
-			yield "@try", name
-	for item in ENTRY_POINTS.get("gui_scripts", ()):
-		name, _ = item.split("=", 1)
-		if not entrypointid or entrypointid == name:
-			yield "@try", name
-	# ideally we would use a try/finally block here to uninstall the package
-	# but this would forbid any "yield" as the generator is already exited;
-	# instead we ignore user-land errors with the "@try" directive above.
-	yield "python", filename, "develop", "--user", "--uninstall"
+	ep = get_entry_points()
+	for script_type in ("console_scripts", "gui_scripts"):
+		for item in ep.get(script_type, ()):
+			name, tail = item.split("=", 1)
+			mod, func = tail.split(":", 1)
+			if not entrypointid or entrypointid == name:
+				yield "python", "-c", "import %s; %s.%s()" % (mod, mod, func)
 
 def on_test(filename, targets):
 	# if nose2 configuration file exists, use nose2 as test framework
