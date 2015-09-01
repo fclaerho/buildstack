@@ -36,7 +36,9 @@ def get_entry_points():
 	with open("setup.py") as fp:
 		t = ast.parse(fp.read())
 		for stmt in t.body:
-			if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call): #FIXME: check name="setup"
+			if isinstance(stmt, ast.Expr)\
+			and isinstance(stmt.value, ast.Call)\
+			and stmt.value.func.attr == "setup":
 				for kw in stmt.value.keywords:
 					if kw.arg == "entry_points":
 						return ast.literal_eval(kw.value)
@@ -270,3 +272,4 @@ MANIFEST = {
 		},
 	},
 }
+
