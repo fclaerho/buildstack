@@ -1,8 +1,17 @@
 
-*NOTICE! This tool is stable for the use cases it covers but it does not cover all major use cases yet. So far you can build [autotools](https://www.sourceware.org/autobook), [setuptools](https://packaging.python.org), [maven](https://maven.apache.org), [cargo](http://doc.crates.io) and [ansible](http://docs.ansible.com/ansible/index.html)-based projects.*
+*NOTICE!
+This tool is stable for the use cases it covers but it does not cover all major use cases yet.
+So far you can build
+[autotools](https://www.sourceware.org/autobook),
+[setuptools](https://packaging.python.org),
+[maven](https://maven.apache.org),
+[cargo](http://doc.crates.io)
+and [ansible](http://docs.ansible.com/ansible/index.html)-based projects.*
 
 **BuildStack** is a wrapper around build tools and their ecosystem:
-its goal is to abstract the build process of any source code repository by driving the underlying build stack through _well-known targets_. Focus on the big picture and let **BuildStack** handle the details.
+its goal is to abstract the build process of any source code repository
+by driving the underlying build stack through _well-known targets_.
+Focus on the big picture and let **BuildStack** handle the details.
 
 **BuildStack** understands the following _well-known targets_:
   * `get:ID` install requirements
