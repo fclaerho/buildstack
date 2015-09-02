@@ -66,8 +66,8 @@ Extra Features
 Pre-requisites
 --------------
 
-**BuildStack** is not bundled with any build tool;
-provision the machine appropriately beforehand.
+**BuildStack** is not bundled with any build tool.
+Provision the machine appropriately beforehand.
 
 
 Installation
