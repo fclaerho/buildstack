@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
 	name = "buildstack", # https://www.python.org/dev/peps/pep-0426/#name
-	version = "5.1.2", # https://www.python.org/dev/peps/pep-0440/
+	version = "5.2.0", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 	#description = "",
 	#long_description = "",
@@ -16,7 +16,7 @@ setuptools.setup(
 	#keyword = [],
 	#py_modules = [],
 	install_requires = [
-		"pyutils >=5,<7a0",
+		"pyutils >=5,<8a0",
 		"docopt",
 		"PyYAML",
 	], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
@@ -29,7 +29,7 @@ setuptools.setup(
 	}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 	test_suite = "test",
 	tests_require = [
-		"pyutils >=5,<6a0",
+		"pyutils >=5,<8a0",
 		"docopt",
 		"PyYAML",
 	],
