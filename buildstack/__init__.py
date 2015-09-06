@@ -48,18 +48,24 @@ import textwrap, fnmatch, glob, os
 
 import docopt, utils # 3rd-party
 
+
 MANIFESTS = tuple(dict({"name": name}, **__import__(name, globals()).MANIFEST) for name in (
 	"ansible",
 	"ant",
 	"autotools",
 	"builtin",
 	"cargo",
+	"cmake",
 	"gradle",
 	"grunt",
+	"gulp",
 	"maven",
+	"ninja",
 	"npm",
 	"rake",
 	"setuptools",
+	"scons",
+	"stack",
 	"vagrant"))
 
 
@@ -379,3 +385,4 @@ def main(args = None):
 			bs.flush()
 	except utils.Error as exc:
 		raise SystemExit(utils.red(exc))
+
