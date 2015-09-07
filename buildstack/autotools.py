@@ -51,9 +51,10 @@ def on_flush(filename, targets):
 			yield "autoconf", # configure.xx => configure
 			with open(filename, "r") as fp:
 				text = fp.read()
-				if "AM_CONFIG_HEADER" in text:
-					yield "'AM_CONFIG_HEADER' is obsolete, use 'AC_CONFIG_HEADERS' instead"
-				if "AC_CONFIG_HEADERS" in text:
+				# Two options for *_CONFIG_HEADER*:
+				# - AM_CONFIG_HEADER, obsolete
+				# - AC_CONFIG_HEADERS
+				if "_CONFIG_HEADER" in text:
 					yield "autoheader", # configure.xx => config.h.in
 				else:
 					yield "@trace", "no _CONFIG_HEADER, skipping autoheader"
