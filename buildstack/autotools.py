@@ -17,7 +17,8 @@ def on_clean(filename, targets):
 		if os.path.islink(name):
 			yield "@remove", name, "lingering from automake --add-missing"
 	for name in ("aclocal.m4", "config.h.in","configure", "Makefile.in", "test-driver"):
-		yield "@remove", name, "lingering from autotools"
+		if os.path.exists(name):
+			yield "@remove", name, "lingering from autotools"
 
 def on_flush(filename, targets):
 	# Invoke Make standard targets:
