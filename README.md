@@ -66,8 +66,8 @@ Extra Features
 Pre-requisites
 --------------
 
-**BuildStack** is not bundled with any build tool.
-Provision the machine appropriately beforehand.
+**BuildStack** is not bundled with any build tool;
+provision the machine appropriately beforehand.
 
 
 Installation
@@ -127,10 +127,12 @@ For instance, to always push after `bumpversion`:
 	}
 
 
-Build Stack Development Process
--------------------------------
+Development Guide
+-----------------
 
-### Module ###
+**Buildstack** can be extended easily to support additional tools.
+
+### Module Creation ###
 
 Create a python module in the `buildstack/` directory,
 and add its name to the list initializing `MANIFESTS` in `__init__.py`.
