@@ -51,8 +51,10 @@ def on_flush(filename, targets):
 			yield "autoconf", # configure.xx => configure
 			with open(filename, "r") as fp:
 				text = fp.read()
-				if "AC_CONFIG_HEADERS" in text:
+				if "AC_CONFIG_HEADERS" in text or "AM_CONFIG_HEADER" in text:
 					yield "autoheader", # configure.xx => config.h.in
+				else:
+					yield "@trace", "no _CONFIG_HEADER, skipping autoheader"
 			if os.path.exists("Makefile.am"):
 				# you'll also need AM_INIT_AUTOMAKE() in configure.xx
 				yield "automake", "--add-missing" # configure.xx + Makefile.am => Makefile.in + missing files
