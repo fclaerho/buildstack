@@ -364,7 +364,7 @@ def main(args = None):
 				profileid = opts["--profile"],
 				manifests = MANIFESTS,
 				path = opts["--file"] or opts["--directory"])
-			_dict = {
+			switch = {
 				"get": lambda value: bs.get(requirementid = value),
 				"clean": lambda _: bs.clean(),
 				"compile": lambda _: bs.compile(),
@@ -378,8 +378,8 @@ def main(args = None):
 			}
 			for target in opts["TARGETS"]:
 				key, _, value = target.partition(":")
-				if key in _dict:
-					_dict[key](value)
+				if key in switch:
+					switch[key](value)
 				else:
 					raise Error(target, "unknown target")
 			bs.flush()
