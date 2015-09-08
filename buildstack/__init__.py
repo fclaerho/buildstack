@@ -5,7 +5,7 @@ Detect and drive a source code build stack to reach well-known targets.
 
 Usage:
   buildstack [options] setup TOOLID [SETTING...]
-  buildstack [options] TARGET...
+  buildstack [options] TARGETS...
   buildstack --help
 
 Options:
@@ -17,7 +17,7 @@ Options:
   -h, --help                 display full help text
   --no-color                 disable colored output
 
-Where TARGET is one of:
+Where a TARGET is one of:
   * get[:ID]          install requirement(s)
   * clean             delete generated files
   * compile           generate target objects from source code
@@ -376,7 +376,7 @@ def main(args = None):
 				"uninstall": lambda value: bs.install(inventoryid = value, uninstall = True),
 				"release": lambda value: bs.release(partid = value, message = opts["--message"])
 			}
-			for target in opts["TARGET"]:
+			for target in opts["TARGETS"]:
 				key, _, value = target.partition(":")
 				if key in _dict:
 					_dict[key](value)
