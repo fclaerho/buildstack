@@ -172,7 +172,7 @@ For all handlers, except `on_flush()`, the default behavior is to stack the targ
 The handler `on_flush()` is automatically called _last_ to unstack and process the targets or it can also be called manually from any handler with the `@flush` command (detailed below.)
 The `targets` list _must_ be empty when `on_flush()` terminates or the plugin is considered faulty.
 The rationale behind the usage of a stack is that most build tools are able to handle multiple targets at the same time (e.g. make clean all) and calling them independently is less efficient.
-However, what can be stacked or not varies for each build tool: therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked. Also, when using a handler keep in mind to flush the current stack at the appropriate point (usually at the beginning before anything else.)
+However, what can be stacked or not varies for each build tool: therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked. Also, when using a handler, remember to flush the current stack at the appropriate point (usually at the beginning, before anything else.)
 
 ### Handlers ###
 
