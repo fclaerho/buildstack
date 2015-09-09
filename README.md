@@ -42,7 +42,7 @@ No need to lookup documentation.
 Extra Features
 --------------
 
-  * Instantiate manifest (or related tool configuration) templates, see `build setup help`.
+  * Instantiate tool configuration templates, see `build setup help`.
   * **Autotools**:
     * better `clean` (remove lingering generated files)
   * **Setuptools**:
@@ -169,10 +169,10 @@ this variable is a dictionary declaring the module properties and handlers.
 ### Target Stack ###
 
 For all handlers, except `on_flush()`, the default behavior is to stack the target in the `targets` list.
-The handler `on_flush()` is automatically called _last_ to unstack and process the targets or it can also be called manually from any handler with the `@flush` command (details below.)
+The handler `on_flush()` is automatically called _last_ to unstack and process the targets or it can also be called manually from any handler with the `@flush` command (detailed below.)
 The `targets` list _must_ be empty when `on_flush()` terminates or the plugin is considered faulty.
 The rationale behind the usage of a stack is that most build tools are able to handle multiple targets at the same time (e.g. make clean all) and calling them independently is less efficient.
-However, what can be stack or not varies for each build tool: therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked. Also, when using a handler keep in mind to flush the current stack at the appropriate point (usually at the beginning before anything else.)
+However, what can be stacked or not varies for each build tool: therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked. Also, when using a handler keep in mind to flush the current stack at the appropriate point (usually at the beginning before anything else.)
 
 ### Handlers ###
 
