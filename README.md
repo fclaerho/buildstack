@@ -196,7 +196,7 @@ The following builtins are available:
 
 Few build stacks are able to handle a `release` target natively,
 **BuildStack** therefore provides some support to work around this issue given that you can:
-  1. fetch the current project version:
+  1. fetch the current project version, e.g.:
      * by using the build tool to extract project attributes (e.g. `python setup.py --version`)
      * by parsing the build manifest directly
   2. write back the new version into the build manifest
