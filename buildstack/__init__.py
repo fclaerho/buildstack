@@ -1,7 +1,7 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
 """
-Detect and drive a source code build stack to reach well-known targets.
+Detect and drive a build stack to reach well-known targets.
 
 Usage:
   buildstack [options] setup TOOLID [SETTING...]
@@ -48,7 +48,6 @@ import textwrap, fnmatch, glob, os
 
 import docopt, utils # 3rd-party
 
-
 MANIFESTS = tuple(dict({"name": name}, **__import__(name, globals()).MANIFEST) for name in (
 	"ansible",
 	"ant",
@@ -63,14 +62,13 @@ MANIFESTS = tuple(dict({"name": name}, **__import__(name, globals()).MANIFEST) f
 	"ninja",
 	"npm",
 	"rake",
-	"setuptools",
 	"scons",
+	"setuptools",
 	"stack",
+	"tup",
 	"vagrant"))
 
-
 class Error(utils.Error): pass
-
 
 class Vcs(object):
 
@@ -96,7 +94,6 @@ class Vcs(object):
 			".git": ("git", "tag", name),
 			".hg": ("hg", "tag", name),
 		}.get(self.key, "unsupported operation")
-
 
 class Version(object):
 	"immutable N(.N)* version object"
@@ -137,7 +134,6 @@ class Version(object):
 				number[j] = 0
 		return Version(*number)
 
-
 class Target(object):
 
 	def __init__(self, name, **kwargs):
@@ -160,12 +156,10 @@ class Target(object):
 		except KeyError:
 			return None
 
-
 class Targets(list):
 
 	def append(self, name, **kwargs):
 		super(Targets, self).append(Target(name, **kwargs))
-
 
 class BuildStack(object):
 
@@ -308,7 +302,6 @@ class BuildStack(object):
 			self._handle_target("flush", canflush = False, default = None)
 		assert not self.targets, "lingering target(s) -- please report this bug"
 
-
 def setup(toolid, settings, manifests):
 	"render a tool configuration template"
 	tools = {k: v for m in manifests for k, v in m.get("tools", {}).items()}
@@ -342,7 +335,6 @@ def setup(toolid, settings, manifests):
 			utils.trace("%s: template instantiated" % path)
 		else:
 			raise Error(path, "file already exists, set overwrite=yes to force")
-
 
 def main(args = None):
 	opts = docopt.docopt(
@@ -385,4 +377,3 @@ def main(args = None):
 			bs.flush()
 	except utils.Error as exc:
 		raise SystemExit(utils.red(exc))
-
