@@ -114,17 +114,6 @@ For instance to provision an Ansible inventory as root with a password:
 This would be invoked with the option `--profile as-root`.
 
 You may also use the special profile `all` which is always applied.
-For instance, to always push after `bumpversion`:
-
-	{
-		[…]
-		"all": {
-			"bumpversion": {
-				"after": [["git", "push", "origin", "master", "--tags"]]
-			}
-		}
-		[…]
-	}
 
 
 Development Guide
@@ -207,6 +196,10 @@ To calculate the new version, **BuildStack** passes the `Version` class to your 
 
 ### Testing ###
 
-You can use buildstack to unit-test itself without installing it:
+You can use buildstack to test itself without installing it, given its dependencies are present:
 
 	$ python -m buildstack test
+
+Otherwise:
+
+	$ python setup.py test
