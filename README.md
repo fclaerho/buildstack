@@ -73,9 +73,9 @@ provision the machine appropriately beforehand.
 Installation
 ------------
 
-	$ pip install --user --extra-index-url https://pypi.fclaerhout.fr/simple/ buildstack
+	$ pip install --user buildstack
 
-or, if that repository is not available:
+or, if the PyPI repository is not available:
 
 	$ pip install --user git+https://github.com/fclaerho/buildstack.git
 
