@@ -16,7 +16,7 @@ setuptools.setup(
 	#keyword = [],
 	#py_modules = [],
 	install_requires = [
-		"pyutils==10",
+		"pyutils",
 		"docopt",
 		"PyYAML",
 	], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
@@ -29,13 +29,13 @@ setuptools.setup(
 	}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 	test_suite = "test",
 	tests_require = [
-		"pyutils==10",
+		"pyutils",
 		"docopt",
 		"PyYAML",
 	],
 	#extra_require = {},
 	#setup_requires = [],
 	dependency_links = [
-		"https://pypi.fclaerhout.fr/simple/pyutils",
+		"https://github.com/fclaerho/pyutils/tarball/master#egg=pyutils-11.0.1",
 	], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
 )

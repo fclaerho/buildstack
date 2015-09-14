@@ -26,7 +26,7 @@ Where a TARGET is one of:
   * package[:ID]      bundle target objects with metadata [in the identified format]
   * publish[:ID]      publish packages [to the identified repository]
   * [un]install[:ID]  [un]deploy target objects [onto the identified inventory]
-  * release:ID [-m]   bump source code version, commit and tag
+  * release:ID [-m]   bump source code version, commit, tag and push
 
 Example:
   $ buildstack clean compile test
@@ -209,14 +209,14 @@ class BuildStack(object):
 
 	def _check_call(self, args):
 		prefs = self.preferences.get(args[0], {})
-		tmp = list(args)
-		tmp[0] = prefs.get("path", args[0]) # FIXME: this is ugly
-		argslist = prefs.get("before", []) + [tmp + prefs.get("append", [])] + prefs.get("after", [])
+		args = list(args)
+		args[0] = prefs.get("path", args[0])
+		argslist = prefs.get("before", []) + [args + prefs.get("append", [])] + prefs.get("after", [])
 		for args in argslist:
 			args[0] = utils.Path(args[0])
 			utils.check_call(*args)
 
-	def _handle_target(self, name, canflush = True, default = "stack", **kwargs):
+	def _handle_target(self, name, default = "stack", **kwargs):
 		"generic target handler: call the custom handler if it exists, or fallback on default"
 		handler = self.manifest.get("on_%s" % name, default)
 		if handler is None:
@@ -237,7 +237,7 @@ class BuildStack(object):
 					elif res[0] == "@tag":
 						self._check_call(self.vcs.tag(*res[1:]))
 					elif res[0] == "@flush":
-						assert canflush, "%s: cannot flush from this target" % key
+						assert target != "flush", "infinite recursion detected"
 						self.flush()
 					elif res[0] == "@trace":
 						utils.trace(*res[1:])
@@ -299,7 +299,7 @@ class BuildStack(object):
 
 	def flush(self):
 		if self.targets:
-			self._handle_target("flush", canflush = False, default = None)
+			self._handle_target("flush", default = None)
 		assert not self.targets, "lingering target(s) -- please report this bug"
 
 def setup(toolid, settings, manifests):
