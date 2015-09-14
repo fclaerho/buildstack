@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
 	name = "buildstack", # https://www.python.org/dev/peps/pep-0426/#name
-	version = "5.7.0", # https://www.python.org/dev/peps/pep-0440/
+	version = "5.7.1", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 	#description = "",
 	#long_description = "",
@@ -16,9 +16,9 @@ setuptools.setup(
 	#keyword = [],
 	#py_modules = [],
 	install_requires = [
-		"pyutils",
 		"docopt",
 		"PyYAML",
+		"fckit==11.0.2",
 	], # https://packaging.python.org/en/latest/requirements.html#install-requires-vs-requirements-files
 	#package_data = {},
 	#data_files = {},
@@ -29,13 +29,11 @@ setuptools.setup(
 	}, # https://pythonhosted.org/setuptools/setuptools.html#automatic-script-creation
 	test_suite = "test",
 	tests_require = [
-		"pyutils",
 		"docopt",
 		"PyYAML",
+		"fckit==11.0.2",
 	],
 	#extra_require = {},
 	#setup_requires = [],
-	dependency_links = [
-		"https://github.com/fclaerho/pyutils/tarball/master#egg=pyutils-11.0.1",
-	], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
+	#dependency_links = [], # https://pythonhosted.org/setuptools/setuptools.html#dependencies-that-aren-t-in-pypi
 )

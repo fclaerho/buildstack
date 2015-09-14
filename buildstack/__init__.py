@@ -46,7 +46,7 @@ Use '~/build.json' to customize commands:
 
 import textwrap, fnmatch, glob, os
 
-import docopt, utils # 3rd-party
+import docopt, fckit # 3rd-party
 
 MANIFESTS = tuple(dict({"name": name}, **__import__(name, globals()).MANIFEST) for name in (
 	"ansible",
@@ -68,7 +68,7 @@ MANIFESTS = tuple(dict({"name": name}, **__import__(name, globals()).MANIFEST) f
 	"tup",
 	"vagrant"))
 
-class Error(utils.Error): pass
+class Error(fckit.Error): pass
 
 class Vcs(object):
 
@@ -100,7 +100,7 @@ class Version(object):
 
 	@staticmethod
 	def parse_stdout(*args):
-		stdout = utils.check_output(*args)
+		stdout = fckit.check_output(*args)
 		number = map(int, stdout.split("."))
 		return Version(*number)
 
@@ -173,14 +173,14 @@ class BuildStack(object):
 			self.preferences = {}
 		# resolve base directory:
 		if path:
-			path = utils.Path(path)
+			path = fckit.Path(path)
 			if os.path.isdir(path):
 				dirname = path
 				self.filename = None
 			else:
 				dirname, self.filename = os.path.split(path)
 			if dirname:
-				utils.chdir(dirname)
+				fckit.chdir(dirname)
 		else:
 			self.filename = None
 		# resolve manifest:
@@ -203,7 +203,7 @@ class BuildStack(object):
 			raise Error("no supported build stack detected")
 		elif cnt > 1:
 			raise Error("multiple build stacks detected, use -f to select a manifest")
-		utils.trace("using %s build stack" % self.manifest["name"])
+		fckit.trace("using %s build stack" % self.manifest["name"])
 		self.targets = Targets()
 		self.vcs = Vcs()
 
@@ -213,8 +213,8 @@ class BuildStack(object):
 		args[0] = prefs.get("path", args[0])
 		argslist = prefs.get("before", []) + [args + prefs.get("append", [])] + prefs.get("after", [])
 		for args in argslist:
-			args[0] = utils.Path(args[0])
-			utils.check_call(*args)
+			args[0] = fckit.Path(args[0])
+			fckit.check_call(*args)
 
 	def _handle_target(self, name, default = "stack", **kwargs):
 		"generic target handler: call the custom handler if it exists, or fallback on default"
@@ -233,20 +233,20 @@ class BuildStack(object):
 						try:
 							self._check_call(res[1:])
 						except:
-							utils.trace("command failure ignored")
+							fckit.trace("command failure ignored")
 					elif res[0] == "@tag":
 						self._check_call(self.vcs.tag(*res[1:]))
 					elif res[0] == "@flush":
-						assert target != "flush", "infinite recursion detected"
+						assert name != "flush", "infinite recursion detected"
 						self.flush()
 					elif res[0] == "@trace":
-						utils.trace(*res[1:])
+						fckit.trace(*res[1:])
 					elif res[0] == "@purge":
 						self._check_call(self.vcs.purge())
 					elif res[0] == "@commit":
 						self._check_call(self.vcs.commit(*res[1:]))
 					elif res[0] == "@remove":
-						utils.remove(*res[1:])
+						fckit.remove(*res[1:])
 					else:
 						self._check_call(res)
 				else: # res is an error object
@@ -312,7 +312,7 @@ def setup(toolid, settings, manifests):
 			required = ", ".join(tools[key]["required_vars"])
 			optional = ", ".join("%s=%s" % (k, v) for k,v in tools[key]["defaults"].items())
 			print\
-				utils.magenta(key.rjust(name_width)),\
+				fckit.magenta(key.rjust(name_width)),\
 				tools[key]["path"].center(path_width),\
 				required,\
 				("[%s]" % optional) if optional else ""
@@ -332,7 +332,7 @@ def setup(toolid, settings, manifests):
 				raise Error(" ".join(exc.args), "missing required variable" + suffix)
 			with open(path, "w") as fp:
 				fp.write(text)
-			utils.trace("%s: template instantiated" % path)
+			fckit.trace("%s: template instantiated" % path)
 		else:
 			raise Error(path, "file already exists, set overwrite=yes to force")
 
@@ -342,9 +342,9 @@ def main(args = None):
 		argv = args)
 	try:
 		if opts["--no-color"]:
-			utils.disable_colors()
+			fckit.disable_colors()
 		if opts["--verbose"]:
-			utils.enable_tracing()
+			fckit.enable_tracing()
 		if opts["setup"]:
 			setup(
 				toolid = opts["TOOLID"],
@@ -352,7 +352,7 @@ def main(args = None):
 				manifests = MANIFESTS)
 		else:
 			bs = BuildStack(
-				preferences = utils.unmarshall("~/buildstack.json"),
+				preferences = fckit.unmarshall("~/buildstack.json"),
 				profileid = opts["--profile"],
 				manifests = MANIFESTS,
 				path = opts["--file"] or opts["--directory"])
@@ -375,5 +375,5 @@ def main(args = None):
 				else:
 					raise Error(target, "unknown target")
 			bs.flush()
-	except utils.Error as exc:
-		raise SystemExit(utils.red(exc))
+	except fckit.Error as exc:
+		raise SystemExit(fckit.red(exc))

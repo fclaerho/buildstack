@@ -9,7 +9,7 @@ Environment variables:
 
 import unittest, sys, os
 
-import buildstack, utils # 3rd-party
+import buildstack, fckit # 3rd-party
 
 ################
 # CORE TESTING #
@@ -42,7 +42,7 @@ class CoreTest(unittest.TestCase):
 
 	def setUp(self):
 		# generate build manifest
-		self.dirname = utils.mkdir()
+		self.dirname = fckit.mkdir()
 		with open(os.path.join(self.dirname, "Foobuild"), "w") as fp:
 			fp.write(FOOBUILD)
 		self.buildstack = buildstack.BuildStack(
@@ -50,7 +50,7 @@ class CoreTest(unittest.TestCase):
 			path = self.dirname)
 
 	def tearDown(self):
-		utils.remove(self.dirname)
+		fckit.remove(self.dirname)
 
 	def assert_is_cleaned(self):
 		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.clean")))
@@ -158,14 +158,14 @@ if os.environ.get("TESTSTACKS", False):
 			class StackTest(unittest.TestCase):
 				def setUp(self, git_url = git_url):
 					"clone repository into temp dir"
-					self.dirname = utils.mkdir()
+					self.dirname = fckit.mkdir()
 					basename = os.path.basename(git_url)
 					rootname, extname = os.path.splitext(basename)
 					self.path = os.path.join(self.dirname, rootname)
-					utils.check_call("git", "-C", self.dirname, "clone", git_url)
+					fckit.check_call("git", "-C", self.dirname, "clone", git_url)
 				def tearDown(self):
 					"delete temp dir"
-					utils.remove(self.dirname)
+					fckit.remove(self.dirname)
 				def test_clean_compile(self, git_url = git_url, target_paths = target_paths):
 					build.main("-C", self.path, "clean", "compile")
 					for path in target_paths:
