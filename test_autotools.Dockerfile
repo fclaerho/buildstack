@@ -8,12 +8,12 @@ RUN apt-get -y install git build-essential autoconf automake python-pip
 RUN pip install buildstack
 
 # test 1
-#WORKDIR /tmp
-#RUN git clone https://github.com/orangeduck/ptest
-#WORKDIR /tmp/ptest
-#RUN buildstack clean compile
-#RUN test -e example
-#RUN test -e example2
+WORKDIR /tmp
+RUN git clone https://github.com/orangeduck/ptest
+WORKDIR /tmp/ptest
+RUN buildstack clean compile
+RUN test -e example
+RUN test -e example2
 
 # test 2
 WORKDIR /tmp
