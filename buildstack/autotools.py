@@ -19,6 +19,8 @@ def on_clean(filename, targets):
 	for name in ("aclocal.m4", "config.h.in","configure", "Makefile.in", "test-driver"):
 		if os.path.exists(name):
 			yield "@remove", name, "lingering from autotools"
+	if filename != "Makefile" and os.path.exists("Makefile"):
+		yield "@remove", "Makefile"
 
 def on_flush(filename, targets):
 	# Invoke Make standard targets:
