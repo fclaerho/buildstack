@@ -11,7 +11,7 @@ RUN pip install git+https://github.com/fclaerho/buildstack.git
 WORKDIR /tmp
 RUN git clone https://github.com/orangeduck/ptest
 WORKDIR /tmp/ptest
-RUN buildstack clean compile
+RUN buildstack -v clean compile
 RUN test -e example
 RUN test -e example2
 
@@ -19,7 +19,7 @@ RUN test -e example2
 WORKDIR /tmp
 RUN git clone https://github.com/andikleen/snappy-c
 WORKDIR /tmp/snappy-c
-RUN buildstack clean compile
+RUN buildstack -v clean compile
 RUN test -e scmd
 RUN test -e sgverify
 RUN test -e verify
@@ -28,7 +28,7 @@ RUN test -e verify
 WORKDIR /tmp
 RUN git clone https://github.com/maxmind/geoip-api-c
 WORKDIR /tmp/geoip-api-c
-RUN buildstack clean compile
+RUN buildstack -v clean compile
 RUN test -e apps/geoiplookup
 RUN test -e apps/geoiplookup6
 
@@ -40,7 +40,7 @@ RUN test -e apps/geoiplookup6
 WORKDIR /tmp
 RUN git clone https://github.com/git/git
 WORKDIR /tmp/git
-RUN buildstack clean compile
+RUN buildstack -v clean compile
 RUN test -e git
 
 # test 6
@@ -51,14 +51,14 @@ RUN test -e git
 WORKDIR /tmp
 RUN git clone https://github.com/bagder/curl
 WORKDIR /tmp/curl
-RUN buildstack clean compile
+RUN buildstack -v clean compile
 RUN test -e src/curl
 
 # test 8
 WORKDIR /tmp
 RUN git clone https://github.com/twitter/twemproxy
 WORKDIR /tmp/twemproxy
-RUN buildstack clean compile
+RUN buildstack -v clean compile
 RUN test -e src/nutcracker
 
 # test 9
@@ -66,5 +66,5 @@ WORKDIR /tmp
 RUN sudo apt-get -y installlibevent-dev libncurses5-dev
 RUN git clone https://github.com/tmux/tmux
 WORKDIR /tmp/tmux
-RUN buildstack clean compile
+RUN buildstack -v clean compile
 RUN test -e tmux

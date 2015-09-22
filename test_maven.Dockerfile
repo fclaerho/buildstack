@@ -11,4 +11,4 @@ RUN pip install git+https://github.com/fclaerho/buildstack.git
 WORKDIR /tmp
 RUN git clone https://github.com/square/retrofit.git
 WORKDIR /tmp/retrofit
-RUN buildstack clean compile
+RUN buildstack -v clean compile
