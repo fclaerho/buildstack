@@ -4,7 +4,7 @@ MAINTAINER fclaerhout.fr
 
 # install maven build environment
 RUN apt-get update
-RUN apt-get install git maven python-pip
+RUN apt-get -y install git maven python-pip
 RUN pip install buildstack
 
 # test 1

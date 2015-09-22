@@ -4,7 +4,7 @@ MAINTAINER fclaerhout.fr
 
 # install build environment
 RUN apt-get update
-RUN apt-get install git build-essential autoconf automake python-pip
+RUN apt-get -y install git build-essential autoconf automake python-pip
 RUN pip install buildstack
 
 # test 1
@@ -63,7 +63,7 @@ RUN test -e src/nutcracker
 
 # test 9
 WORKDIR /tmp
-RUN sudo apt-get install libevent-dev libncurses5-dev
+RUN sudo apt-get -y installlibevent-dev libncurses5-dev
 RUN git clone https://github.com/tmux/tmux
 WORKDIR /tmp/tmux
 RUN buildstack clean compile
