@@ -20,7 +20,7 @@ def on_clean(filename, targets):
 		if os.path.exists(name):
 			yield "@remove", name, "lingering from autotools"
 	if filename != "Makefile" and os.path.exists("Makefile"):
-		yield "@remove", "Makefile"
+		yield "@remove", "Makefile", "lingering from autotools"
 
 def on_flush(filename, targets):
 	# Invoke Make standard targets:
