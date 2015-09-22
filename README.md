@@ -59,7 +59,7 @@ Extra Features
     * support the `release` target
     * use `build package:pkg` to build native OS/X packages (on an OS/X platform.)
     * use `build package:deb` to build debian packages (on a debian platform.)
-      Install the following tools beforehands:
+      Install the following tools beforehand:
 
 			$ sudo pip install make-deb
 			$ sudo add-apt-repository ppa:dh-virtualenv/daily
