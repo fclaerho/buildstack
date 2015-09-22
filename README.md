@@ -137,19 +137,19 @@ You might use the following template as bootstrap.
 The module must define a `MANIFEST` global variable to be loaded;
 this variable is a dictionary declaring the module properties and handlers.
 
-	def on_get(filename, targets, requirementid): raise NotImplementedError
-	def on_clean(filename, targets): raise NotImplementedError
-	def on_compile(filename, targets): raise NotImplementedError
-	def on_run(filename, targets, entrypointid): raise NotImplementedError
-	def on_test(filename, targets): raise NotImplementedError
-	def on_package(filename, targets, formatid): raise NotImplementedError
-	def on_publish(filename, targets, repositoryid): raise NotImplementedError
-	def on_install(filename, targets, uninstall): raise NotImplementedError
-	def on_release(filename, targets, partid, message, Version): raise NotImplementedError
-	def on_flush(filename, targets): raise NotImplementedError
+	#def on_get(filename, targets, requirementid):
+	#def on_clean(filename, targets):
+	#def on_compile(filename, targets):
+	#def on_run(filename, targets, entrypointid):
+	#def on_test(filename, targets):
+	#def on_package(filename, targets, formatid):
+	#def on_publish(filename, targets, repositoryid):
+	#def on_install(filename, targets, uninstall):
+	#def on_release(filename, targets, partid, message, Version):
+	#def on_flush(filename, targets):
 	MANIFEST = {
-		"name": "…" # build stack friendly name
 		"filenames": [], # list of patterns matching supported build manifest filenames
+		#"name": # build stack custom name, defaults to module name otherwise
 		#"on_get": Exception | None | on_get,
 		#"on_clean": Exception | None | on_clean,
 		#"on_compile": Exception | None | on_compile,

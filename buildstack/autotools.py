@@ -66,7 +66,7 @@ def on_flush(filename, targets):
 
 MANIFEST = {
 	"filenames": ("configure.ac", "configure.in", "Makefile"),
-	"on_get": Exception,
+	"on_get": Exception, # there's no package manager for autotools
 	"on_clean": on_clean,
 	"on_flush": on_flush,
 }
