@@ -25,14 +25,10 @@ The following _well-known targets_ are supported:
   * `release:ID [-m]` bump version, commit and tag source code
 
 Besides, [lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)
-are supported even if the underlying concrete build stack does not:
+are supported even if the concrete build stack does not:
   * `compile` < (`run` | `test`)
   * `test` < (`package` | `release`)
   * `package` < (`install` | `publish`)
-
-For instance, the following command also triggers `compile` and `test` before `package`:
-
-	$ buildstack clean package
 
 
 Why, Oh Why?
@@ -46,7 +42,7 @@ No question asked.
 No need to lookup documentation.
 
 	$ git pull $HOST/$FOO.git
-	$ build -C $FOO clean test
+	$ build -C $FOO clean test # automatically triggers 'compile'
 
 
 Extra Features
