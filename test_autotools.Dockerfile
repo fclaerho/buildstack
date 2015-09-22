@@ -28,7 +28,7 @@ RUN test -e verify
 WORKDIR /tmp
 RUN git clone https://github.com/maxmind/geoip-api-c
 WORKDIR /tmp/geoip-api-c
-RUN buildstack -v clean compile
+RUN buildstack -vf autoconf.ac clean compile
 RUN test -e apps/geoiplookup
 RUN test -e apps/geoiplookup6
 
