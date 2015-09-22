@@ -177,7 +177,7 @@ remember to flush the current stack at the appropriate point (usually at the beg
 
 ### Handlers ###
 
-When setting a handler in the manifest, there are 3 options:
+When setting a handler in the `MANIFEST`, there are 3 options:
   * A value of `Exception` indicates the handler is not supported and raise an error.
   * A value of `None` indicates that there is nothing to do for this handler.
   * A generator callback with the proper signature.
