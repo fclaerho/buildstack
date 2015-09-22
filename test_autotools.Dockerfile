@@ -11,7 +11,7 @@ RUN pip install git+https://github.com/fclaerho/buildstack.git
 WORKDIR /tmp
 RUN git clone https://github.com/orangeduck/ptest
 WORKDIR /tmp/ptest
-RUN buildstack -v clean compile
+RUN buildstack -vf Makefile clean compile
 RUN test -e example
 RUN test -e example2
 
