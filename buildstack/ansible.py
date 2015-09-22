@@ -44,19 +44,16 @@ def on_get(filename, targets, requirementid):
 		args = (requirementid,)
 	yield galaxy("install", "--force", *args)
 
-def on_clean(filename, targets, scopeid):
+def on_clean(filename, targets):
 	yield "@flush",
 	# given a requirements file, remove each requirement:
-	if os.path.isfile(scopeid):
-		with open(scopeid, "r") as fp:
-			requirements = yaml.load(fp)
-		for req in requirements:
-			yield galaxy("remove", req["name"])
-		roles_path = get_roles_path()
-		if roles_path and os.path.exists(roles_path) and os.listdir(roles_path) == []:
-			os.rmdir(roles_path)
-	else:
-		yield "%s: unknown clean scope, expected requirements file" % scopeid
+	with open("requirements.yml", "r") as fp:
+		requirements = yaml.load(fp)
+	for req in requirements:
+		yield galaxy("remove", req["name"])
+	roles_path = get_roles_path()
+	if roles_path and os.path.exists(roles_path) and os.listdir(roles_path) == []:
+		os.rmdir(roles_path)
 
 def on_flush(filename, targets):
 	do_play = False
