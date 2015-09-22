@@ -281,36 +281,36 @@ class BuildStack(object):
 		self._handle_target("compile")
 
 	def run(self, entrypointid = None):
-		self.manifest.get("support_lifecycles", False) or self.compile()
+		self.compile()
 		self._handle_target(
 			"run",
 			entrypointid = entrypointid)
 
 	def test(self):
-		self.manifest.get("support_lifecycles", False) or self.compile()
+		self.compile()
 		self._handle_target("test")
 
 	def package(self, formatid = None):
-		self.manifest.get("support_lifecycles", False) or self.test()
+		self.test()
 		self._handle_target(
 			"package",
 			formatid = formatid)
 
 	def publish(self, repositoryid = None):
-		self.manifest.get("support_lifecycles", False) or self.package()
+		self.package()
 		self._handle_target(
 			"publish",
 			repositoryid = repositoryid)
 
 	def install(self, inventoryid = None, uninstall = False):
-		self.manifest.get("support_lifecycles", False) or self.package()
+		self.package()
 		self._handle_target(
 			"install",
 			inventoryid = inventoryid,
 			uninstall = uninstall)
 
 	def release(self, partid, message = None):
-		self.manifest.get("support_lifecycles", False) or self.test()
+		self.test()
 		self._handle_target(
 			"release",
 			partid = partid,

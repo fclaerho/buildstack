@@ -24,11 +24,12 @@ The following _well-known targets_ are supported:
   * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
   * `release:ID [-m]` bump version, commit and tag source code
 
-Besides, _[lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)_
-are supported even if the concrete build stack does not:
-  * `compile` < (`run` | `test`)
-  * `test` < (`package` | `release`)
-  * `package` < (`install` | `publish`)
+The following _[lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)_ are supported:
+  * run: `compile` < `run`
+  * clean: `clean`
+  * build: `compile` < `test` < `package` < `publish`
+  * install: `compile` < `test` < `package` < `install`
+  * release: `compile` < `test` < `release`
 
 
 Why, Oh Why?
@@ -48,7 +49,7 @@ No need to lookup documentation.
 Extra Features
 --------------
 
-  * Lifecycle support.
+  * Lifecycles support.
   * Instantiate tool configuration templates, see `build setup help`.
   * **Autotools**:
     * better `clean` (remove lingering generated files)
@@ -149,7 +150,6 @@ this variable is a dictionary declaring the module properties and handlers.
 	MANIFEST = {
 		"name": "…" # build stack friendly name
 		"filenames": [], # list of patterns matching supported build manifest filenames
-		#"support_lifecycles": False,
 		#"on_get": Exception | None | on_get,
 		#"on_clean": Exception | None | on_clean,
 		#"on_compile": Exception | None | on_compile,
