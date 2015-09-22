@@ -64,7 +64,7 @@ RUN test -e src/nutcracker
 
 # test 9
 WORKDIR /tmp
-RUN sudo apt-get -y installlibevent-dev libncurses5-dev
+RUN apt-get -y installlibevent-dev libncurses5-dev
 RUN git clone https://github.com/tmux/tmux
 WORKDIR /tmp/tmux
 RUN buildstack -v clean compile
