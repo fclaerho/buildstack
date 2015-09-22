@@ -30,8 +30,9 @@ are supported even if the underlying concrete build stack does not:
   * `test` < (`package` | `release`)
   * `package` < (`install` | `publish`)
 
-E.g.
-	$ buildstack clean package # automatically triggers 'compile' and 'test' beforehand
+For instance, the following command also triggers `compile` and `test` before `package`:
+
+	$ buildstack clean package
 
 
 Why, Oh Why?
