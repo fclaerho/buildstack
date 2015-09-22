@@ -166,9 +166,6 @@ this variable is a dictionary declaring the module properties and handlers.
 ### Target Stack ###
 
 For all handlers, except `on_flush()`, the default behavior is to stack the target onto the `targets` list.
-  * A value of `Exception` indicates the handler is not supported and raise an error.
-  * A value of `None` indicates that there is nothing to do for this handler.
-  * Any other value must be a suitable callback.
 The handler `on_flush()` is automatically called _last_ to unstack and process the targets or
 it can also be called manually from any handler with the `@flush` command (detailed below.)
 The `targets` list _must_ be empty when `on_flush()` terminates or the plugin is considered faulty.
@@ -180,7 +177,12 @@ remember to flush the current stack at the appropriate point (usually at the beg
 
 ### Handlers ###
 
-All handlers are generators and can yield either:
+When setting an handler in the manifest, 3 values are possible:
+  * A value of `Exception` indicates the handler is not supported and raise an error.
+  * A value of `None` indicates that there is nothing to do for this handler.
+  * A generator callback with the proper signature.
+
+A generator callback can yield either:
   * a command, i.e. a sequence of strings, e.g. `yield "echo", "hello"`
   * any single object -- considered as an error object and raising `build.Error()`
 
