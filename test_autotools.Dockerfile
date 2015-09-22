@@ -5,6 +5,7 @@ MAINTAINER fclaerhout.fr
 # install build environment
 RUN apt-get update
 RUN apt-get -y install git build-essential autoconf automake libtool python-pip
+ENV fix 201509221703
 RUN pip install git+https://github.com/fclaerho/buildstack.git
 
 # test 1
