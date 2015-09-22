@@ -194,7 +194,7 @@ class BuildStack(object):
 			self.filename = None
 		# resolve manifest:
 		if self.filename:
-			candidates = {manifest["name"]: (manifest, filename)
+			candidates = {manifest["name"]: (manifest, self.filename)
 				for manifest in manifests
 					for pattern in manifest["filenames"]
 						if fnmatch.fnmatch(self.filename, pattern)}
