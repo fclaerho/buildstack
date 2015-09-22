@@ -194,24 +194,22 @@ class BuildStack(object):
 			self.filename = None
 		# resolve manifest:
 		if self.filename:
-			candidates = [
-				(manifest, self.filename)
-					for manifest in manifests
-						for pattern in manifest["filenames"]
-							if fnmatch.fnmatch(self.filename, pattern)]
+			candidates = {manifest["name"]: (manifest, filename)
+				for manifest in manifests
+					for pattern in manifest["filenames"]
+						if fnmatch.fnmatch(self.filename, pattern)}
 		else:
-			candidates = [
-				(manifest, filename)
-					for manifest in manifests
-						for pattern in manifest["filenames"]
-							for filename in glob.glob(pattern)[:1]]
+			candidates = {manifest["name"]: (manifest, filename)
+				for manifest in manifests
+					for pattern in reversed(manifest["filenames"])
+						for filename in glob.glob(pattern)[:1]}
 		if not candidates:
-			raise Error("no supported build stack detected")
+			raise Error("no known manifest found")
 		elif len(candidates) > 1:
 			raise Error(
-				[(manifest["name"], filename) for manifest, filename in candidates],
-				"multiple build stacks detected, use -f to select a manifest")
-		self.manifest, self.filename = candidates[0]
+				[filename for manifest, filename in candidates.values()],
+				"multiple candidate manifests found, use -f to select a manifest")
+		self.manifest, self.filename = candidates.values()[0]
 		fckit.trace("using %s build stack" % self.manifest["name"])
 		self.targets = Targets()
 		self.vcs = Vcs()
