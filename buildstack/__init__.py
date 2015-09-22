@@ -84,8 +84,8 @@ class Vcs(object):
 					".git": {
 						"commit": lambda message: ("git", "commit", "-am", message),
 						"purge": lambda: ("git", "clean", "--force", "-d", "-x"),
-						"push": lambda: ("git", "push", "--follow-tags"),
-						"tag": lambda name: ("git", "tag", name),
+						"push": lambda: ("git", "push", "--follow-tags"), # work with annotated tags
+						"tag": lambda name: ("git", "tag", "-a", "-m", "release", name),
 					},
 					".svn": {},
 					".hg": {
