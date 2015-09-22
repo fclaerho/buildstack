@@ -1,7 +1,7 @@
 # copyright (c) 2015 fclaerhout.fr, released under the MIT license.
 
 """
-Detect and drive a build stack to reach well-known targets.
+Detect and drive any build stack to reach well-known targets.
 
 Usage:
   buildstack [options] setup TOOLID [SETTING...]

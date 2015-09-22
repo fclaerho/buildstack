@@ -6,7 +6,7 @@ setuptools.setup(
 	name = "buildstack", # https://www.python.org/dev/peps/pep-0426/#name
 	version = "6.0.1", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
-	#description = "",
+	description = "Build stack wrapper",
 	#long_description = "",
 	url = "https://github.com/fclaerho/buildstack",
 	author = "florent claerhout",
