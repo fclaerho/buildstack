@@ -25,11 +25,12 @@ The following _well-known targets_ are supported:
   * `release:ID [-m]` bump version, commit and tag source code
 
 The following _[lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)_ are supported:
-  * run: `compile` < `run`
-  * clean: `clean`
-  * install: `compile` < `test` < `package` < `install`
-  * publish: `compile` < `test` < `package` < `publish`
-  * release: `compile` < `test` < `release`
+  * `get`
+  * `clean`
+  * `run` > `compile`
+  * `release` > `test` > `compile`
+  * `install` > `package` > `test` > `compile`
+  * `publish` > `package` > `test` > `compile`
 
 
 Why, Oh Why?

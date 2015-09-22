@@ -28,10 +28,13 @@ TARGET:
   * [un]install[:ID]  [un]deploy target objects [onto the identified inventory]
   * release:ID [-m]   bump source code version, commit, tag and push
 
-Target Dependencies:
-  * compile < (run | test)
-  * test < (package | release)
-  * package < (install | publish)
+Lifecycles:
+  * get
+  * clean
+  * run > compile
+  * release > test > compile
+  * install > package > test > compile
+  * publish > package > test > compile
 
 Example:
   $ buildstack clean test
