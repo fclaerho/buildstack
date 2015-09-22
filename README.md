@@ -221,3 +221,5 @@ You can use buildstack to test itself without installing it, given its dependenc
 Otherwise:
 
 	$ python setup.py test
+
+To test concrete build stacks, build the provided docker files.
