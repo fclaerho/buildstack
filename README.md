@@ -192,6 +192,7 @@ it is considered to be a builtin function, e.g. `yield "@trace", "hello"`.
 The following builtins are available:
   * `try(*args)` — exec args, resume on exception
   * `tag` — triggers a VCS tag
+  * `push` — triggers a VCS push
   * `flush([reason])` — triggers `on_flush()`
   * `trace(*strings)` — trace execution
   * `purge()` — triggers a VCS purge, i.e. delete all untracked files
