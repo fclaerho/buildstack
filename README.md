@@ -24,7 +24,7 @@ The following _well-known targets_ are supported:
   * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
   * `release:ID [-m]` bump version, commit and tag source code
 
-Besides, [lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)
+Besides, _[lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)_
 are supported even if the concrete build stack does not:
   * `compile` < (`run` | `test`)
   * `test` < (`package` | `release`)
