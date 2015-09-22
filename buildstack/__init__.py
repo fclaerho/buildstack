@@ -166,7 +166,9 @@ class Target(object):
 class Targets(list):
 
 	def append(self, name, **kwargs):
-		super(Targets, self).append(Target(name, **kwargs))
+		tgt = Target(name, **kwargs)
+		if not len(self) or self[-1] != tgt: # do not push twice the same target
+			super(Targets, self).append(tgt)
 
 class BuildStack(object):
 
@@ -225,9 +227,12 @@ class BuildStack(object):
 
 	def _handle_target(self, name, default = "stack", **kwargs):
 		"generic target handler: call the custom handler if it exists, or fallback on default"
+		fckit.trace("[", name, "]")
 		handler = self.manifest.get("on_%s" % name, default)
-		if handler is None:
+		if handler is Exception:
 			raise Error(self.manifest["name"], name, "unsupported target")
+		elif handler is None:
+			fckit.trace("nothing to do")
 		elif handler == "stack": # stack target and let the on_flush handler deal with it
 			self.targets.append(name, **kwargs)
 		elif callable(handler):
@@ -276,36 +281,36 @@ class BuildStack(object):
 		self._handle_target("compile")
 
 	def run(self, entrypointid = None):
-		self.compile()
+		self.manifest.get("support_lifecycles", False) or self.compile()
 		self._handle_target(
 			"run",
 			entrypointid = entrypointid)
 
 	def test(self):
-		self.compile()
+		self.manifest.get("support_lifecycles", False) or self.compile()
 		self._handle_target("test")
 
 	def package(self, formatid = None):
-		self.test()
+		self.manifest.get("support_lifecycles", False) or self.test()
 		self._handle_target(
 			"package",
 			formatid = formatid)
 
 	def publish(self, repositoryid = None):
-		self.package()
+		self.manifest.get("support_lifecycles", False) or self.package()
 		self._handle_target(
 			"publish",
 			repositoryid = repositoryid)
 
 	def install(self, inventoryid = None, uninstall = False):
-		self.package()
+		self.manifest.get("support_lifecycles", False) or self.package()
 		self._handle_target(
 			"install",
 			inventoryid = inventoryid,
 			uninstall = uninstall)
 
 	def release(self, partid, message = None):
-		self.test()
+		self.manifest.get("support_lifecycles", False) or self.test()
 		self._handle_target(
 			"release",
 			partid = partid,
@@ -315,7 +320,7 @@ class BuildStack(object):
 	def flush(self):
 		if self.targets:
 			self._handle_target("flush", default = None)
-		assert not self.targets, "lingering target(s) -- please report this bug"
+		assert not self.targets, "lingering target(s), please report this bug!"
 
 def setup(toolid, settings, manifests):
 	"render a tool configuration template"
@@ -332,7 +337,7 @@ def setup(toolid, settings, manifests):
 				required,\
 				("[%s]" % optional) if optional else ""
 	else:
-		suffix = "-- see 'build setup help'"
+		suffix = ", see 'build setup help'"
 		if not toolid in tools:
 			raise Error(toolid, "unknown tool", suffix)
 		path = os.path.expanduser(tools[toolid]["path"])

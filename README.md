@@ -13,7 +13,7 @@ its goal is to abstract the build process of any source code repository
 by driving the underlying build stack through _well-known targets_.
 Focus on the big picture and let **BuildStack** handle the details.
 
-**BuildStack** understands the following _well-known targets_:
+The following _well-known targets_ are supported:
   * `get:ID` install requirements
   * `clean` delete build byproducts
   * `compile` compile code
@@ -23,6 +23,15 @@ Focus on the big picture and let **BuildStack** handle the details.
   * `publish[:ID]` publish package [to the specified repository]
   * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
   * `release:ID [-m]` bump version, commit and tag source code
+
+Besides, [lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)
+are supported even if the underlying concrete build stack does not:
+  * `compile` < (`run` | `test`)
+  * `test` < (`package` | `release`)
+  * `package` < (`install` | `publish`)
+
+E.g.
+	$ buildstack clean package # automatically triggers 'compile' and 'test' beforehand
 
 
 Why, Oh Why?
@@ -36,12 +45,13 @@ No question asked.
 No need to lookup documentation.
 
 	$ git pull $HOST/$FOO.git
-	$ build -C $FOO clean compile package install
+	$ build -C $FOO clean test
 
 
 Extra Features
 --------------
 
+  * Lifecycle support.
   * Instantiate tool configuration templates, see `build setup help`.
   * **Autotools**:
     * better `clean` (remove lingering generated files)
@@ -142,26 +152,34 @@ this variable is a dictionary declaring the module properties and handlers.
 	MANIFEST = {
 		"name": "…" # build stack friendly name
 		"filenames": [], # list of patterns matching supported build manifest filenames
-		#"on_get": None | on_get,
-		#"on_clean": None | on_clean,
-		#"on_compile": None | on_compile,
-		#"on_run": None | on_run,
-		#"on_test": None | on_test,
-		#"on_package": None | on_package,
-		#"on_publish": None | on_publish,
-		#"on_install": None | on_install,
-		#"on_release": None | on_release,
-		#"on_flush": None | on_flush,
+		#"support_lifecycles": False,
+		#"on_get": Exception | None | on_get,
+		#"on_clean": Exception | None | on_clean,
+		#"on_compile": Exception | None | on_compile,
+		#"on_run": Exception | None | on_run,
+		#"on_test": Exception | None | on_test,
+		#"on_package": Exception | None | on_package,
+		#"on_publish": Exception | None | on_publish,
+		#"on_install": Exception | None | on_install,
+		#"on_release": Exception | None | on_release,
+		#"on_flush": Exception | None | on_flush,
 		#"tools": {}
 	}
 
 ### Target Stack ###
 
-For all handlers, except `on_flush()`, the default behavior is to stack the target in the `targets` list.
-The handler `on_flush()` is automatically called _last_ to unstack and process the targets or it can also be called manually from any handler with the `@flush` command (detailed below.)
+For all handlers, except `on_flush()`, the default behavior is to stack the target onto the `targets` list.
+  * A value of `Exception` indicates the handler is not supported and raise an error.
+  * A value of `None` indicates that there is nothing to do for this handler.
+  * Any other value must be a suitable callback.
+The handler `on_flush()` is automatically called _last_ to unstack and process the targets or
+it can also be called manually from any handler with the `@flush` command (detailed below.)
 The `targets` list _must_ be empty when `on_flush()` terminates or the plugin is considered faulty.
-The rationale behind the usage of a stack is that most build tools are able to handle multiple targets at the same time (e.g. make clean all) and calling them independently is less efficient.
-However, what can be stacked or not varies for each build tool: therefore, when developping a plugin, use target handlers to perform a task that cannot be stacked. Also, when using a handler, remember to flush the current stack at the appropriate point (usually at the beginning, before anything else.)
+The rationale behind the usage of a stack is that most build tools are able to handle multiple
+targets at the same time (e.g. make clean all) and calling them independently is less efficient.
+However, what can be stacked or not varies for each build tool: therefore, when developping a plugin,
+use target handlers to perform a task that cannot be stacked. Also, when using a handler,
+remember to flush the current stack at the appropriate point (usually at the beginning, before anything else.)
 
 ### Handlers ###
 

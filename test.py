@@ -82,31 +82,31 @@ class CoreTest(unittest.TestCase):
 	def test_test(self):
 		self.buildstack.test()
 		self.buildstack.flush()
+		self.assert_is_compiled()
 		self.assert_is_tested()
 
 	def test_package(self):
 		self.buildstack.package()
 		self.buildstack.flush()
+		self.assert_is_compiled()
+		self.assert_is_tested()
 		self.assert_is_packaged()
 
 	def test_install(self):
 		self.buildstack.install()
 		self.buildstack.flush()
+		self.assert_is_compiled()
+		self.assert_is_tested()
+		self.assert_is_packaged()
 		self.assert_is_installed()
 
 	def test_publish(self):
 		self.buildstack.publish()
 		self.buildstack.flush()
-		self.assert_is_published()
-
-	def test_stacking(self):
-		self.buildstack.clean()
-		self.buildstack.compile()
-		self.buildstack.test()
-		self.buildstack.flush()
-		self.assert_is_cleaned()
 		self.assert_is_compiled()
 		self.assert_is_tested()
+		self.assert_is_packaged()
+		self.assert_is_published()
 
 class VersionTest(unittest.TestCase):
 

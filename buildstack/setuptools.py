@@ -116,6 +116,7 @@ def on_release(filename, targets, partid, message, Version):
 		fp.write(text.replace(str(last_version), str(next_version)))
 	yield "@commit", "%s: %s" % (str(next_version), message) if message else str(next_version)
 	yield "@tag", str(next_version)
+	yield "@push",
 
 def on_flush(filename, targets):
 	args = []
@@ -123,8 +124,6 @@ def on_flush(filename, targets):
 		target = targets.pop(0)
 		if target == "clean":
 			args += ["clean", "--all"]
-		elif target == "compile":
-			args.append("build")
 		elif target == "test":
 			args.append("test")
 		elif target == "package":
@@ -166,6 +165,7 @@ MANIFEST = {
 	"filenames": ("setup.py",),
 	"on_get": on_get,
 	"on_clean": on_clean,
+	"on_compile": None,
 	"on_run": on_run,
 	"on_test": on_test,
 	"on_package": on_package,
@@ -272,4 +272,3 @@ MANIFEST = {
 		},
 	},
 }
-
