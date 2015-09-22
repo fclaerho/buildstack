@@ -3,6 +3,7 @@ FROM ubuntu:15.10
 MAINTAINER fclaerhout.fr
 
 # install build environment
+RUN apt-get update
 RUN apt-get install git build-essential autoconf automake python-pip
 RUN pip install buildstack
 

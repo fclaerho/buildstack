@@ -3,6 +3,7 @@ FROM ubuntu:15.10
 MAINTAINER fclaerhout.fr
 
 # install maven build environment
+RUN apt-get update
 RUN apt-get install git maven python-pip
 RUN pip install buildstack
 
