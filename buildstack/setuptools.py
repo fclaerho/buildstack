@@ -94,6 +94,7 @@ def on_package(filename, targets, formatid):
 		targets.append("package", formatid = formatid)
 
 def on_publish(filename, targets, repositoryid):
+	targets.append("register") # FIXME: should be done before first publish only
 	yield "@flush",
 	args = ["upload"] + glob.glob("dist/*")
 	if repositoryid:
@@ -156,6 +157,8 @@ def on_flush(filename, targets):
 			args.append("install")
 			if target.uninstall:
 				args.append("--uninstall")
+		elif target == "register":
+			args.append("register")
 		else:
 			yield "%s: unexpected target" % target
 	if args:

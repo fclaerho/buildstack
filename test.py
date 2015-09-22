@@ -1,12 +1,5 @@
 # copyright (c) 2014 fclaerhout.fr, released under the MIT license.
 
-"""
-Environment variables:
-  * TESTSTACKS: if set, build real-world code, otherwise test model only
-  * FAILFAST
-  * PAUSE: pause before cleaning the working directory, for inspection
-"""
-
 import unittest, sys, os
 
 import buildstack, fckit # 3rd-party
@@ -125,62 +118,4 @@ class VersionTest(unittest.TestCase):
 	def test_bump_N(self):
 		self.assertEqual(self.version.bump(3).number, buildstack.Version(1, 2, 3, 1).number)
 
-#################
-# STACK TESTING #
-#################
-
-if os.environ.get("TESTSTACKS", False):
-	def load_tests(loader, tests, pattern):
-		suite = unittest.TestSuite()
-		builds = {
-		#
-		# autotools stack
-		# pre-requisites: build-essential, autoconf, automake
-		#
-			"https://github.com/orangeduck/ptest": ["example", "example2"],
-			"https://github.com/andikleen/snappy-c": ["scmd", "sgverify", "verify"],
-			"https://github.com/maxmind/geoip-api-c": ["apps/geoiplookup", "apps/geoiplookup6"],
-			# automake fails due to a missing macro; issue reported
-			#"https://github.com/vlm/asn1c": [],
-			"https://github.com/git/git": ["git"],
-			# not a standard process! no Makefile.am so install-sh touch'ed manually >=|
-			#"https://github.com/php/php-src": [],
-			"https://github.com/bagder/curl": ["src/curl"],
-			"https://github.com/twitter/twemproxy": ["src/nutcracker"],
-			# + libevent-dev, libncurses5-dev
-			#"https://github.com/tmux/tmux": ["tmux"],
-		#
-		# maven stack
-		#
-			"https://github.com/square/retrofit.git": [],
-		}
-		for git_url, target_paths in builds.items():
-			class StackTest(unittest.TestCase):
-				def setUp(self, git_url = git_url):
-					"clone repository into temp dir"
-					self.dirname = fckit.mkdir()
-					basename = os.path.basename(git_url)
-					rootname, extname = os.path.splitext(basename)
-					self.path = os.path.join(self.dirname, rootname)
-					fckit.check_call("git", "-C", self.dirname, "clone", git_url)
-				def tearDown(self):
-					"delete temp dir"
-					fckit.remove(self.dirname)
-				def test_clean_compile(self, git_url = git_url, target_paths = target_paths):
-					build.main("-C", self.path, "clean", "compile")
-					for path in target_paths:
-						self.assertTrue(os.path.exists(os.path.join(self.path, path)))
-					if os.environ.get("PAUSE", False):
-						print "---"
-						print "Working on %s, dir to be cleaned: %s" % (git_url, self.dirname)
-						raw_input("PAUSED, press enter to continue.")
-			ldr = loader.loadTestsFromTestCase(StackTest)
-			suite.addTests(ldr)
-		ldr = loader.loadTestsFromTestCase(CoreTest)
-		suite.addTests(ldr)
-		return suite
-
-if __name__ == "__main__":
-	unittest.main(
-		verbosity = 2,
-		failfast = os.environ.get("FAILFAST", False))
+if __name__ == "__main__": unittest.main(verbosity = 2)
