@@ -27,7 +27,7 @@ The following _well-known targets_ are supported:
 The following _[lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)_ are supported:
   * run: `compile` < `run`
   * clean: `clean`
-  * build: `compile` < `test` < `package` < `publish`
+  * publish: `compile` < `test` < `package` < `publish`
   * install: `compile` < `test` < `package` < `install`
   * release: `compile` < `test` < `release`
 
