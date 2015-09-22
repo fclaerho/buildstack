@@ -17,7 +17,7 @@ Options:
   -h, --help                 display full help text
   --no-color                 disable colored output
 
-Where a TARGET is one of:
+TARGET:
   * get[:ID]          install requirement(s)
   * clean             delete generated files
   * compile           generate target objects from source code
@@ -28,8 +28,13 @@ Where a TARGET is one of:
   * [un]install[:ID]  [un]deploy target objects [onto the identified inventory]
   * release:ID [-m]   bump source code version, commit, tag and push
 
+Target Dependencies:
+  * compile < (run | test)
+  * test < (package | release)
+  * package < (install | publish)
+
 Example:
-  $ buildstack clean compile test
+  $ buildstack clean test
 
 Use '~/build.json' to customize commands:
   {
@@ -75,25 +80,27 @@ class Vcs(object):
 	def __init__(self):
 		for key in (".hg", ".git", ".svn"):
 			if os.path.exists(key):
-				self.key = key
+				self.attr = {
+					".git": {
+						"commit": lambda message: ("git", "commit", "-am", message),
+						"purge": lambda: ("git", "clean", "--force", "-d", "-x"),
+						"push": lambda: ("git", "push", "--follow-tags"),
+						"tag": lambda name: ("git", "tag", name),
+					},
+					".svn": {},
+					".hg": {
+						"commit": lambda message: ("hg", "commit", "-m", message),
+						"purge": lambda: ("hg", "purge", "--config", "extensions.purge="),
+						"push": lambda: ("hg", "push"),
+						"tag": lambda name: ("hg", "tag", name),
+					},
+				}[key]
 
-	def commit(self, message):
-		return {
-			".git": ("git", "commit", "-am", message),
-			".hg": ("hg", "commit", "-m", message),
-		}.get(self.key, "unsupported operation")
-
-	def purge(self):
-		return {
-			".git": ("git", "clean", "--force", "-d", "-x"),
-			".hg": ("hg", "purge", "--config", "extensions.purge="),
-		}.get(self.key, "unsupported operation")
-
-	def tag(self, name):
-		return {
-			".git": ("git", "tag", name),
-			".hg": ("hg", "tag", name),
-		}.get(self.key, "unsupported operation")
+	def __getattr__(self, key):
+		try:
+			return self.attr[key]
+		except KeyError:
+			raise Error("unsupported operation")
 
 class Version(object):
 	"immutable N(.N)* version object"
@@ -236,6 +243,8 @@ class BuildStack(object):
 							fckit.trace("command failure ignored")
 					elif res[0] == "@tag":
 						self._check_call(self.vcs.tag(*res[1:]))
+					elif res[0] == "@push":
+						self._check_call(self.vcs.push())
 					elif res[0] == "@flush":
 						assert name != "flush", "infinite recursion detected"
 						self.flush()
@@ -267,30 +276,36 @@ class BuildStack(object):
 		self._handle_target("compile")
 
 	def run(self, entrypointid = None):
+		self.compile()
 		self._handle_target(
 			"run",
 			entrypointid = entrypointid)
 
 	def test(self):
+		self.compile()
 		self._handle_target("test")
 
 	def package(self, formatid = None):
+		self.test()
 		self._handle_target(
 			"package",
 			formatid = formatid)
 
 	def publish(self, repositoryid = None):
+		self.package()
 		self._handle_target(
 			"publish",
 			repositoryid = repositoryid)
 
 	def install(self, inventoryid = None, uninstall = False):
+		self.package()
 		self._handle_target(
 			"install",
 			inventoryid = inventoryid,
 			uninstall = uninstall)
 
 	def release(self, partid, message = None):
+		self.test()
 		self._handle_target(
 			"release",
 			partid = partid,
