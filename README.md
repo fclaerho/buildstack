@@ -220,4 +220,6 @@ Otherwise:
 
 	$ python setup.py test
 
-To test concrete build stacks, build the provided docker files.
+To test concrete build stacks, build the provided docker files, e.g.:
+
+	$ sudo docker build -f test_autotools.Dockerfile .
