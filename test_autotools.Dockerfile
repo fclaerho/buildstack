@@ -1,11 +1,10 @@
 
 FROM ubuntu:15.10
 MAINTAINER fclaerhout.fr
-USER ubuntu
 
 # install build environment
-RUN sudo apt-get install git build-essential autoconf automake python-pip
-RUN sudo pip install buildstack
+RUN apt-get install git build-essential autoconf automake python-pip
+RUN pip install buildstack
 
 # test 1
 WORKDIR /tmp
