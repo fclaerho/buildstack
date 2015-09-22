@@ -208,7 +208,7 @@ class BuildStack(object):
 		if not candidates:
 			raise Error("no supported build stack detected")
 		elif len(candidates) > 1:
-			raise Error("multiple build stacks detected, use -f to select a manifest")
+			raise Error(candidates, "multiple build stacks detected, use -f to select a manifest")
 		self.manifest, self.filename = candidates[0]
 		fckit.trace("using %s build stack" % self.manifest["name"])
 		self.targets = Targets()
