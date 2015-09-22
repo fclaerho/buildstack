@@ -37,10 +37,8 @@ Why, Oh Why?
 
 _SQA engineers_, _build engineers_ and _developers_ are all dealing with the same problem:
 how to quickly build and use a project using a build stack they are not familiar with?
-
 By using **BuildStack**, check out any repository and reach your build targets.
-No question asked.
-No need to lookup documentation.
+No question asked and no need to lookup documentation.
 
 	$ git pull $HOST/$FOO.git
 	$ build -C $FOO clean test # automatically triggers 'compile'
