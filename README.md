@@ -22,7 +22,7 @@ The following _well-known targets_ are supported:
   * `package[:ID]` package code [in the specified format]
   * `publish[:ID]` publish package [to the specified repository]
   * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
-  * `release:ID [-m]` bump version, commit and tag source code
+  * `release:ID [-m]` bump source code version, commit, tag and push
 
 The following _[lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)_ are supported:
   * `get`
