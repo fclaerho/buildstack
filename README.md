@@ -213,7 +213,7 @@ Otherwise:
 
 	$ python setup.py test
 
-To test concrete build stacks, build the provided [Docker](https://www.docker.com) files, e.g.:
+To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 
 	$ sudo docker build -f test_autotools.Dockerfile .
 
@@ -286,4 +286,5 @@ Keep in mind that anything below type 4 will slow the project at some point:
 [9]: https://en.wikipedia.org/wiki/Software_quality_assurance
 [10]: https://en.wikipedia.org/wiki/Release_engineering
 [11]: https://en.wikipedia.org/wiki/Software_developer
+[12]: https://www.docker.com
 
