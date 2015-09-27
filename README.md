@@ -114,7 +114,7 @@ This would be invoked with the option `--profile as-root`.
 You may also use the special profile `all` which is always applied.
 
 
-<a name="glossary"/>
+<a name="glossary"></a>
 Glossary
 --------
 
