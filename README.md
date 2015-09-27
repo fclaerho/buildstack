@@ -257,7 +257,7 @@ How to choose a stack? it's easy:
   2. If there is no standard build stack, then pick the **highest type** available according to the above taxonomy.
 
 Keep in mind that anything below type 4 will slow the project at some point:
-  * either because it will break easily on any new use case
+  * either because it will break easily on any change
   * or, because of initial shortcuts, it cannot meet new needs without major rework
   * or because it is too difficult to use
   * or because its learning curve is too steep for newcomers
