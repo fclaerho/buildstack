@@ -231,14 +231,21 @@ Appendix: Build Engineering
 
 ### Types of Build Stack ###
 
-  * Type 1: Build library
-    Collection of helper functions to manage a dependency graph and build targets.
-    The build manifest is actually a program written in the build stack native language.
-    Developers must have a deep knowledge of build engineering to use this option.
-    In most cases, this result into an overly custom build system that is not maintainable.
+  * Type 1: Build library — Collection of helper functions to manage a dependency graph and build targets.
   * Type 2: Build framework
-  * Type 3: DSL
+  * Type 3: Dependency graph DSL
   * Type 4: Configuration
+
+For types 1 and 2,
+the build manifest is actually a program written in a turing-complete language, generally the language for which the build stack was designed.
+This means the build system has to be created and maintained by developers.
+Developers must have a deep knowledge of build engineering to use this option.
+In most cases, this result into an overly custom build system that is not maintainable.
+
+For a type 3 build stack,
+the underlying system is able to manage incremental builds and know how to reach most targets.
+The canonical example of this is Make.
+The build manifest can be created and maintained by build engineers, no development is needed.
 
 ### Classification of Existing Build Stacks ###
 
