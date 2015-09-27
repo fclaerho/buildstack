@@ -225,7 +225,7 @@ Build & Release Engineering 101
 
   * **Dependency Graph**:
     Graph specifying dependencies between concrete build targets.
-    Typically, it indicated the source files from which an object file is compiled.
+    Typically, it indicates the source files from which an object file is compiled.
   * **Build Target**: an abstract or concreted state to reach.
     Concrete build target are generally platform objects such as files;
     Abstract build targets are varying depending on the tool, but well-know targets should be supported.
