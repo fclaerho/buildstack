@@ -226,8 +226,8 @@ To test concrete build stacks, build the provided [Docker](https://www.docker.co
 	$ sudo docker build -f test_autotools.Dockerfile .
 
 
-Appendix: the Art of Building
------------------------------
+Appendix: Build Engineering
+---------------------------
 
 ### Types of Build Stack ###
 
