@@ -238,7 +238,8 @@ It is generally written in the language for which the build stack was designed, 
 This means the build system has to be created and maintained by developers.
 Those developers must have a solid knowledge of build engineering to use this option.
 In most cases, this result into an overly custom build system that is not maintainable.
-Enforcing a proper dependency graph usage can only be done from a type 2 build stack, if it supports it.
+Enforcing the usage of a dependency graph, which is the core of any proper build system, can only be done from types 2.
+For this reason, types 1 are to be avoided.
 
 For a type 3 build stack,
 the underlying system is able to manage incremental builds and know how to reach most targets.
