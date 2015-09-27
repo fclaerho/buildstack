@@ -231,7 +231,7 @@ Build stacks can be divided into 4 types:
   * Type 2: **Build framework** — Dependency graph manager + Type 1 features
   * Type 3: **Build DSL** (over a type 2)
   * Type 4: **Build Programmable Configuration**
-  * Type 5: **Build Configuration**, the current state of the art.
+  * Type 5: **Build Configuration**, the current state of the art (back to .ini files!)
 
 For types 1 and 2,
 the build manifest is actually a program.
