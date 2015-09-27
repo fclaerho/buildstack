@@ -265,13 +265,13 @@ Keep in mind that anything below type 4 will slow the project at some point:
 
 ### Classification of Concrete Build Stacks ###
 
-| Type | Name | Build Manifest |
-|------|------|----------------|
+| Type | Name | Build Manifest Format |
+|------|------|-----------------------|
 | 4 | Maven | XML |
 | 4 | Cargo | init |
-| 3 | Autotools | M4
-| 3 | Make | Makefile |
-| 2/3 | Setuptools | Python |
+| ~4 | Setuptools | Python Call |
+| 3 | Autotools | M4 |
+| 3 | Make | Make Rules |
 
 <!-- REFERENCES -->
 [1]: https://www.sourceware.org/autobook
