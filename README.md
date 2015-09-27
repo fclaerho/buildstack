@@ -8,7 +8,7 @@ its goal is to abstract the build process of any source code repository
 by driving the underlying build stack through _well-known targets_.
 Focus on the big picture and let **BuildStack** handle the details.
 
-The following [well-known targets][6] are supported:
+The following [well-known targets](#glossary) are supported:
   * `get:ID` install requirements
   * `clean` delete build byproducts
   * `compile` compile code
@@ -19,7 +19,7 @@ The following [well-known targets][6] are supported:
   * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
   * `release:ID [-m]` bump source code version, commit, tag and push
 
-The following [lifecycles][7] are supported:
+The following [lifecycles](#glossary) are supported:
   * **`get`**
   * **`clean`**
   * **`run`** > `compile`
@@ -218,10 +218,19 @@ To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 	$ sudo docker build -f test_autotools.Dockerfile .
 
 
-Build Engineering 101
----------------------
+Build & Release Engineering 101
+-------------------------------
 
-### GLOSSARY
+### <a name="glossary">GLOSSARY</a>
+
+  * **Dependency Graph**:
+    Graph specifying dependencies between concrete build targets.
+  * **Build Target**: an abstract or concreted state to reach.
+    Concrete build target are generally platform objects such as files;
+    Abstract build targets are varying depending on the tool.
+  * **Well-known Build Targets** are abstract build targets supported by most build tools: clean, compile, test, etc.
+  * **Lifecycle**:
+    Logical sequence of build target such that invoking one implies its predecessors.
 
 ### BUILD STACKS TAXONOMY
 
