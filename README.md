@@ -32,7 +32,7 @@ Why, Oh Why?
 ------------
 
 [SwQA engineers][9], [Build & Release engineers][10] and [developers][11] are all dealing with the same problem:
-how to quickly build and use a project using a build stack they are not familiar with?
+how to quickly build and work with a project using a build stack they are not familiar with?
 By using **BuildStack**, check out any repository and reach your build targets.
 No question asked and no need to lookup documentation.
 
@@ -218,12 +218,12 @@ To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 	$ sudo docker build -f test_autotools.Dockerfile .
 
 
-Build Stack Taxonomy
---------------------
+Build Engineering 101
+---------------------
 
-There's no reference for the following statements because this is a personal standpoint.
+### Build Stack Taxonomy ###
 
-### Types of Build Stack ###
+*NOTICE! the following classification is my personal standpoint*
 
 Build stacks can be divided into 5 types:
 
