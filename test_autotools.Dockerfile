@@ -53,7 +53,7 @@ RUN test -e apps/geoiplookup6
 WORKDIR /tmp
 RUN git clone https://github.com/bagder/curl
 WORKDIR /tmp/curl
-RUN buildstack -v clean compile
+RUN buildstack -f configure.ac -v clean compile
 RUN test -e src/curl
 
 # test 8

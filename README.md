@@ -114,6 +114,22 @@ This would be invoked with the option `--profile as-root`.
 You may also use the special profile `all` which is always applied.
 
 
+<a name="glossary"/>
+Glossary
+--------
+
+  * **Dependency Graph**:
+    Graph specifying dependencies between concrete build targets.
+    For instance, the source files from which an object file is compiled.
+  * **Build Target**: abstract or concrete state to reach.
+    Concrete build target are generally platform objects such as files;
+    Abstract build targets are varying depending on the tool, but well-know targets should be supported.
+  * **Well-known Build Target**: abstract build target supported by most build tools: clean, compile, test, package, install, publish.
+  * **Lifecycle**:
+    Logical sequence of build target such that invoking one implies its predecessors.
+    See [Maven Lifecycles][7] for details.
+
+
 Development Guide
 -----------------
 
@@ -218,27 +234,12 @@ To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 	$ sudo docker build -f test_autotools.Dockerfile .
 
 
-Build & Release Engineering 101
--------------------------------
+Introduction to Build Stack Taxonomy
+------------------------------------
 
-### <a name="glossary">GLOSSARY</a>
+### TYPES OF BUILD STACKS
 
-  * **Dependency Graph**:
-    Graph specifying dependencies between concrete build targets.
-    For instance, the source files from which an object file is compiled.
-  * **Build Target**: an abstract or concrete state to reach.
-    Concrete build target are generally platform objects such as files;
-    Abstract build targets are varying depending on the tool, but well-know targets should be supported.
-  * **Well-known Build Targets** are abstract build targets supported by most build tools: clean, compile, test, package, install, publish.
-  * **Lifecycle**:
-    Logical sequence of build target such that invoking one implies its predecessors.
-    See [Maven Lifecycles][7] for details.
-
-### BUILD STACKS TAXONOMY
-
-*NOTICE! the following classification is my personal standpoint*
-
-Build stacks can be divided into 5 types:
+From my standpoint, build stacks can be divided into 5 types:
 
   * Type 1: **Build library** — Collection of build functions
   * Type 2: **Build framework** — Dependency graph manager + Type 1 features
