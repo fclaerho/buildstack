@@ -218,8 +218,8 @@ To test concrete build stacks, build the provided [Docker](https://www.docker.co
 	$ sudo docker build -f test_autotools.Dockerfile .
 
 
-Trivia: Build Stack Taxonomy
-----------------------------
+Build Stack Taxonomy
+--------------------
 
 There's no reference for the following statements because there are entirely non-official.
 
@@ -227,9 +227,9 @@ There's no reference for the following statements because there are entirely non
 
 Build stacks can be divided into (so far) 4 types:
 
-  * Type 1: Build library — Collection of build functions and classes
-  * Type 2: Build framework — Dependency-graph manager, able to resolve standard transitions
-  * Type 3: Build DSL
+  * Type 1: Build library — Collection of build functions
+  * Type 2: Build framework — Dependency graph manager + Type 1 features
+  * Type 3: Build DSL (over a type 2)
   * Type 4: Build Configuration, the current state of the art.
 
 For types 1 and 2,
