@@ -43,11 +43,11 @@ No question asked and no need to lookup documentation.
 Extra Features
 --------------
 
-  * Lifecycles support.
+  * [Lifecycles][7] support.
   * Instantiate tool configuration templates, see `build setup help`.
-  * **Autotools**:
+  * [Autotools][1]:
     * better `clean` (remove lingering generated files)
-  * **Setuptools**:
+  * [Setuptools][2]:
     * better `clean` (remove lingering generated files)
     * support the `run` target: fetch and run entry points from the manifest
     * support the `release` target
@@ -68,8 +68,7 @@ Extra Features
 Pre-requisites
 --------------
 
-As **BuildStack** is not bundled with any build tool,
-provision the machine appropriately beforehand.
+As **BuildStack** is not bundled with any build tool, provision the machine appropriately beforehand.
 
 
 Installation
@@ -203,7 +202,8 @@ Few build stacks are able to handle a `release` target natively,
      * or by parsing the build manifest directly
   2. write back the new version into the build manifest
 
-To calculate the new version, **BuildStack** passes the `Version` class to your release handler — of course, you can ignore this argument if you have another mean to do version calculation.
+To calculate the new version, **BuildStack** passes the `Version` class to your release handler.
+Of course, you can ignore this argument if you have another mean to do version calculation.
   * `Version.parse_stdout(*args)` — return version instance from the command output (it should match N(.N)*)
   * `version.bump(partid)` — return bumped version, where partid is (major|minor|patch) or an index.
 
