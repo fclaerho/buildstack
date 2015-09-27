@@ -248,9 +248,9 @@ However, even types 3 do not guarantee a maintainable build system, as it might 
 The canonical example of types 4 is Maven.
 Types 4 enforce configuration and convention over programming.
 A type 4 knows when, what and how to build, assuming your provide the bootstrap information.
-For some typical projects you might have very little to provide: a project name, version and authors (this is convention.)
+For some typical projects you might have very little to provide: a project name, version and authors.
 
-### Chosing a Build Stack ###
+### Picking a Build Stack ###
 
 How to chose a stack? it's easy:
   1. If there is a **standard build stack**, then however bad it is, use it, and request improvements
