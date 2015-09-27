@@ -227,21 +227,23 @@ There's no reference for the following statements because this is a personal sta
 
 Build stacks can be divided into 4 types:
 
-  * Type 1: Build library — Collection of build functions
-  * Type 2: Build framework — Dependency graph manager + Type 1 features
-  * Type 3: Build DSL (over a type 2)
-  * Type 4: Build Configuration, the current state of the art.
+  * **Type 1: Build library** — Collection of build functions
+  * **Type 2: Build framework** — Dependency graph manager + Type 1 features
+  * **Type 3: Build DSL** (over a type 2)
+  * **Type 4: Build Configuration**, the current state of the art.
 
 For types 1 and 2,
 the build manifest is actually a program.
 It is generally written in the language for which the build stack was designed, but not necessarily.
-This means the build system has to be created and maintained by developers who must have a solid knowledge of build engineering.
-If this not the case, the result is an overly custom build system that is not maintainable.
+This means it has to be created and maintained by developers who must have a solid knowledge of build engineering.
+If this not the case, the result is an overly custom build system that is neither learnable nor maintainable.
 Enforcing the usage of a dependency graph, which is the core of any proper build system, can only be done from types 2.
 For this reason, types 1 are to be avoided at all costs for the sanity of the technical teams.
 
-The canonical example of types 3 is Make, despite Make does not constitute a build stack in itself.
-The build manifest can be created and maintained by build engineers, no development is needed.
+Avoiding having developers design the build system can only be done from types 3.
+The canonical example of types 3 is Make.
+The build manifest can be created and maintained by build engineers as no development is needed.
+The DSL allows to specify the depedency graph and how to walk it (i.e. how to build intermediate and final targets.)
 However, even types 3 do not guarantee a maintainable build system, as it remains far to easy to create custom mechanisms.
 
 The canonical example of types 4 is Maven.
