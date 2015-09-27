@@ -242,12 +242,12 @@ Enforcing the usage of a dependency graph, which is the core of any proper build
 For this reason, types 1 are to be avoided at all costs for the sanity of the technical teams.
 
 Avoiding having developers design the build system can only be done from types 3.
-The canonical example of types 3 is Make.
+The canonical example of types 3 is [Make][8].
 The build manifest can be written by build engineers in a DSL allowing to specify the dependency graph and how to walk it.
 However, even types 3 do not guarantee a maintainable build system, as it might still be easy to create custom mechanisms.
 
 Types 4 and 5 enforce configuration and convention over programming.
-The canonical example of types 5 is Maven.
+The canonical example of types 5 is [Maven][3].
 Such a build stack knows what and how to build, assuming your provide the bootstrap information.
 For non-exotic projects you should have very little to provide to get a working build stack: a project name, version and authors.
 
@@ -282,6 +282,7 @@ Keep in mind that anything below type 4 will slow the project at some point:
 [5]: http://docs.ansible.com/ansible/index.html
 [6]: https://en.wikipedia.org/wiki/Software_build
 [7]: https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html
+[8]: https://www.gnu.org/software/make/
 [9]: https://en.wikipedia.org/wiki/Software_quality_assurance
 [10]: https://en.wikipedia.org/wiki/Release_engineering
 [11]: https://en.wikipedia.org/wiki/Software_developer
