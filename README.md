@@ -218,12 +218,16 @@ To test concrete build stacks, build the provided [Docker](https://www.docker.co
 	$ sudo docker build -f test_autotools.Dockerfile .
 
 
-Appendix: Build Engineering
----------------------------
+Trivia: Build Stack Taxonomy
+----------------------------
+
+There's no reference for the following statements because there are entirely non-official.
 
 ### Types of Build Stack ###
 
-  * Type 1: Build library — Collection of helper functions to manage a dependency graph and build targets.
+Build stacks can be divided into (so far) 4 types:
+
+  * Type 1: Build library
   * Type 2: Build framework
   * Type 3: Dependency graph DSL
   * Type 4: Configuration
@@ -240,7 +244,7 @@ the underlying system is able to manage incremental builds and know how to reach
 The canonical example of this is Make.
 The build manifest can be created and maintained by build engineers, no development is needed.
 
-### Classification of Existing Build Stacks ###
+### Classification of Concrete Build Stacks ###
 
 | Type | Name | Build Manifest |
 |------|------|----------------|
