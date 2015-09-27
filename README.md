@@ -255,8 +255,12 @@ How to chose a stack? it's easy:
   1. If there is a **standard build stack**, then however bad it is, use it, and request improvements
   2. If there is no standard build stack, then pick the **highest type** available according to the above taxonomy.
 
-Keep in mind that anything below type 4 will slow the project at some point,
-either because it will break, or because it is too difficult to use or too difficult to understand for newcomers.
+Keep in mind that anything below type 4 will slow the project at some point:
+  * either because it will break
+  * or because of initial assumptions it cannot meet new needs
+  * or because it is too difficult to use
+  * or it is too difficult to understand for newcomers
+  * or it's rather a combination of any of the above reasons.
 
 ### Classification of Concrete Build Stacks ###
 
