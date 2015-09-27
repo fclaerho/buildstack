@@ -102,11 +102,11 @@ def on_publish(filename, targets, repositoryid):
 	yield cat("twine", *args)
 
 def on_install(filename, targets, inventoryid, uninstall):
+	yield "@flush"
 	if uninstall:
-		yield "@flush",
 		yield "pip", "uninstall", os.path.basename(os.getcwd())
 	else:
-		targets.append("install")
+		yield "pip", "install", "--user", "."
 
 def on_release(filename, targets, partid, message, Version):
 	last_version = Version.parse_stdout("python", filename, "--version")
@@ -153,10 +153,6 @@ def on_flush(filename, targets):
 			elif target.formatid not in func:
 				yield "%s: unsupported format id" % target.formatid
 			func[target.formatid]()
-		elif target == "install":
-			args.append("install")
-			if target.uninstall:
-				args.append("--uninstall")
 		elif target == "register":
 			args.append("register")
 		else:

@@ -2,10 +2,6 @@
 
 import ConfigParser, yaml, os
 
-###########
-# helpers #
-###########
-
 cat = lambda *args: args
 
 def get_roles_path():
@@ -14,22 +10,7 @@ def get_roles_path():
 	if parser.has_option("defaults", "roles_path"):
 		return parser.get("defaults", "roles_path")
 
-#########
-# tools #
-#########
-
-def galaxy(*args):
-	return cat("ansible-galaxy", *args)
-
-def play(filename, *args):
-	return cat("ansible-playbook", filename, *args)
-
-############
-# handlers #
-############
-
 def on_get(filename, targets, requirementid):
-	yield "@flush",
 	# create roles_path if it does not exist:
 	roles_path = get_roles_path()
 	if not os.path.exists(roles_path):
@@ -42,43 +23,32 @@ def on_get(filename, targets, requirementid):
 		if not re.match("\w\.\w(,\w)?", requirementid):
 			yield "%s: expected id format 'username.rolename[,version]' format" % requirementid
 		args = (requirementid,)
-	yield galaxy("install", "--force", *args)
+	yield cat("ansible-galaxy", "install", "--force", *args)
 
 def on_clean(filename, targets):
-	yield "@flush",
 	# given a requirements file, remove each requirement:
 	with open("requirements.yml", "r") as fp:
 		requirements = yaml.load(fp)
 	for req in requirements:
-		yield galaxy("remove", req["name"])
+		yield cat("ansible-galaxy", "remove", req["name"])
 	roles_path = get_roles_path()
 	if roles_path and os.path.exists(roles_path) and os.listdir(roles_path) == []:
 		os.rmdir(roles_path)
 
-def on_flush(filename, targets):
-	do_play = False
-	args = []
-	while targets:
-		target = targets.pop(0)
-		if target == "test":
-			args.append("--syntax-check")
-		elif target == "install" and not target.uninstall:
-			if target.inventoryid:
-				args += ["--inventory-file", target.inventoryid]
-			else:
-				do_play = True
-		else:
-			yield "%s: unexpected target" % target
-	if args or do_play:
-		yield play(
-			filename = filename,
-			*args)
+def on_test(filename, targets):
+	yield cat("ansible-playbook", "--syntax-check", filename)
+
+def on_run(filename, targets, entrypointid):
+	yield cat("ansible-playbook", filename)
 
 MANIFEST = {
 	"filenames": ("playbook.yml", "*.yml"),
 	"on_get": on_get,
 	"on_clean": on_clean,
-	"on_flush": on_flush,
+	"on_compile": None,
+	"on_run": on_run,
+	"on_package": Exception, # cannot package playbook
+	"on_publish": Exception, # therefore cannot publish
 	"tools": {
 		"ansible": {
 			"required_vars": ("user", "inventory"),

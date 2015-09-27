@@ -86,7 +86,7 @@ or, if the PyPI repository is not available:
 
 	$ pip install --user git+https://github.com/fclaerho/buildstack.git
 
-The package will be installed in your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) directory; make sure its `bin/` sub-directory is in your shell lookup path.
+The package will be installed in your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) directory.
 
 To uninstall:
 
@@ -224,3 +224,29 @@ Otherwise:
 To test concrete build stacks, build the provided [Docker](https://www.docker.com) files, e.g.:
 
 	$ sudo docker build -f test_autotools.Dockerfile .
+
+
+Appendix: the Art of Building
+-----------------------------
+
+### Types of Build Stack ###
+
+  * Type 1: Build library
+    Collection of helper functions to manage a dependency graph and build targets.
+    The build manifest is actually a program written in the build stack native language.
+    Developers must have a deep knowledge of build engineering to use this option.
+    In most cases, this result into an overly custom build system that is not maintainable.
+  * Type 2: Build framework
+  * Type 3: DSL
+  * Type 4: Configuration
+
+### Classification of Existing Build Stacks ###
+
+| Type | Name | Build Manifest |
+|------|------|----------------|
+| 4 | Maven | XML |
+| 4 | Cargo | init |
+| 3 | Autotools | M4
+| 3 | Make | Makefile |
+| 2/3 | Setuptools | Python |
+
