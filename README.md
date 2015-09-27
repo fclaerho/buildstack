@@ -225,7 +225,7 @@ There's no reference for the following statements because this is a personal sta
 
 ### Types of Build Stack ###
 
-Build stacks can be divided into 4 types:
+Build stacks can be divided into 5 types:
 
   * Type 1: **Build library** — Collection of build functions
   * Type 2: **Build framework** — Dependency graph manager + Type 1 features
