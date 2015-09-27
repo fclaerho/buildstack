@@ -1,7 +1,7 @@
 
 *NOTICE!
 This tool is stable for the use cases it covers but it does not cover all major use cases yet.
-So far you can build [autotools][1], [setuptools][2], [maven][3], [cargo][4] and [ansible][5]-based projects.*
+So far you can build [Autotools][1], [Setuptools][2], [Maven][3], [Cargo][4] and [Ansible][5]-based projects.*
 
 **BuildStack** is a wrapper around build tools and their ecosystem:
 its goal is to abstract the build process of any source code repository
@@ -230,7 +230,8 @@ Build stacks can be divided into 4 types:
   * Type 1: **Build library** — Collection of build functions
   * Type 2: **Build framework** — Dependency graph manager + Type 1 features
   * Type 3: **Build DSL** (over a type 2)
-  * Type 4: **Build Configuration**, the current state of the art.
+  * Type 4: **Build Programmable Configuration**
+  * Type 5: **Build Configuration**, the current state of the art.
 
 For types 1 and 2,
 the build manifest is actually a program.
@@ -245,9 +246,9 @@ The canonical example of types 3 is Make.
 The build manifest can be written by build engineers in a DSL allowing to specify the dependency graph and how to walk it.
 However, even types 3 do not guarantee a maintainable build system, as it might still be easy to create custom mechanisms.
 
-The canonical example of types 4 is Maven.
-Types 4 enforce configuration and convention over programming.
-A type 4 knows when, what and how to build, assuming your provide the bootstrap information.
+Types 4 and 5 enforce configuration and convention over programming.
+The canonical example of types 5 is Maven.
+Such a build stack knows what and how to build, assuming your provide the bootstrap information.
 For some typical projects you might have very little to provide: a project name, version and authors.
 
 ### Choosing a Build Stack ###
@@ -267,10 +268,10 @@ Keep in mind that anything below type 4 will slow the project at some point:
 
 | Type | Name | Build Manifest Format |
 |------|------|-----------------------|
-| 4 | Maven | XML |
-| 4 | Cargo | init |
-| ~4 | Setuptools | Python Call |
-| 3 | Autotools | M4 |
+| 5 | Maven | XML |
+| 5 | Cargo | init |
+| 4 | Setuptools | Python Call |
+| 4 | Autotools | M4 |
 | 3 | Make | Make Rules |
 
 <!-- REFERENCES -->
