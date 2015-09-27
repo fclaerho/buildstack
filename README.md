@@ -250,9 +250,9 @@ Types 4 enforce configuration and convention over programming.
 A type 4 knows when, what and how to build, assuming your provide the bootstrap information.
 For some typical projects you might have very little to provide: a project name, version and authors.
 
-### Picking a Build Stack ###
+### Choosing a Build Stack ###
 
-How to chose a stack? it's easy:
+How to choose a stack? it's easy:
   1. If there is a **standard build stack**, then however bad it is, use it, and request improvements
   2. If there is no standard build stack, then pick the **highest type** available according to the above taxonomy.
 
