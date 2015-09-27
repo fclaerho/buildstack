@@ -228,7 +228,7 @@ There's no reference for the following statements because there are entirely non
 Build stacks can be divided into (so far) 4 types:
 
   * Type 1: Build library — Collection of build functions and classes
-  * Type 2: Build framework — Dependency-based system
+  * Type 2: Build framework — Dependency-graph manager, able to resolve standard transitions
   * Type 3: Build DSL
   * Type 4: Build Configuration, the current state of the art.
 
@@ -236,14 +236,12 @@ For types 1 and 2,
 the build manifest is actually a program.
 It is generally written in the language for which the build stack was designed, but not necessarily.
 This means the build system has to be created and maintained by developers.
-Those developers must have a solid knowledge of build engineering to use this option.
+who must have a solid knowledge of build engineering to use this option.
 In most cases, this result into an overly custom build system that is not maintainable.
 Enforcing the usage of a dependency graph, which is the core of any proper build system, can only be done from types 2.
-For this reason, types 1 are to be avoided.
+For this reason, types 1 are to be avoided at all costs for the sanity of the technical teams.
 
-For a type 3 build stack,
-the underlying system is able to manage incremental builds and know how to reach most targets.
-The canonical example of this is Make.
+The canonical example of a type 3 is Make.
 The build manifest can be created and maintained by build engineers, no development is needed.
 
 ### Classification of Concrete Build Stacks ###
