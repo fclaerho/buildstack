@@ -1,11 +1,11 @@
 
-*NOTICE!
+**NOTICE!
 This tool is stable for the use cases it covers but it does not cover all major use cases yet.
-So far you can build [Autotools][1], [Setuptools][2], [Maven][3], [Cargo][4] and [Ansible][5]-based projects.*
+So far you can build [Autotools][1], [Setuptools][2], [Maven][3], [Cargo][4] and [Ansible][5]-based projects.**
 
 **BuildStack** is a wrapper around build tools and their ecosystem:
 its goal is to abstract the build process of any source code repository
-by driving the underlying build stack through _well-known targets_.
+by driving the underlying build stack through [well-known targets](#glossary).
 Focus on the big picture and let **BuildStack** handle the details.
 
 The following [well-known targets](#glossary) are supported:
@@ -43,7 +43,7 @@ No question asked and no need to lookup documentation.
 Extra Features
 --------------
 
-  * [Lifecycles][7] support.
+  * [Lifecycles](#glossary) support.
   * Instantiate tool configuration templates, see `build setup help`.
   * [Autotools][1]:
     * better `clean` (remove lingering generated files)
@@ -172,9 +172,9 @@ this variable is a dictionary declaring the module properties and handlers.
 ### TARGET STACK
 
 For all handlers, except `on_flush()`, the default behavior is to stack the target onto the `targets` list.
-The handler `on_flush()` is automatically called _last_ to unstack and process the targets or
+The handler `on_flush()` is automatically called last to unstack and process the targets or
 it can also be called manually from any handler with the `@flush` command (detailed below.)
-The `targets` list _must_ be empty when `on_flush()` terminates or the plugin is considered faulty.
+The `targets` list must be empty when `on_flush()` terminates or the plugin is considered faulty.
 The rationale behind the usage of a stack is that most build tools are able to handle multiple
 targets at the same time (e.g. make clean all) and calling them independently is less efficient.
 However, what can be stacked or not varies for each build tool: therefore, when developping a plugin,
@@ -216,7 +216,7 @@ Few build stacks are able to handle a `release` target natively,
 
 To calculate the new version, **BuildStack** passes the `Version` class to your release handler.
 Of course, you can ignore this argument if you have another mean to do version calculation.
-  * `Version.parse_stdout(*args)` — return version instance from the command output (it should match N(.N)*)
+  * `Version.parse_stdout(*args)` — return version instance from the command output (it should match `N(.N)*`)
   * `version.bump(partid)` — return bumped version, where partid is (major|minor|patch) or an index.
 
 ### TESTING
