@@ -276,7 +276,7 @@ Keep in mind that anything below type 4 will slow the project at some point:
   * or, because of initial shortcuts, it cannot meet new needs without major rework
   * or because it is too difficult to use
   * or because its learning curve is too steep for newcomers
-  * or it's rather a combination of any of the above reasons.
+  * or because of a combination of any of the above reasons.
 
 ### CLASSIFICATION OF CONCRETE BUILD STACKS
 
@@ -285,8 +285,10 @@ Keep in mind that anything below type 4 will slow the project at some point:
 | 5 | Maven | XML |
 | 5 | Cargo | init |
 | 4 | Setuptools | Python Call |
-| 4 | Autotools | M4 |
+| 4 | Autotools | M4 Macros |
 | 3 | Make | Make Rules |
+
+_To be completed…_
 
 <!-- REFERENCES -->
 [1]: https://www.sourceware.org/autobook
