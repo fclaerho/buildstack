@@ -286,8 +286,6 @@ Keep in mind that anything below type 4 will slow the project at some point:
 | 4 | Autotools | M4 Macros |
 | 3 | Make | Make Rules |
 
-_To be completed…_
-
 <!-- REFERENCES -->
 [1]: https://www.sourceware.org/autobook
 [2]: https://packaging.python.org
