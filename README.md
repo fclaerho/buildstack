@@ -257,7 +257,7 @@ For this reason, types 1 are to be avoided at all costs for the sanity of the te
 Avoiding having developers design the build system can only be done from types 3.
 The canonical example of types 3 is [Make][8].
 The build manifest can be written by build engineers in a DSL allowing to specify the dependency graph and how to walk it.
-However, even types 3 do not guarantee a maintainable build system, as it might still be easy to create custom mechanisms.
+DSL are far more safe, but they can still be misused, so types 3 are not bullet-proof.
 
 Types 4 and 5 enforce configuration and convention over programming.
 The canonical example of types 5 is [Maven][3].
