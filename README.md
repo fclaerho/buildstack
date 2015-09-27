@@ -221,7 +221,8 @@ To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 Build Engineering 101
 ---------------------
 
-### <a name="glossary">GLOSSARY</a>
+<a name="glossary"></a>
+### GLOSSARY
 
   * **Dependency Graph**:
     Graph specifying dependencies between concrete build targets.
