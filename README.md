@@ -31,7 +31,7 @@ The following [lifecycles][7] are supported:
 Why, Oh Why?
 ------------
 
-[SwQA engineers][9], [build engineers][10] and developers are all dealing with the same problem:
+[SwQA engineers][9], [Build & Release engineers][10] and developers are all dealing with the same problem:
 how to quickly build and use a project using a build stack they are not familiar with?
 By using **BuildStack**, check out any repository and reach your build targets.
 No question asked and no need to lookup documentation.
