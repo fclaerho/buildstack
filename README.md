@@ -114,22 +114,6 @@ This would be invoked with the option `--profile as-root`.
 You may also use the special profile `all` which is always applied.
 
 
-<a name="glossary"></a>
-Glossary
---------
-
-  * **Dependency Graph**:
-    Graph specifying dependencies between concrete build targets.
-    For instance, the source files from which an object file is compiled.
-  * **Build Target**: abstract or concrete state to reach.
-    Concrete build target are generally platform objects such as files;
-    Abstract build targets are varying depending on the tool, but well-know targets should be supported.
-  * **Well-known Build Target**: abstract build target supported by most build tools: clean, compile, test, package, install, publish.
-  * **Lifecycle**:
-    Logical sequence of build target such that invoking one implies its predecessors.
-    See [Maven Lifecycles][7] for details.
-
-
 Development Guide
 -----------------
 
@@ -234,10 +218,23 @@ To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 	$ sudo docker build -f test_autotools.Dockerfile .
 
 
-Build Stack Taxonomy
---------------------
+Build Engineering 101
+---------------------
 
-### TYPES OF BUILD STACKS
+### <a name="glossary">GLOSSARY</a>
+
+  * **Dependency Graph**:
+    Graph specifying dependencies between concrete build targets.
+    For instance, the source files from which an object file is compiled.
+  * **Build Target**: abstract or concrete state to reach.
+    Concrete build target are generally platform objects such as files;
+    Abstract build targets are varying depending on the tool, but well-know targets should be supported.
+  * **Well-known Build Target**: abstract build target supported by most build tools: clean, compile, test, package, install, publish.
+  * **Lifecycle**:
+    Logical sequence of build target such that invoking one implies its predecessors.
+    See [Maven Lifecycles][7] for details.
+
+### BUILD STACKS TAXONOMY
 
 From my standpoint, build stacks can be divided into 5 types:
 
