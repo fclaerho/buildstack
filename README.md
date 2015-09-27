@@ -85,18 +85,17 @@ To uninstall:
 	$ pip uninstall buildstack
 
 
-Advanced Configuration
-----------------------
+Configuration
+-------------
 
 Create the file `~/buildstack.json` to customize each command executed by `build`:
 
-  * before: run commands before
-  * after: run commands after
-  * append: append extra arguments to the command
-  * path: set command path (e.g. on user-wide installation)
+  * `before`: run commands before
+  * `after`: run commands after
+  * `append`: append extra arguments to the command
+  * `path`: set command path (e.g. on user-wide installation)
 
-You can group customizations into "profiles",
-use the `-p, --profile` switch on the command line to select the one to use.
+Customizations can be grouped into "profiles", use the `--profile` switch on the command line to select one.
 
 For instance to provision an Ansible inventory as root with a password:
 
