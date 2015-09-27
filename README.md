@@ -249,7 +249,7 @@ However, even types 3 do not guarantee a maintainable build system, as it might 
 Types 4 and 5 enforce configuration and convention over programming.
 The canonical example of types 5 is Maven.
 Such a build stack knows what and how to build, assuming your provide the bootstrap information.
-For some typical projects you might have very little to provide: a project name, version and authors.
+For non-exotic projects you should have very little to provide to get a working build stack: a project name, version and authors.
 
 ### Choosing a Build Stack ###
 
