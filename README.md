@@ -80,9 +80,6 @@ or, if the PyPI repository is not available:
 
 	$ pip install --user git+https://github.com/fclaerho/buildstack.git
 
-The package will be installed in your [user site-packages][8] directory.
-Update your shell lookup path accordingly.
-
 To uninstall:
 
 	$ pip uninstall buildstack
