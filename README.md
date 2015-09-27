@@ -259,7 +259,6 @@ The build manifest can be created and maintained by build engineers, no developm
 [5]: http://docs.ansible.com/ansible/index.html
 [6]: https://en.wikipedia.org/wiki/Software_build
 [7]: https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html
-[8]: https://www.python.org/dev/peps/pep-0370/#specification
 [9]: https://en.wikipedia.org/wiki/Software_quality_assurance
 [10]: https://en.wikipedia.org/wiki/Release_engineering
 [11]: https://en.wikipedia.org/wiki/Software_developer
