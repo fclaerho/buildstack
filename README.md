@@ -221,11 +221,11 @@ To test concrete build stacks, build the provided [Docker](https://www.docker.co
 Build Stack Taxonomy
 --------------------
 
-There's no reference for the following statements because there are entirely non-official.
+There's no reference for the following statements because this is a personal standpoint.
 
 ### Types of Build Stack ###
 
-Build stacks can be divided into (so far) 4 types:
+Build stacks can be divided into 4 types:
 
   * Type 1: Build library — Collection of build functions
   * Type 2: Build framework — Dependency graph manager + Type 1 features
