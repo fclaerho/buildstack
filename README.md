@@ -31,7 +31,7 @@ The following [lifecycles][7] are supported:
 Why, Oh Why?
 ------------
 
-SwQA engineers, build engineers and developers are all dealing with the same problem:
+[SwQA engineers][9], build engineers and developers are all dealing with the same problem:
 how to quickly build and use a project using a build stack they are not familiar with?
 By using **BuildStack**, check out any repository and reach your build targets.
 No question asked and no need to lookup documentation.
@@ -263,3 +263,4 @@ The build manifest can be created and maintained by build engineers, no developm
 [6]: https://en.wikipedia.org/wiki/Software_build
 [7]: https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html
 [8]: https://www.python.org/dev/peps/pep-0370/#specification
+[9]: https://en.wikipedia.org/wiki/Software_quality_assurance
