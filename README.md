@@ -119,7 +119,7 @@ Development Guide
 
 **Buildstack** can be extended easily to support additional tools.
 
-### Module Creation ###
+### MODULE CREATION
 
 Create a python module in the `buildstack/` directory,
 and add its name to the list initializing `MANIFESTS` in `__init__.py`.
@@ -153,7 +153,7 @@ this variable is a dictionary declaring the module properties and handlers.
 		#"tools": {}
 	}
 
-### Target Stack ###
+### TARGET STACK
 
 For all handlers, except `on_flush()`, the default behavior is to stack the target onto the `targets` list.
 The handler `on_flush()` is automatically called _last_ to unstack and process the targets or
@@ -165,7 +165,7 @@ However, what can be stacked or not varies for each build tool: therefore, when 
 use target handlers to perform a task that cannot be stacked. Also, when using a handler,
 remember to flush the current stack at the appropriate point (usually at the beginning, before anything else.)
 
-### Handlers ###
+### HANDLERS
 
 When setting a handler in the `MANIFEST`, there are 3 options:
   * A value of `Exception` indicates the handler is not supported and will raise an error at runtime.
@@ -189,7 +189,7 @@ The following builtins are available:
   * `commit([message])` — triggers a VCS commit
   * `remove(path[, reason])` — remove file or directory
 
-### Release Target ###
+### RELEASE TARGET
 
 Few build stacks are able to handle a `release` target natively,
 **BuildStack** therefore provides some support to work around this issue given that you can:
@@ -203,7 +203,7 @@ Of course, you can ignore this argument if you have another mean to do version c
   * `Version.parse_stdout(*args)` — return version instance from the command output (it should match N(.N)*)
   * `version.bump(partid)` — return bumped version, where partid is (major|minor|patch) or an index.
 
-### Testing ###
+### TESTING
 
 You can use buildstack to test itself without installing it, given its dependencies are present:
 
@@ -221,7 +221,9 @@ To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 Build Engineering 101
 ---------------------
 
-### Build Stack Taxonomy ###
+### GLOSSARY
+
+### BUILD STACKS TAXONOMY
 
 *NOTICE! the following classification is my personal standpoint*
 
@@ -251,7 +253,7 @@ The canonical example of types 5 is [Maven][3].
 Such a build stack knows what and how to build, assuming your provide the bootstrap information.
 For non-exotic projects you should have very little to provide to get a working build stack: a project name, version and authors.
 
-### Choosing a Build Stack ###
+### CHOOSING A BUILD STACK
 
 How to choose a stack? it's easy:
   1. If there is a **standard build stack**, then however bad it is, use it, and request improvements
@@ -264,7 +266,7 @@ Keep in mind that anything below type 4 will slow the project at some point:
   * or because its learning curve is too steep for newcomers
   * or it's rather a combination of any of the above reasons.
 
-### Classification of Concrete Build Stacks ###
+### CLASSIFICATION OF CONCRETE BUILD STACKS
 
 | Type | Name | Build Manifest Format |
 |------|------|-----------------------|
