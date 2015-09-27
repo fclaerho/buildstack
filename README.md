@@ -31,7 +31,7 @@ The following [lifecycles][7] are supported:
 Why, Oh Why?
 ------------
 
-[SwQA engineers][9], [Build & Release engineers][10] and developers are all dealing with the same problem:
+[SwQA engineers][9], [Build & Release engineers][10] and [developers][11] are all dealing with the same problem:
 how to quickly build and use a project using a build stack they are not familiar with?
 By using **BuildStack**, check out any repository and reach your build targets.
 No question asked and no need to lookup documentation.
@@ -265,3 +265,5 @@ The build manifest can be created and maintained by build engineers, no developm
 [8]: https://www.python.org/dev/peps/pep-0370/#specification
 [9]: https://en.wikipedia.org/wiki/Software_quality_assurance
 [10]: https://en.wikipedia.org/wiki/Release_engineering
+[11]: https://en.wikipedia.org/wiki/Software_developer
+
