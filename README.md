@@ -234,8 +234,8 @@ To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 	$ sudo docker build -f test_autotools.Dockerfile .
 
 
-Introduction to Build Stack Taxonomy
-------------------------------------
+Build Stack Taxonomy
+--------------------
 
 ### TYPES OF BUILD STACKS
 
