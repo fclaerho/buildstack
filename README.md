@@ -242,13 +242,20 @@ For this reason, types 1 are to be avoided at all costs for the sanity of the te
 
 Avoiding having developers design the build system can only be done from types 3.
 The canonical example of types 3 is Make.
-The build manifest can be created and maintained by build engineers as no development is needed.
-The DSL allows to specify the depedency graph and how to walk it (i.e. how to build intermediate and final targets.)
-However, even types 3 do not guarantee a maintainable build system, as it remains far to easy to create custom mechanisms.
+The build manifest can be written by build engineers in a DSL allowing to specify the dependency graph and how to walk it.
+However, even types 3 do not guarantee a maintainable build system, as it might still be easy to create custom mechanisms.
 
 The canonical example of types 4 is Maven.
 Types 4 enforce configuration over programming:
 They know when and how to build your project, assuming your provide the bootstrap information.
+
+### Chosing a Build Stack ###
+
+How to chose a stack? it's easy:
+  1. If there is a **standard build stack**, then however bad it is, use it, and request improvements
+  2. If there is no standard build stack, then pick the **highest type** available according to the above taxonomy.
+
+Keep in mind that anything below type 4 will be a source of issues at some point.
 
 ### Classification of Concrete Build Stacks ###
 
