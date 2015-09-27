@@ -258,7 +258,7 @@ How to choose a stack? it's easy:
 
 Keep in mind that anything below type 4 will slow the project at some point:
   * either because it will break
-  * or, because of initial shortcuts, it cannot meet new needs
+  * or, because of initial shortcuts, it cannot meet new needs and has to be entirely reworked
   * or because it is too difficult to use
   * or because its learning curve is too steep for newcomers
   * or it's rather a combination of any of the above reasons.
