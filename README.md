@@ -1,7 +1,7 @@
 
 *NOTICE!
 This tool is stable for the use cases it covers but it does not cover all major use cases yet.
-So far you can build [autotools][1], [setuptools][2], [maven][3], [cargo][4] and [ansible][5]-based projects.
+So far you can build [autotools][1], [setuptools][2], [maven][3], [cargo][4] and [ansible][5]-based projects.*
 
 **BuildStack** is a wrapper around build tools and their ecosystem:
 its goal is to abstract the build process of any source code repository
