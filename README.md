@@ -1,19 +1,14 @@
 
 *NOTICE!
 This tool is stable for the use cases it covers but it does not cover all major use cases yet.
-So far you can build
-[autotools](https://www.sourceware.org/autobook),
-[setuptools](https://packaging.python.org),
-[maven](https://maven.apache.org),
-[cargo](http://doc.crates.io)
-and [ansible](http://docs.ansible.com/ansible/index.html)-based projects.*
+So far you can build [autotools][1], [setuptools][2], [maven][3], [cargo][4] and [ansible][5]-based projects.
 
 **BuildStack** is a wrapper around build tools and their ecosystem:
 its goal is to abstract the build process of any source code repository
 by driving the underlying build stack through _well-known targets_.
 Focus on the big picture and let **BuildStack** handle the details.
 
-The following _well-known targets_ are supported:
+The following [well-known targets][6] are supported:
   * `get:ID` install requirements
   * `clean` delete build byproducts
   * `compile` compile code
@@ -24,7 +19,7 @@ The following _well-known targets_ are supported:
   * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
   * `release:ID [-m]` bump source code version, commit, tag and push
 
-The following _[lifecycles](https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html)_ are supported:
+The following [lifecycles][7] are supported:
   * `get`
   * `clean`
   * `run` > `compile`
@@ -73,7 +68,7 @@ Extra Features
 Pre-requisites
 --------------
 
-**BuildStack** is not bundled with any build tool;
+As **BuildStack** is not bundled with any build tool,
 provision the machine appropriately beforehand.
 
 
@@ -86,7 +81,8 @@ or, if the PyPI repository is not available:
 
 	$ pip install --user git+https://github.com/fclaerho/buildstack.git
 
-The package will be installed in your [user site-packages](https://www.python.org/dev/peps/pep-0370/#specification) directory.
+The package will be installed in your [user site-packages][8] directory.
+Update your shell lookup path accordingly.
 
 To uninstall:
 
@@ -237,10 +233,11 @@ Appendix: Build Engineering
   * Type 4: Configuration
 
 For types 1 and 2,
-the build manifest is actually a program written in a turing-complete language, generally the language for which the build stack was designed.
+the build manifest is actually a program.
+It is generally written in the language for which the build stack was designed but not necessarily.
 This means the build system has to be created and maintained by developers.
-Developers must have a deep knowledge of build engineering to use this option.
-In most cases, this result into an overly custom build system that is not maintainable.
+Those developers must have a solid knowledge of build engineering to use this option.
+In most cases, this result into an overly custom build system that is not maintainable. REF?
 
 For a type 3 build stack,
 the underlying system is able to manage incremental builds and know how to reach most targets.
@@ -257,3 +254,12 @@ The build manifest can be created and maintained by build engineers, no developm
 | 3 | Make | Makefile |
 | 2/3 | Setuptools | Python |
 
+<!-- REFERENCES -->
+[1]: https://www.sourceware.org/autobook
+[2]: https://packaging.python.org
+[3]: https://maven.apache.org
+[4]: http://doc.crates.io
+[5]: http://docs.ansible.com/ansible/index.html
+[6]: https://en.wikipedia.org/wiki/Software_build
+[7]: https://maven.apache.org/ref/3.3.3/maven-core/lifecycles.html
+[8]: https://www.python.org/dev/peps/pep-0370/#specification
