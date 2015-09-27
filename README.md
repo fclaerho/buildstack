@@ -235,14 +235,18 @@ Build stacks can be divided into (so far) 4 types:
 For types 1 and 2,
 the build manifest is actually a program.
 It is generally written in the language for which the build stack was designed, but not necessarily.
-This means the build system has to be created and maintained by developers.
-who must have a solid knowledge of build engineering to use this option.
-In most cases, this result into an overly custom build system that is not maintainable.
+This means the build system has to be created and maintained by developers who must have a solid knowledge of build engineering.
+If this not the case, the result is an overly custom build system that is not maintainable.
 Enforcing the usage of a dependency graph, which is the core of any proper build system, can only be done from types 2.
 For this reason, types 1 are to be avoided at all costs for the sanity of the technical teams.
 
-The canonical example of a type 3 is Make.
+The canonical example of types 3 is Make, despite Make does not constitute a build stack in itself.
 The build manifest can be created and maintained by build engineers, no development is needed.
+However, even types 3 do not guarantee a maintainable build system, as it remains far to easy to create custom mechanisms.
+
+The canonical example of types 4 is Maven.
+Types 4 enforce configuration over programming:
+They know when and how to build your project, assuming your provide the bootstrap information.
 
 ### Classification of Concrete Build Stacks ###
 
