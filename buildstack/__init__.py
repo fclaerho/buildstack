@@ -228,7 +228,7 @@ class BuildStack(object):
 
 	def _handle_target(self, name, default = "stack", **kwargs):
 		"generic target handler: call the custom handler if it exists, or fallback on default"
-		fckit.trace("-->", name)
+		fckit.trace(">>", "[", name, "]")
 		handler = self.manifest.get("on_%s" % name, default)
 		if handler is Exception:
 			raise Error(self.manifest["name"], name, "unsupported target")
@@ -268,7 +268,7 @@ class BuildStack(object):
 					raise Error(self.manifest["name"], name, res)
 		else:
 			raise AssertionError("invalid target handler")
-		fckit.trace("<--", name)
+		fckit.trace("<<", "[", name, "]")
 
 	def get(self, requirementid = None):
 		self._handle_target(
