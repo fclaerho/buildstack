@@ -221,7 +221,7 @@ To test concrete build stacks, build the provided [Docker][12] files, e.g.:
 Build Engineering 101
 ---------------------
 
-<a name="glossary"></a>
+<a id="glossary"></a>
 ### GLOSSARY
 
   * **Dependency Graph**:
