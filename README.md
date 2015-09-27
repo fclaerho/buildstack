@@ -20,12 +20,12 @@ The following [well-known targets][6] are supported:
   * `release:ID [-m]` bump source code version, commit, tag and push
 
 The following [lifecycles][7] are supported:
-  * `get`
-  * `clean`
-  * `run` > `compile`
-  * `release` > `test` > `compile`
-  * `install` > `package` > `test` > `compile`
-  * `publish` > `package` > `test` > `compile`
+  * **`get`**
+  * **`clean`**
+  * **`run`** > `compile`
+  * **`release`** > `test` > `compile`
+  * **`install`** > `package` > `test` > `compile`
+  * **`publish`** > `package` > `test` > `compile`
 
 
 Why, Oh Why?
