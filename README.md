@@ -246,8 +246,8 @@ The build manifest can be written by build engineers in a DSL allowing to specif
 However, even types 3 do not guarantee a maintainable build system, as it might still be easy to create custom mechanisms.
 
 The canonical example of types 4 is Maven.
-Types 4 enforce configuration over programming:
-They know when and how to build your project, assuming your provide the bootstrap information.
+Types 4 enforce configuration and convention over programming.
+A type 4 knows when, what and how to build, assuming your provide the bootstrap information.
 
 ### Chosing a Build Stack ###
 
@@ -255,7 +255,8 @@ How to chose a stack? it's easy:
   1. If there is a **standard build stack**, then however bad it is, use it, and request improvements
   2. If there is no standard build stack, then pick the **highest type** available according to the above taxonomy.
 
-Keep in mind that anything below type 4 will be a source of issues at some point.
+Keep in mind that anything below type 4 will slow the project at some point,
+either because it will break, or because it is too difficult to use or too difficult to understand for newcomers.
 
 ### Classification of Concrete Build Stacks ###
 
