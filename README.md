@@ -265,11 +265,15 @@ DSL are far more safe, but they can still be misused, so types 3 are not bullet-
 Types 4 and 5 enforce configuration and convention over programming.
 The canonical example of types 5 is [Maven][3].
 Such a build stack knows what and how to build, assuming your provide the bootstrap information.
-For non-exotic projects you should have very little to provide to get a working build stack: a project name, version and authors.
+For non-exotic projects you should have very little to provide to get a working build stack:
+  * a project name
+  * a version
+  * a type (library or executable)
+  * an entry point for an executable.
 
 ### CHOOSING A BUILD STACK
 
-How to choose a stack? it's easy:
+From a development standpoint, how to choose a stack? it's easy:
   1. If there is a **standard build stack**, then however bad it is, use it, and request improvements
   2. If there is no standard build stack, then pick the **highest type** available according to the above taxonomy.
 
