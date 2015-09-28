@@ -239,7 +239,9 @@ Build Engineering 101
 
 ### BUILD STACKS TAXONOMY
 
-From my standpoint, build stacks can be divided into 5 types:
+NOTICE! the following classification is my personal standpoint.
+
+Build stacks can be divided into 5 types:
 
   * Type 1: **Build library** — Collection of build functions
   * Type 2: **Build framework** — Dependency graph manager + Type 1 features
