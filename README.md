@@ -284,11 +284,11 @@ Keep in mind that anything below type 4 will slow the project at some point:
 
 | Type | Name | Build Manifest Format |
 |------|------|-----------------------|
-| 5 | Maven | XML |
-| 5 | Cargo | ini |
-| 4 | Setuptools | Python Call |
-| 4 | Autotools | M4 Macros |
-| 3 | Make | Make Rules |
+| 5 | [Maven][3] | XML |
+| 5 | [Cargo][4] | ini |
+| 4 | [Setuptools][2] | Python Call |
+| 4 | [Autotools][1] | M4 Macros |
+| 3 | [Makei][8] | Make Rules |
 
 <!-- REFERENCES -->
 [1]: https://www.sourceware.org/autobook
