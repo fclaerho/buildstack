@@ -224,13 +224,15 @@ Build Engineering 101
 <a id="glossary"></a>
 ### GLOSSARY
 
+  * **Build Target**:
+    Abstract or concrete state to reach.
+    Concrete build targets are generally platform objects such as files;
+    Abstract build targets (aka [phony targets][13] in Make jargon)  are varying depending on the tool, but well-know targets should be supported.
   * **Dependency Graph**:
     Graph specifying dependencies between concrete build targets.
     For instance, the source files from which an object file is compiled.
-  * **Build Target**: abstract or concrete state to reach.
-    Concrete build target are generally platform objects such as files;
-    Abstract build targets are varying depending on the tool, but well-know targets should be supported.
-  * **Well-known Build Target**: abstract build target supported by most build tools: clean, compile, test, package, install, publish.
+  * **Well-known Build Target**:
+    Abstract build target supported by most build tools: clean, compile, test, package, install, publish.
   * **Lifecycle**:
     Logical sequence of build target such that invoking one implies its predecessors.
     See [Maven Lifecycles][7] for details.
@@ -299,4 +301,5 @@ Keep in mind that anything below type 4 will slow the project at some point:
 [10]: https://en.wikipedia.org/wiki/Release_engineering
 [11]: https://en.wikipedia.org/wiki/Software_developer
 [12]: https://www.docker.com
+[13]: https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
 
