@@ -239,7 +239,7 @@ Build Engineering 101
 
 ### BUILD STACKS TAXONOMY
 
-NOTICE! the following classification is my personal standpoint.
+**NOTICE! The following classification is my personal standpoint.**
 
 Build stacks can be divided into 5 types:
 
