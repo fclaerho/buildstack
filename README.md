@@ -134,10 +134,11 @@ this variable is a dictionary declaring the module properties and handlers.
 	#def on_compile(filename, targets):
 	#def on_run(filename, targets, entrypointid):
 	#def on_test(filename, targets):
+	#def on_release(filename, targets, partid, message, Version):
 	#def on_package(filename, targets, formatid):
 	#def on_publish(filename, targets, repositoryid):
-	#def on_install(filename, targets, uninstall):
-	#def on_release(filename, targets, partid, message, Version):
+	#def on_install(filename, targets):
+	#def on_uninstall(filename, targets):
 	#def on_flush(filename, targets):
 	MANIFEST = {
 		"filenames": [], # list of patterns matching supported build manifest filenames
@@ -147,10 +148,11 @@ this variable is a dictionary declaring the module properties and handlers.
 		#"on_compile": Exception | None | on_compile,
 		#"on_run": Exception | None | on_run,
 		#"on_test": Exception | None | on_test,
+		#"on_release": Exception | None | on_release,
 		#"on_package": Exception | None | on_package,
 		#"on_publish": Exception | None | on_publish,
 		#"on_install": Exception | None | on_install,
-		#"on_release": Exception | None | on_release,
+		#"on_uninstall": Exception | None | on_uninstall,
 		#"on_flush": Exception | None | on_flush,
 		#"tools": {}
 	}
