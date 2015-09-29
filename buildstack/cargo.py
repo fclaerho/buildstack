@@ -8,15 +8,15 @@ def on_flush(filename, targets):
 	args = []
 	while targets:
 		target = targets.pop(0)
-		if target == "clean":
-			args.append("clean")
-		elif target == "get":
+		if target == "get":
 			args.append("update")
 			if target.requirementid:
 				args += ["-p", target.requirementid]
+		elif target == "clean":
+			args.append("clean")
 		elif target == "compile":
 			args.append("build") # create a profile to append "--release" when needed
-		elif target == "build":
+		elif target == "run":
 			args.append("run")
 		elif target == "test":
 			args.append("test")
@@ -32,6 +32,16 @@ def on_flush(filename, targets):
 
 MANIFEST = {
 	"filenames": ("Cargo.toml",),
+	#"on_get" -> flush
+	#"on_clean" -> flush
+	#"on_compile" -> flush
+	#"on_run" -> flush
+	#"on_test" -> flush
+	"on_release": Exception,
+	#"on_package" -> flush
+	#"on_publish" -> flush
+	"on_install": Exception,
+	"on_uninstall": Exception,
 	"on_flush": on_flush,
 	"tools": {
 		"cargo": {

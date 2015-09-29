@@ -24,7 +24,7 @@ def on_flush(filename, targets):
 			args.append("package")
 		elif target == "publish":
 			args.append("deploy")
-		elif target == "install" and not target.uninstall:
+		elif target == "install":
 			args.append("install")
 		else:
 			yield "%s: unexpected target" % target
@@ -33,6 +33,16 @@ def on_flush(filename, targets):
 
 MANIFEST = {
 	"filenames": ("pom.xml",),
+	#"on_get" -> flush
+	#"on_clean" -> flush
+	#"on_compile" -> flush
+	"on_run": Exception,
+	#"on_test" -> flush
+	"on_release": Exception,
+	#"on_package" -> flush
+	#"on_publish" -> flush
+	#"on_install" -> flush
+	"on_uninstall": Exception,
 	"on_flush": on_flush,
 	"tools": {
 		"maven": {

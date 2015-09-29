@@ -14,10 +14,11 @@ The following [well-known targets](#glossary) are supported:
   * `compile` compile code
   * `run` run project
   * `test` run unit tests
+  * `release:ID` bump source code version, commit, tag and push
   * `package[:ID]` package code [in the specified format]
-  * `publish[:ID]` publish package [to the specified repository]
-  * `[un]install[:ID]` [un]install locally [or [un]provision inventory]
-  * `release:ID [-m]` bump source code version, commit, tag and push
+  * `publish[:ID]` publish package(s) [to the specified repository]
+  * `install[:ID]` install package(s) [on the specigied inventory]
+  * `uninstall[:ID]`  uninstall package(s) [from specified inventory]
 
 The following [lifecycles](#glossary) are supported:
   * **`get`**
@@ -26,6 +27,7 @@ The following [lifecycles](#glossary) are supported:
   * **`release`** > `test` > `compile`
   * **`install`** > `package` > `test` > `compile`
   * **`publish`** > `package` > `test` > `compile`
+  * **`uninstall`**
 
 
 Why, Oh Why?
@@ -155,7 +157,7 @@ this variable is a dictionary declaring the module properties and handlers.
 
 ### TARGET STACK
 
-For all handlers, except `on_flush()`, the default behavior is to stack the target onto the `targets` list.
+For all handlers, except `on_get()` and `on_flush()`, the default behavior is to stack the target onto the `targets` list.
 The handler `on_flush()` is automatically called last to unstack and process the targets or
 it can also be called manually from any handler with the `@flush` command (detailed below.)
 The `targets` list must be empty when `on_flush()` terminates or the plugin is considered faulty.

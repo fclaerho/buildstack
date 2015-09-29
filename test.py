@@ -20,6 +20,9 @@ do
 done
 """
 
+def _foo_on_get(filename, targets, requirementid):
+	yield "bash", filename, "get"
+
 def _foo_on_flush(filename, targets):
 	args = map(lambda target: target.name, targets)
 	del targets[:]
@@ -28,6 +31,7 @@ def _foo_on_flush(filename, targets):
 MANIFEST = {
 	"name": "foo",
 	"filenames": ["Foobuild"],
+	"on_get": _foo_on_get,
 	"on_flush": _foo_on_flush,
 }
 
@@ -45,61 +49,50 @@ class CoreTest(unittest.TestCase):
 	def tearDown(self):
 		fckit.remove(self.dirname)
 
-	def assert_is_cleaned(self):
-		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.clean")))
+	def assert_done(self, name):
+		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.%s" % name)))
 
-	def assert_is_compiled(self):
-		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.compile")))
+	def test_get_lifecycle(self):
+		self.buildstack.get()
+		self.buildstack.flush()
+		self.assert_done("get")
 
-	def assert_is_tested(self):
-		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.test")))
-
-	def assert_is_installed(self):
-		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.install")))
-
-	def assert_is_packaged(self):
-		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.package")))
-
-	def assert_is_published(self):
-		self.assertTrue(os.path.exists(os.path.join(self.dirname, "foo.publish")))
-
-	def test_clean(self):
+	def test_clean_lifecycle(self):
 		self.buildstack.clean()
 		self.buildstack.flush()
+		self.assert_done("clean")
 
-	def test_compile(self):
-		self.buildstack.compile()
-		self.buildstack.flush()
-		self.assert_is_compiled()
-
-	def test_test(self):
+	def test_test_lifecycle(self):
 		self.buildstack.test()
 		self.buildstack.flush()
-		self.assert_is_compiled()
-		self.assert_is_tested()
+		self.assert_done("compile")
+		self.assert_done("test")
 
-	def test_package(self):
+	def test_run_lifecycle(self):
+		self.buildstack.run()
+		self.buildstack.flush()
+		self.assert_done("compile")
+		self.assert_done("run")
+
+	def test_package_lifecycle(self):
 		self.buildstack.package()
 		self.buildstack.flush()
-		self.assert_is_compiled()
-		self.assert_is_tested()
-		self.assert_is_packaged()
+		self.assert_done("compile")
+		self.assert_done("test")
+		self.assert_done("package")
 
-	def test_install(self):
-		self.buildstack.install()
-		self.buildstack.flush()
-		self.assert_is_compiled()
-		self.assert_is_tested()
-		self.assert_is_packaged()
-		self.assert_is_installed()
-
-	def test_publish(self):
+	def test_publish_lifecycle(self):
 		self.buildstack.publish()
 		self.buildstack.flush()
-		self.assert_is_compiled()
-		self.assert_is_tested()
-		self.assert_is_packaged()
-		self.assert_is_published()
+		self.assert_done("compile")
+		self.assert_done("test")
+		self.assert_done("package")
+		self.assert_done("publish")
+
+	def test_uninstall_lifecycle(self):
+		self.buildstack.uninstall()
+		self.buildstack.flush()
+		self.assert_done("uninstall")
 
 class VersionTest(unittest.TestCase):
 

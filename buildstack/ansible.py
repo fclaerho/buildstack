@@ -35,11 +35,11 @@ def on_clean(filename, targets):
 	if roles_path and os.path.exists(roles_path) and os.listdir(roles_path) == []:
 		os.rmdir(roles_path)
 
-def on_test(filename, targets):
-	yield cat("ansible-playbook", "--syntax-check", filename)
-
 def on_run(filename, targets, entrypointid):
 	yield cat("ansible-playbook", filename)
+
+def on_test(filename, targets):
+	yield cat("ansible-playbook", "--syntax-check", filename)
 
 MANIFEST = {
 	"filenames": ("playbook.yml", "*.yml"),
@@ -47,8 +47,12 @@ MANIFEST = {
 	"on_clean": on_clean,
 	"on_compile": None,
 	"on_run": on_run,
+	"on_test": on_test,
+	"on_release": Exception,
 	"on_package": Exception, # cannot package playbook
 	"on_publish": Exception, # therefore cannot publish
+	"on_install": Exception,
+	"on_uninstall": Exception,
 	"tools": {
 		"ansible": {
 			"required_vars": ("user", "inventory"),

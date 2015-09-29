@@ -101,12 +101,13 @@ def on_publish(filename, targets, repositoryid):
 		args += ["--repository", repositoryid]
 	yield cat("twine", *args)
 
-def on_install(filename, targets, inventoryid, uninstall):
+def on_install(filename, targets, inventoryid):
 	yield "@flush"
-	if uninstall:
-		yield "pip", "uninstall", os.path.basename(os.getcwd())
-	else:
-		yield "pip", "install", "--user", "."
+	yield "pip", "install", "--user", "."
+
+def on_uninstall(filename, targets, inventoryid):
+	yield "@flush"
+	yield "pip", "uninstall", os.path.basename(os.getcwd())
 
 def on_release(filename, targets, partid, message, Version):
 	last_version = Version.parse_stdout("python", filename, "--version")
@@ -168,9 +169,10 @@ MANIFEST = {
 	"on_run": on_run,
 	"on_test": on_test,
 	"on_package": on_package,
+	"on_release": on_release,
 	"on_publish": on_publish,
 	"on_install": on_install,
-	"on_release": on_release,
+	"on_uninstall": on_uninstall,
 	"on_flush": on_flush,
 	"tools": {
 		"setuptools": {

@@ -25,11 +25,11 @@ def on_publish(filename, targets, repositoryid): yield "npm", "publish"
 
 MANIFEST = {
 	"filenames": ("package.json",),
-	"on_get": on_get,
+	#"on_get": on_get,
 	#"on_clean": None | on_clean,
-	"on_test": on_test,
-	"on_compile": on_compile,
-	"on_package": on_package,
-	"on_publish": on_publish,
+	#"on_test": on_test,
+	#"on_compile": on_compile,
+	#"on_package": on_package,
+	#"on_publish": on_publish,
 	#"on_install": None | on_install,
 }

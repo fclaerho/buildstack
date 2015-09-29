@@ -18,23 +18,25 @@ Options:
   --no-color                 disable colored output
 
 TARGET:
-  * get[:ID]          install requirement(s)
-  * clean             delete generated files
-  * compile           generate target objects from source code
-  * run[:ID]          execute entry point(s)
-  * test              run unit tests
-  * package[:ID]      bundle target objects with metadata [in the identified format]
-  * publish[:ID]      publish packages [to the identified repository]
-  * [un]install[:ID]  [un]deploy target objects [onto the identified inventory]
-  * release:ID [-m]   bump source code version, commit, tag and push
+  * get[:ID]        install requirement(s)
+  * clean           delete generated files
+  * compile         generate target objects from source code
+  * run[:ID]        execute entry point(s)
+  * test            run unit tests
+  * release:ID      bump source code version, commit, tag and push
+  * package[:ID]    bundle target objects with metadata [in the identified format]
+  * publish[:ID]    publish package(s) [to the identified repository]
+  * install[:ID]    install package(s) [to the identified inventory]
+  * uninstall[:ID]  uninstall package(s) [from the identified inventory]
 
 Lifecycles:
   * get
   * clean
   * run     > compile
   * release > test > compile
-  * install > package > test > compile
   * publish > package > test > compile
+  * install > package > test > compile
+  * uninstall
 
 Example:
   $ buildstack clean test
@@ -214,6 +216,8 @@ class BuildStack(object):
 				"multiple candidate manifests found, use -f to select a manifest")
 		self.manifest, self.filename = candidates.values()[0]
 		fckit.trace("using %s build stack" % self.manifest["name"])
+		if not any(key.startswith("on_") for key in self.manifest):
+			raise Error("this build stack is still under development, request support on github")
 		self.targets = Targets()
 		self.vcs = Vcs()
 
@@ -298,19 +302,6 @@ class BuildStack(object):
 			"package",
 			formatid = formatid)
 
-	def publish(self, repositoryid = None):
-		self.package()
-		self._handle_target(
-			"publish",
-			repositoryid = repositoryid)
-
-	def install(self, inventoryid = None, uninstall = False):
-		self.package()
-		self._handle_target(
-			"install",
-			inventoryid = inventoryid,
-			uninstall = uninstall)
-
 	def release(self, partid, message = None):
 		self.test()
 		self._handle_target(
@@ -318,6 +309,23 @@ class BuildStack(object):
 			partid = partid,
 			message = message,
 			Version = Version)
+
+	def publish(self, repositoryid = None):
+		self.package()
+		self._handle_target(
+			"publish",
+			repositoryid = repositoryid)
+
+	def install(self, inventoryid = None):
+		self.package()
+		self._handle_target(
+			"install",
+			inventoryid = inventoryid)
+
+	def uninstall(self, inventoryid = None):
+		self._handle_target(
+			"uninstall",
+			inventoryid = inventoryid)
 
 	def flush(self):
 		if self.targets:
@@ -339,7 +347,7 @@ def setup(toolid, settings, manifests):
 				required,\
 				("[%s]" % optional) if optional else ""
 	else:
-		suffix = ", see 'build setup help'"
+		suffix = ", call 'setup help' for details"
 		if not toolid in tools:
 			raise Error(toolid, "unknown tool", suffix)
 		path = os.path.expanduser(tools[toolid]["path"])
@@ -384,18 +392,20 @@ def main(args = None):
 				"compile": lambda _: bs.compile(),
 				"run": lambda value: bs.run(entrypointid = value),
 				"test": lambda _: bs.test(),
+				"release": lambda value: bs.release(
+					partid = value,
+					message = opts["--message"]),
 				"package": lambda value: bs.package(formatid = value),
 				"publish": lambda value: bs.publish(repositoryid = value),
 				"install": lambda value: bs.install(inventoryid = value),
-				"uninstall": lambda value: bs.install(inventoryid = value, uninstall = True),
-				"release": lambda value: bs.release(partid = value, message = opts["--message"])
+				"uninstall": lambda value: bs.uninstall(inventoryid = value),
 			}
 			for target in opts["TARGETS"]:
 				key, _, value = target.partition(":")
 				if key in switch:
 					switch[key](value)
 				else:
-					raise Error(target, "unknown target")
+					raise Error(target, "unknown target, call --help for details")
 			bs.flush()
 	except fckit.Error as exc:
 		raise SystemExit(fckit.red(exc))

@@ -40,7 +40,9 @@ def on_flush(filename, targets):
 		elif target == "package":
 			args.append("dist")
 		elif target == "install":
-			args.append("uninstall" if target.uninstall else "install")
+			args.append("install")
+		elif target == "uninstall":
+			args.append("uninstall")
 		else:
 			yield "%s: unexpected target" % target
 	if args:
@@ -69,5 +71,13 @@ MANIFEST = {
 	"filenames": ("configure.ac", "configure.in", "Makefile"),
 	"on_get": Exception, # there's no package manager for autotools
 	"on_clean": on_clean,
+	#"on_compile" -> flush
+	"on_run": Exception,
+	#"on_test" -> flush
+	"on_release": Exception,
+	#"on_package" -> flush
+	"on_publish": Exception,
+	#"on_install" -> flush
+	#"on_uninstall" -> flush
 	"on_flush": on_flush,
 }
