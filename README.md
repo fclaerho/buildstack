@@ -17,7 +17,7 @@ The following [well-known targets](#glossary) are supported:
   * `release:ID` bump source code version, commit, tag and push
   * `package[:ID]` package code [in the specified format]
   * `publish[:ID]` publish package(s) [to the specified repository]
-  * `install[:ID]` install package(s) [on the specigied inventory]
+  * `install[:ID]` install package(s) [on the specified inventory]
   * `uninstall[:ID]`  uninstall package(s) [from specified inventory]
 
 The following [lifecycles](#glossary) are supported:
