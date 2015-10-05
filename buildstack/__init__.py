@@ -32,10 +32,10 @@ TARGET:
 Lifecycles:
   * get
   * clean
-  * run       > compile
-  * release   > test > compile
-  * publish   > package > test > compile
-  * install   > package > test > compile
+  * run < compile
+  * release < test < compile
+  * publish < package < test < compile
+  * install < package < test < compile
   * uninstall
 
 Example:
