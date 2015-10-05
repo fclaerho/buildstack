@@ -24,7 +24,7 @@ TARGET:
   * run[:ID]        execute entry point(s)
   * test            run unit tests
   * release:ID      bump source code version, commit, tag and push
-  * package[:ID]    bundle target objects with metadata [in the identified format]
+  * package[:ID]    package target objects [in the identified format]
   * publish[:ID]    publish package(s) [to the identified repository]
   * install[:ID]    install package(s) [to the identified inventory]
   * uninstall[:ID]  uninstall package(s) [from the identified inventory]
@@ -32,10 +32,10 @@ TARGET:
 Lifecycles:
   * get
   * clean
-  * run     > compile
-  * release > test > compile
-  * publish > package > test > compile
-  * install > package > test > compile
+  * run       > compile
+  * release   > test > compile
+  * publish   > package > test > compile
+  * install   > package > test > compile
   * uninstall
 
 Example:
