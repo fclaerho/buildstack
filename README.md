@@ -33,13 +33,15 @@ The following [lifecycles](#glossary) are supported:
 |-------|-------|-----|-------|-----|------|------|------|--------|
 | [Setuptools][2] | ✚ | ✔+ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | [Autotools][1] | ✗ | ✗ | ✔+ | ✗ | ✗ | ✔ | ✗ | ✔ |
+| [Ansible][5] | — | ✔ | ✔ | ✔ | — | — | — | — |
 | [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✗ | ✔ | ✔ | ✔ |
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
-| [Ansible][5] | — | ✔ | ✔ | ✔ | — | – | – | – |
+
 
   * ✚ Not natively supported but implemented by buildstack
   * ✔+ Partial native implementation completed by buildstack
   * ✘ Not natively supported
+  * — Irrelevant
 
 Why, Oh Why?
 ------------
