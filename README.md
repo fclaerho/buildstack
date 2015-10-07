@@ -35,7 +35,7 @@ Support status:
 | [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✔ | ✗ | ✔ | ✔ | ✔ |
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 
-  * ✔+ Partial native implementation extended by **BuildStack** – See Extended Feature for details
+  * ✔+ Partial native implementation extended by **BuildStack** – See Extended Targets for details
   * ✔ Native implementation driven by **BuildStack**
   * ✚ Implemented by **BuildStack**
   * ✗ No native implementation
@@ -52,8 +52,8 @@ No question asked and no need to lookup documentation.
 	$ build -C $FOO clean test # automatically triggers 'compile'
 
 
-Extended Features
------------------
+Extended Targets
+----------------
 
   * [Setuptools][2]:clean – Remove all lingering files
   * [Setuptools][2]:package
