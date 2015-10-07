@@ -37,7 +37,7 @@ Support status:
 
   * ✔+ Partial native implementation completed by **BuildStack** – See Extended Feature for details
   * ✚ Implemented by **BuildStack**
-  * ✗ Not natively implemented
+  * ✗ Not native implementation
 
 Why, Oh Why?
 ------------
