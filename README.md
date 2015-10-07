@@ -28,15 +28,14 @@ The following [lifecycles](#glossary) are supported:
 | Stack | Setup | Get | Clean | Run | Test | Rel. | Ins. | Pub. | Unins. |
 |-------|-------|-----|-------|-----|------|------|------|------|--------|
 | [Setuptools][2] | ✚ | ✔ | ✔+ | ✔ | ✔+ | ✚ | ✔ | ✔+ | ✔ |
-| [Autotools][1] | ✗ | — | ✔+ | ✗ | ✔ | — | ✔ | — | ✔ |
-| [Ansible][5] | — | ✔+ | ✔ | ✔ | ✔ | — | — | — | — |
-| [Maven][3] | ✚ | ✔ | ✔ | — | ✔ | — | ✔ | ✔ | ✔ |
-| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | — | ✗ | ✔ | ✗ |
+| [Autotools][1] | ✗ | ✗ | ✔+ | ✗ | ✔ | ✗ | ✔ | ✗ | ✔ |
+| [Ansible][5] | ✗ | ✔+ | ✔ | ✔ | ✔ | ✗ | ✗ | ✗ | ✗ |
+| [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✔ | ✗ | ✔ | ✔ | ✔ |
+| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 
   * ✔+ Partial native implementation completed by **BuildStack** – See Extended Feature for details
   * ✚ Implemented by **BuildStack**
-  * ✘ Not natively implemented
-  * — Undefined
+  * ✗ Not natively implemented
 
 Why, Oh Why?
 ------------
