@@ -28,14 +28,14 @@ The following [lifecycles](#glossary) are supported:
 
 | Stack | Setup | Get | Clean | Run | Test | Rel. | Ins. | Pub. | Unins. |
 |-------|-------|-----|-------|-----|------|------|------|------|--------|
-| [Setuptools][2] | ✚ | ✔+ | ✔ | ✔ | ✔+ | ✔ | ✔ | ✔+ | ✔ |
+| [Setuptools][2] | ✚ | ✔ | ✔+ | ✔ | ✔+ | ✔ | ✔ | ✔+ | ✔ |
 | [Autotools][1] | ✗ | — | ✔+ | ✗ | ✔ | ✗ | ✔ | — | ✔ |
 | [Ansible][5] | — | ✔+ | ✔ | ✔ | ✔ | — | — | — | — |
 | [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✔ | ✗ | ✔ | ✔ | ✔ |
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 
   * ✚ Not natively supported but implemented by buildstack
-  * ✔+ Partial native support completed by buildstack
+  * ✔+ Partial native support completed by buildstack – See Extended Feature for details
   * ✘ Not natively supported
   * — Undefined
 
@@ -51,9 +51,11 @@ No question asked and no need to lookup documentation.
 	$ build -C $FOO clean test # automatically triggers 'compile'
 
 
-Extra Features
---------------
+Extended Features
+-----------------
 
+  * [Autotools][1]:clean – Remove all lingering files
+  * [Setuptools][2]:clean – Remove all lingering files
   * [Setuptools][2]:package
     * use `build package:pkg` to build native OS/X packages (on an OS/X platform.)
     * use `build package:deb` to build debian packages (on a debian platform.)
