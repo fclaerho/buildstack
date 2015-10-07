@@ -92,7 +92,7 @@ To uninstall:
 Configuration
 -------------
 
-Create the file `~/buildstack.json` to customize each command executed by `build`:
+Create the file `~/buildstack.json` to customize any executed command:
 
   * `before`: run commands before
   * `after`: run commands after
