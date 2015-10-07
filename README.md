@@ -32,9 +32,9 @@ The following [lifecycles](#glossary) are supported:
 | Stack | Setup | Get | Clean | Run | Rel. | Ins. | Pub. | Unins. |
 |-------|-------|-----|-------|-----|------|------|------|--------|
 | [Setuptools][2] | ✚ | ✔+ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| [Autotools][1] | ✘ | ✘ | ✔+ | ✘ | ✘ | ✔ | ✘ | ✔ |
-| [Maven][3] | ✚ | ✔ | ✔ | ✘ | ✘ | ✔ | ✔ | ✔ |
-| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✘ | ✘ | ✔ | ✘ |
+| [Autotools][1] | ✗ | ✗ | ✔+ | ✗ | ✗ | ✔ | ✗ | ✔ |
+| [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✗ | ✔ | ✔ | ✔ |
+| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 | [Ansible][5] |
 
   * ✚ Not natively supported but implemented by buildstack
