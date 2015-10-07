@@ -1,8 +1,4 @@
 
-**NOTICE!
-This tool is stable for the use cases it covers but it does not cover all major use cases yet.
-So far you can build [Autotools][1], [Setuptools][2], [Maven][3], [Cargo][4] and [Ansible][5]-based projects.**
-
 **BuildStack** is a wrapper around build tools and their ecosystem:
 its goal is to abstract the build process of any source code repository
 by driving the underlying build stack through [well-known targets](#glossary).
@@ -24,24 +20,24 @@ The following [lifecycles](#glossary) are supported:
   * **`get`**
   * **`clean`**
   * **`run`** > `compile`
+  * **`test`** > `compile`
   * **`release`** > `test` > `compile`
   * **`install`** > `package` > `test` > `compile`
   * **`publish`** > `package` > `test` > `compile`
   * **`uninstall`**
 
-| Stack | Setup | Get | Clean | Run | Rel. | Ins. | Pub. | Unins. |
-|-------|-------|-----|-------|-----|------|------|------|--------|
-| [Setuptools][2] | ✚ | ✔+ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| [Autotools][1] | ✗ | ✗ | ✔+ | ✗ | ✗ | ✔ | ✗ | ✔ |
-| [Ansible][5] | — | ✔ | ✔ | ✔ | — | — | — | — |
-| [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✗ | ✔ | ✔ | ✔ |
-| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
-
+| Stack | Setup | Get | Clean | Run | Test | Rel. | Ins. | Pub. | Unins. |
+|-------|-------|-----|-------|-----|------|------|------|------|--------|
+| [Setuptools][2] | ✚ | ✔+ | ✔ | ✔ | ✔+ | ✔ | ✔ | ✔+ | ✔ |
+| [Autotools][1] | ✗ | ✗ | ✔+ | ✗ | ✔ | ✗ | ✔ | ✗ | ✔ |
+| [Ansible][5] | — | ✔+ | ✔ | ✔ | ✔ | — | — | — | — |
+| [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✔ | ✗ | ✔ | ✔ | ✔ |
+| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 
   * ✚ Not natively supported but implemented by buildstack
-  * ✔+ Partial native implementation completed by buildstack
+  * ✔+ Partial native support, completed by buildstack
   * ✘ Not natively supported
-  * — Irrelevant
+  * — Undefined
 
 Why, Oh Why?
 ------------
