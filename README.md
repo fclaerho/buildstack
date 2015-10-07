@@ -244,7 +244,11 @@ Build Engineering 101
     For instance, the source files from which an object file is compiled.
   * **Well-known Build Target**:
     Abstract build target supported by most build tools: clean, compile, test, package, install, publish.
-  * **Incremental Build**: Build stack ability to only update the targets that need to.
+  * **Incremental Build**:
+    Build stack ability to only update the targets that need to.
+    Two strategies are used: timestamp (fast, but not necessarily reliable) and hash (slow but reliable.)
+    For instance [Make][8] uses timestamps:
+    if a target timestamp is older than its sources, it has to be updated.
   * **Lifecycle**:
     Logical sequence of build targets such that invoking one implies its predecessors.
     Lifecycles make more sense if the build stack supports incremental builds.
