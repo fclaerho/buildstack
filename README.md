@@ -36,6 +36,7 @@ Support status:
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 
   * ✔+ Partial native implementation completed by **BuildStack** – See Extended Feature for details
+  * ✔ Native implementation driven by **BuildStack**
   * ✚ Implemented by **BuildStack**
   * ✗ No native implementation
 
