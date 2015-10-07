@@ -20,7 +20,6 @@ The following [lifecycles](#glossary) are supported:
   * **`get`**
   * **`clean`**
   * **`run`** > `compile`
-  * **`test`** > `compile`
   * **`release`** > `test` > `compile`
   * **`install`** > `package` > `test` > `compile`
   * **`publish`** > `package` > `test` > `compile`
