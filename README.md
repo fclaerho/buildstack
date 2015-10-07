@@ -29,6 +29,14 @@ The following [lifecycles](#glossary) are supported:
   * **`publish`** > `package` > `test` > `compile`
   * **`uninstall`**
 
+| Stack | Setup | Get | Clean | Run | Rel. | Ins. | Pub. | Unins. |
+|-------|-------|-----|-------|-----|------|------|------|--------|
+| Setuptools | ✔! | ✔+ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Maven | ✔ | ✔ | ✔ | ✘ | ✘ | ✔ | ✔ | ✔ |
+
+  * ✔! Implemented by buildstack
+  * ✔+ Natively supported and completed by buildstack
+  * ✘ Not supported
 
 Why, Oh Why?
 ------------
@@ -77,10 +85,6 @@ Installation
 ------------
 
 	$ pip install --user buildstack
-
-or, if the PyPI repository is not available:
-
-	$ pip install --user git+https://github.com/fclaerho/buildstack.git
 
 To uninstall:
 
