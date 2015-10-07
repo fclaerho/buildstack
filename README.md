@@ -33,8 +33,8 @@ The following [lifecycles](#glossary) are supported:
 | [Maven][3] | ✚ | ✔ | ✔ | — | ✔ | — | ✔ | ✔ | ✔ |
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | — | ✗ | ✔ | ✗ |
 
-  * ✔+ Partial native implementation completed by buildstack – See Extended Feature for details
-  * ✚ Implemented by buildstack
+  * ✔+ Partial native implementation completed by **BuildStack** – See Extended Feature for details
+  * ✚ Implemented by **BuildStack**
   * ✘ Not natively implemented
   * — Undefined
 
