@@ -31,15 +31,15 @@ The following [lifecycles](#glossary) are supported:
 
 | Stack | Setup | Get | Clean | Run | Rel. | Ins. | Pub. | Unins. |
 |-------|-------|-----|-------|-----|------|------|------|--------|
-| [Setuptools][2] | ✔! | ✔+ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| [Setuptools][2] | ✚ | ✔+ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | [Autotools][1] | ✘ | ✘ | ✔+ | ✘ | ✘ | ✔ | ✘ | ✔ |
 | [Maven][3] | ✔ | ✔ | ✔ | ✘ | ✘ | ✔ | ✔ | ✔ |
-| [Cargo][4] | ✔! | ✔ | ✔ | ✔ | ✘ | ✘ | ✔ | ✘ |
+| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✘ | ✘ | ✔ | ✘ |
 | [Ansible][5] |
 
-  * ✔! Implemented by buildstack
+  * ✚ Not natively supported but implemented by buildstack
   * ✔+ Partial native implementation completed by buildstack
-  * ✘ Not supported
+  * ✘ Not natively supported
 
 Why, Oh Why?
 ------------
