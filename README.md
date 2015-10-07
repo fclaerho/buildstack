@@ -246,7 +246,9 @@ Build Engineering 101
     Abstract build target supported by most build tools: clean, compile, test, package, install, publish.
   * **Incremental Build**:
     Build stack ability to only update the targets that need to.
-    Two strategies are used: timestamp (fast, but not necessarily reliable) and hash (slow but reliable.)
+    Two strategies are used:
+    _timestamp-based_ (fast but not always reliable)
+    or _hash-based_ (slow but reliable.)
     For instance [Make][8] uses timestamps:
     if a target timestamp is older than its sources, it has to be updated.
   * **Lifecycle**:
