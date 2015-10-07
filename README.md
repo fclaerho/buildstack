@@ -232,11 +232,8 @@ Build Engineering 101
 
   * **Build Manifest**:
     Build stack input file.
-    For non-exotic projects and types 4+ build stacks, the following information is sufficient:
-      * a project name
-      * a version
-      * a type (library or executable)
-      * an entry point for an executable.
+    For non-exotic projects and types 4+ build stacks, few things are needed:
+    a project name, a version, a type (library or executable) and an entry point for an executable.
     For lower types of build stack, the build manifest might contain the entire dependency graph.
   * **Build Target**:
     Abstract or concrete state to reach.
