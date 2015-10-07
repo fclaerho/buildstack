@@ -35,7 +35,7 @@ The following [lifecycles](#glossary) are supported:
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 
   * ✚ Not natively supported but implemented by buildstack
-  * ✔+ Partial native support, completed by buildstack
+  * ✔+ Partial native support completed by buildstack
   * ✘ Not natively supported
   * — Undefined
 
@@ -54,14 +54,7 @@ No question asked and no need to lookup documentation.
 Extra Features
 --------------
 
-  * [Lifecycles](#glossary) support.
-  * Instantiate tool configuration templates, see `build setup help`.
-  * [Autotools][1]:
-    * better `clean` (remove lingering generated files)
-  * [Setuptools][2]:
-    * better `clean` (remove lingering generated files)
-    * support the `run` target: fetch and run entry points from the manifest
-    * support the `release` target
+  * [Setuptools][2]:package
     * use `build package:pkg` to build native OS/X packages (on an OS/X platform.)
     * use `build package:deb` to build debian packages (on a debian platform.)
       Install the following tools beforehand:
@@ -71,9 +64,9 @@ Extra Features
 			$ sudo apt-get update
 			$ sudo apt-get install debhelper dh-virtualenv
 
-    * on testing,
-      if `nose2.cfg` is present and setup.py does not use it,
-      the original setup.py will be backed up and a new one will be generated to call nose2.
+  * [Setuptools][2]:test,
+    if `nose2.cfg` is present and setup.py does not use it,
+    the original setup.py will be backed up and a new one will be generated to call nose2.
 
 
 Pre-requisites
