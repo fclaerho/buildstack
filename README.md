@@ -38,7 +38,7 @@ The following [lifecycles](#glossary) are supported:
 | [Ansible][5] |
 
   * ✔! Implemented by buildstack
-  * ✔+ Natively supported and completed by buildstack
+  * ✔+ Partial native implementation completed by buildstack
   * ✘ Not supported
 
 Why, Oh Why?
