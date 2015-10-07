@@ -35,7 +35,7 @@ Support status:
 | [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✔ | ✗ | ✔ | ✔ | ✔ |
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 
-  * ✔+ Partial native implementation completed by **BuildStack** – See Extended Feature for details
+  * ✔+ Partial native implementation extended by **BuildStack** – See Extended Feature for details
   * ✔ Native implementation driven by **BuildStack**
   * ✚ Implemented by **BuildStack**
   * ✗ No native implementation
