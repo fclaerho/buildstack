@@ -281,7 +281,8 @@ For non-exotic projects you should have very little to provide to get a working 
 
 From a development standpoint, how to choose a stack? it's easy:
   1. If there is a **standard build stack**, then however bad it is, use it, and request improvements
-  2. If there is no standard build stack, then pick the **highest type** available according to the above taxonomy.
+  2. If there is no standard build stack but build stacks are available, then pick the **highest type** available according to the above taxonomy.
+  3. If there is no build stack, you can still fallback on a generic one, like [Make][8].
 
 Keep in mind that anything below type 4 will slow the project at some point:
   * either because it will break easily as soon as the source project is slightly reorganized
