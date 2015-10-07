@@ -25,6 +25,8 @@ The following [lifecycles](#glossary) are supported:
   * **`publish`** > `package` > `test` > `compile`
   * **`uninstall`**
 
+Support status:
+
 | Stack | Setup | Get | Clean | Run | Test | Rel. | Ins. | Pub. | Unins. |
 |-------|-------|-----|-------|-----|------|------|------|------|--------|
 | [Setuptools][2] | ✚ | ✔ | ✔+ | ✔ | ✔+ | ✚ | ✔ | ✔+ | ✔ |
