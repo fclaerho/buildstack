@@ -35,7 +35,7 @@ The following [lifecycles](#glossary) are supported:
 | [Autotools][1] | ✗ | ✗ | ✔+ | ✗ | ✗ | ✔ | ✗ | ✔ |
 | [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✗ | ✔ | ✔ | ✔ |
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
-| [Ansible][5] |
+| [Ansible][5] | — | ✔ | ✔ | ✔ | — | – | – | – |
 
   * ✚ Not natively supported but implemented by buildstack
   * ✔+ Partial native implementation completed by buildstack
