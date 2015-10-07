@@ -230,6 +230,14 @@ Build Engineering 101
 <a id="glossary"></a>
 ### GLOSSARY
 
+  * **Build Manifest**:
+    Build stack input file.
+    For non-exotic projects and types 4+ build stacks, the following information is sufficient:
+      * a project name
+      * a version
+      * a type (library or executable)
+      * an entry point for an executable.
+    For lower types of build stack, the build manifest might contain the entire dependency graph.
   * **Build Target**:
     Abstract or concrete state to reach.
     Concrete build targets are generally platform objects such as files;
@@ -239,9 +247,11 @@ Build Engineering 101
     For instance, the source files from which an object file is compiled.
   * **Well-known Build Target**:
     Abstract build target supported by most build tools: clean, compile, test, package, install, publish.
+  * **Incremental Build**: Build stack ability to only update the targets that need to.
   * **Lifecycle**:
     Logical sequence of build targets such that invoking one implies its predecessors.
-    See [Maven Lifecycles][7] for details.
+    Lifecycles make more sense if the build stack supports incremental builds.
+    See [Maven Lifecycles][7] for an example of implementation.
 
 ### BUILD STACKS TAXONOMY
 
@@ -271,11 +281,6 @@ DSL are far more safe, but they can still be misused, so types 3 are not bullet-
 Types 4 and 5 enforce configuration and convention over programming.
 The canonical example of types 5 is [Maven][3].
 Such a build stack knows what and how to build, assuming your provide the bootstrap information.
-For non-exotic projects you should have very little to provide to get a working build stack:
-  * a project name
-  * a version
-  * a type (library or executable)
-  * an entry point for an executable.
 
 ### CHOOSING A BUILD STACK
 
