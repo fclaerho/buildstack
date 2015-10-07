@@ -28,10 +28,10 @@ The following [lifecycles](#glossary) are supported:
 | Stack | Setup | Get | Clean | Run | Test | Rel. | Ins. | Pub. | Unins. |
 |-------|-------|-----|-------|-----|------|------|------|------|--------|
 | [Setuptools][2] | ✚ | ✔ | ✔+ | ✔ | ✔+ | ✚ | ✔ | ✔+ | ✔ |
-| [Autotools][1] | ✗ | — | ✔+ | ✗ | ✔ | ✗ | ✔ | — | ✔ |
+| [Autotools][1] | ✗ | — | ✔+ | ✗ | ✔ | — | ✔ | — | ✔ |
 | [Ansible][5] | — | ✔+ | ✔ | ✔ | ✔ | — | — | — | — |
-| [Maven][3] | ✚ | ✔ | ✔ | — | ✔ | ✗ | ✔ | ✔ | ✔ |
-| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
+| [Maven][3] | ✚ | ✔ | ✔ | — | ✔ | — | ✔ | ✔ | ✔ |
+| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | — | ✗ | ✔ | ✗ |
 
   * ✔+ Partial native support completed by buildstack – See Extended Feature for details
   * ✚ Not natively supported but implemented by buildstack
