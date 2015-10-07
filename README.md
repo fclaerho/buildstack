@@ -34,7 +34,7 @@ The following [lifecycles](#glossary) are supported:
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | — | ✗ | ✔ | ✗ |
 
   * ✔+ Partial native implementation completed by buildstack – See Extended Feature for details
-  * ✚ Not natively implemented but done by buildstack
+  * ✚ Implemented by buildstack
   * ✘ Not natively implemented
   * — Undefined
 
