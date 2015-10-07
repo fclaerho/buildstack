@@ -31,7 +31,7 @@ The following [lifecycles](#glossary) are supported:
 | [Setuptools][2] | ✚ | ✔ | ✔+ | ✔ | ✔+ | ✔ | ✔ | ✔+ | ✔ |
 | [Autotools][1] | ✗ | — | ✔+ | ✗ | ✔ | ✗ | ✔ | — | ✔ |
 | [Ansible][5] | — | ✔+ | ✔ | ✔ | ✔ | — | — | — | — |
-| [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✔ | ✗ | ✔ | ✔ | ✔ |
+| [Maven][3] | ✚ | ✔ | ✔ | — | ✔ | ✗ | ✔ | ✔ | ✔ |
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
 
   * ✔+ Partial native support completed by buildstack – See Extended Feature for details
@@ -54,7 +54,6 @@ No question asked and no need to lookup documentation.
 Extended Features
 -----------------
 
-  * [Autotools][1]:clean – Remove all lingering files
   * [Setuptools][2]:clean – Remove all lingering files
   * [Setuptools][2]:package
     * use `build package:pkg` to build native OS/X packages (on an OS/X platform.)
@@ -66,9 +65,11 @@ Extended Features
 			$ sudo apt-get update
 			$ sudo apt-get install debhelper dh-virtualenv
 
-  * [Setuptools][2]:test,
+  * [Setuptools][2]:test –
     if `nose2.cfg` is present and setup.py does not use it,
     the original setup.py will be backed up and a new one will be generated to call nose2.
+  * [Autotools][1]:clean – Remove all lingering files
+  * [Ansible][5]:clean – Remove all lingering files
 
 
 Pre-requisites
