@@ -27,7 +27,7 @@ The following [lifecycles](#glossary) are supported:
 
 | Stack | Setup | Get | Clean | Run | Test | Rel. | Ins. | Pub. | Unins. |
 |-------|-------|-----|-------|-----|------|------|------|------|--------|
-| [Setuptools][2] | ✚ | ✔ | ✔+ | ✔ | ✔+ | ✔ | ✔ | ✔+ | ✔ |
+| [Setuptools][2] | ✚ | ✔ | ✔+ | ✔ | ✔+ | ✚ | ✔ | ✔+ | ✔ |
 | [Autotools][1] | ✗ | — | ✔+ | ✗ | ✔ | ✗ | ✔ | — | ✔ |
 | [Ansible][5] | — | ✔+ | ✔ | ✔ | ✔ | — | — | — | — |
 | [Maven][3] | ✚ | ✔ | ✔ | — | ✔ | ✗ | ✔ | ✔ | ✔ |
