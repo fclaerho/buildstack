@@ -240,7 +240,7 @@ Build Engineering 101
   * **Well-known Build Target**:
     Abstract build target supported by most build tools: clean, compile, test, package, install, publish.
   * **Lifecycle**:
-    Logical sequence of build target such that invoking one implies its predecessors.
+    Logical sequence of build targets such that invoking one implies its predecessors.
     See [Maven Lifecycles][7] for details.
 
 ### BUILD STACKS TAXONOMY
