@@ -33,9 +33,9 @@ The following [lifecycles](#glossary) are supported:
 | [Maven][3] | ✚ | ✔ | ✔ | — | ✔ | — | ✔ | ✔ | ✔ |
 | [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | — | ✗ | ✔ | ✗ |
 
-  * ✔+ Partial native support completed by buildstack – See Extended Feature for details
-  * ✚ Not natively supported but implemented by buildstack
-  * ✘ Not natively supported
+  * ✔+ Partial native implementation completed by buildstack – See Extended Feature for details
+  * ✚ Not natively implemented but done by buildstack
+  * ✘ Not natively implemented
   * — Undefined
 
 Why, Oh Why?
