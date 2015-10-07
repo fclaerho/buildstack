@@ -250,7 +250,7 @@ Build Engineering 101
     _timestamp-based_ (fast but not always reliable)
     or _hash-based_ (slow but reliable.)
     For instance [Make][8] uses timestamps:
-    if a target timestamp is older than its sources, it has to be updated.
+    if a target is older than its sources, it has to be updated.
   * **Lifecycle**:
     Logical sequence of build targets such that invoking one implies its predecessors.
     Lifecycles make more sense if the build stack supports incremental builds.
