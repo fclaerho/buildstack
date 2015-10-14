@@ -266,19 +266,22 @@ Build stacks can be divided into 5 types:
   * Type 2: **Build framework** — Dependency graph manager + Type 1 features
   * Type 3: **Build DSL** (over a type 2)
   * Type 4: **Build Programmable Configuration**
-  * Type 5: **Build Configuration**, the current state of the art (back to .ini files!)
+  * Type 5: **Build Configuration**, the current state of the art
 
-For types 1 and 2,
-the build manifest is actually a program.
+For types 1 and 2, the build manifest is actually a program.
 It is generally written in the language for which the build stack was designed, but not necessarily.
-This means it has to be created and maintained by developers who must have a solid knowledge of build engineering.
-If this not the case, the result is an overly custom build system that is neither learnable nor maintainable.
-Enforcing the usage of a dependency graph, which is the core of any proper build system, can only be done from types 2.
+This means it has to be created and maintained by developers
+who must have a solid knowledge of build engineering.
+If this not the case,
+the result is an overly custom build system that is neither learnable nor maintainable.
+Enforcing the usage of a dependency graph, which is the core of any proper build system,
+can only be done from types 2.
 For this reason, types 1 are to be avoided at all costs for the sanity of the technical teams.
 
 Avoiding having developers design the build system can only be done from types 3.
 The canonical example of types 3 is [Make][8].
-The build manifest can be written by build engineers in a DSL allowing to specify the dependency graph and how to walk it.
+The build manifest can be written by build engineers in a DSL
+allowing to specify the dependency graph and how to walk it.
 DSL are far more safe, but they can still be misused, so types 3 are not bullet-proof.
 
 Types 4 and 5 enforce configuration and convention over programming.
