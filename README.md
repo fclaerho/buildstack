@@ -19,10 +19,10 @@ The following [well-known targets](#glossary) are supported:
 The following [lifecycles](#glossary) are supported:
   * **`get`**
   * **`clean`**
-  * **`run`** > `compile`
-  * **`release`** > `test` > `compile`
-  * **`install`** > `package` > `test` > `compile`
-  * **`publish`** > `package` > `test` > `compile`
+  * **`run`** < `compile`
+  * **`release`** < `test` < `compile`
+  * **`install`** < `package` < `test` < `compile`
+  * **`publish`** < `package` < `test` < `compile`
   * **`uninstall`**
 
 Support status:
