@@ -253,7 +253,9 @@ Build Engineering 101
     if a target is older than its sources, it has to be updated.
   * **Lifecycle**:
     Logical sequence of build targets such that invoking one implies its predecessors.
-    Lifecycles make more sense if the build stack supports incremental builds.
+    Lifecycles make more 'sense' if the build stack supports incremental builds:
+    otherwise if two lifecycles having common targets are called,
+    those common targets will be build twice.
     See [Maven Lifecycles][7] for an example of implementation.
 
 ### BUILD STACKS TAXONOMY
