@@ -27,13 +27,14 @@ The following [lifecycles](#glossary) are supported:
 
 Support status:
 
-| Stack | Setup | Get | Clean | Run | Test | Rel. | Ins. | Pub. | Unins. |
-|-------|-------|-----|-------|-----|------|------|------|------|--------|
-| [Setuptools][2] | ✚ | ✔ | ✔+ | ✔ | ✔+ | ✚ | ✔ | ✔+ | ✔ |
-| [Autotools][1] | ✗ | ✗ | ✔+ | ✗ | ✔ | ✗ | ✔ | ✗ | ✔ |
-| [Ansible][5] | ✗ | ✔+ | ✔ | ✔ | ✔ | ✗ | ✗ | ✗ | ✗ |
-| [Maven][3] | ✚ | ✔ | ✔ | ✗ | ✔ | ✗ | ✔ | ✔ | ✔ |
-| [Cargo][4] | ✚ | ✔ | ✔ | ✔ | ✔ | ✗ | ✗ | ✔ | ✗ |
+| Stack                  | Setup | Get | Clean | Run | Test | Rel | Ins | Pub | Unins |
+|------------------------|-------|-----|-------|-----|------|-----|-----|-----|-------|
+| [Ansible-universe][14] | ✗     | ✗   | ✔     | ✗   | ✔   | ✔   | -   | ✔   | -     |
+| [Setuptools][2]        | ✚     | ✔  | ✔+    | ✔   | ✔+  | ✚   | ✔   | ✔+ | ✔     |
+| [Autotools][1]         | ✗     | ✗   | ✔+    | ✗   | ✔   | ✗    | ✔   | ✗  | ✔     |
+| [Ansible][5]           | ✗     | ✔+ | ✔     | ✔   | ✔   | ✗    | ✗   | ✗   | ✗     |
+| [Maven][3]             | ✚     | ✔  | ✔     | ✗   | ✔   | ✗    | ✔   | ✔  | ✔     |
+| [Cargo][4]             | ✚     | ✔  | ✔     | ✔   | ✔   | ✗   | ✗    | ✔  | ✗     |
 
   * ✔+ Partial native implementation extended by **BuildStack** – See Extended Targets for details
   * ✔ Native implementation driven by **BuildStack**
@@ -308,6 +309,7 @@ Keep in mind that anything below type 4 will slow the project at some point:
 
 | Type | Name | Build Manifest Format |
 |------|------|-----------------------|
+| 5 | [Ansible-universe][14] | YAML |
 | 5 | [Maven][3] | XML |
 | 5 | [Cargo][4] | ini |
 | 4 | [Setuptools][2] | Python Call |
@@ -328,4 +330,5 @@ Keep in mind that anything below type 4 will slow the project at some point:
 [11]: https://en.wikipedia.org/wiki/Software_developer
 [12]: https://www.docker.com
 [13]: https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
+[14]: https://github.com/fclaerho/ansible-universe
 

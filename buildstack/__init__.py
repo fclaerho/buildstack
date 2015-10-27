@@ -76,6 +76,7 @@ MANIFESTS = tuple(dict({"name": name}, **__import__(name, globals()).MANIFEST) f
 	"setuptools",
 	"stack",
 	"tup",
+	"universe",
 	"vagrant"))
 
 class Error(fckit.Error): pass
