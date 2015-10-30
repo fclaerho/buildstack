@@ -231,7 +231,7 @@ Appendix: Build Engineering 101
 <a id="glossary"></a>
 ### GLOSSARY
 
-  * **Build Tool**, See [15]
+  * **Build Tool**, See [Wikipedia][15]
   * **Build Manifest**:
     Build stack input file.
     For non-exotic projects and types 4+ build stacks, few things are needed:
