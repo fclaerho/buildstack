@@ -29,17 +29,17 @@ Support status:
 
 | Stack                  | Setup | Get | Clean | Run | Test | Rel | Ins | Pub | Unins |
 |------------------------|-------|-----|-------|-----|------|-----|-----|-----|-------|
-| [Ansible-universe][14] | ✗     | ✗   | ✔     | ✗   | ✔   | ✔   | -   | ✔   | -     |
-| [Setuptools][2]        | ✚     | ✔  | ✔+    | ✔   | ✔+  | ✚   | ✔   | ✔+ | ✔     |
-| [Autotools][1]         | ✗     | ✗   | ✔+    | ✗   | ✔   | ✗    | ✔   | ✗  | ✔     |
-| [Ansible][5]           | ✗     | ✔+ | ✔     | ✔   | ✔   | ✗    | ✗   | ✗   | ✗     |
-| [Maven][3]             | ✚     | ✔  | ✔     | ✗   | ✔   | ✗    | ✔   | ✔  | ✔     |
-| [Cargo][4]             | ✚     | ✔  | ✔     | ✔   | ✔   | ✗   | ✗    | ✔  | ✗     |
+| [Ansible-universe][14] | -     | -   | ✔     | -   | ✔   | ✔   | -   | ✔   | -     |
+| [Setuptools][2]        | ✚     | ✔   | ✔+    | ✔   | ✔+  | ✚   | ✔   | ✔+ | ✔     |
+| [Autotools][1]         | -     | -   | ✔+    | -   | ✔   | -    | ✔   | -  | ✔     |
+| [Ansible][5]           | -     | ✔+ | ✔     | ✔   | ✔   | -    | -   | -   | -     |
+| [Maven][3]             | ✚     | ✔  | ✔     | -   | ✔   | -    | ✔   | ✔  | ✔     |
+| [Cargo][4]             | ✚     | ✔  | ✔     | ✔   | ✔   | -   | -    | ✔  | -     |
 
   * ✔+ Partial native implementation extended by **BuildStack** – See Extended Targets for details
   * ✔ Native implementation driven by **BuildStack**
   * ✚ Implemented by **BuildStack**
-  * ✗ No native implementation
+  * - No native implementation
 
 Why, Oh Why?
 ------------
@@ -231,6 +231,7 @@ Appendix: Build Engineering 101
 <a id="glossary"></a>
 ### GLOSSARY
 
+  * **Build Tool**, See [15]
   * **Build Manifest**:
     Build stack input file.
     For non-exotic projects and types 4+ build stacks, few things are needed:
@@ -331,4 +332,4 @@ Keep in mind that anything below type 4 will slow the project at some point:
 [12]: https://www.docker.com
 [13]: https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
 [14]: https://github.com/fclaerho/ansible-universe
-
+[15]: https://en.wikipedia.org/wiki/Build_automation
