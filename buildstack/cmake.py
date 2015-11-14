@@ -5,4 +5,3 @@
 MANIFEST = {
 	"filenames": ("CMakeLists",),
 }
-

@@ -10,7 +10,7 @@ requirements = (
 
 setuptools.setup(
 	name = "buildstack", # https://www.python.org/dev/peps/pep-0426/#name
-	version = "6.2.1", # https://www.python.org/dev/peps/pep-0440/
+	version = "6.3.0", # https://www.python.org/dev/peps/pep-0440/
 	packages = ["buildstack"], # https://pythonhosted.org/setuptools/setuptools.html#using-find-packages
 	description = "Build stack wrapper",
 	#long_description = "",
